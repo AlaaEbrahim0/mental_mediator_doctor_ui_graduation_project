@@ -4,7 +4,6 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { useAuth } from "../../auth/authProvider";
 import { useNavigate } from "react-router-dom";
 import { useSignIn } from "../../api/auth/signIn";
-import { useState } from "react";
 
 const validate = (values) => {
     const errors = {};
@@ -55,7 +54,6 @@ const FormField = ({
 export const LoginForm = () => {
     const { setToken } = useAuth();
     const navigate = useNavigate();
-    const [passwordVisible, setPasswordVisibility] = useState;
 
     const { isLoading, error, execute } = useSignIn();
 
@@ -115,7 +113,7 @@ export const LoginForm = () => {
                                 Remember me
                             </span>
                         </label>
-                        <a className="text-primary font-semibold" href="#">
+                    <a className="text-primary font-semibold" href="#">6=
                             Forget Your Password
                         </a>
                     </div>

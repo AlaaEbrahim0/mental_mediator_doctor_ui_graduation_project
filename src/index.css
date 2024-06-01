@@ -3,6 +3,10 @@
 @tailwind utilities;
 @import url("https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Questrial&display=swap");
 
+html,
+:host {
+    -webkit-text-size-adjust: 100%;
+}
 body {
     font-family: "Questrial", sans-serif;
     margin: 0;

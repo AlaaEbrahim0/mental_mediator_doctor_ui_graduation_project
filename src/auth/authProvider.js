@@ -4,13 +4,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    // State to hold the authentication token
-    const [token, setToken_] = useState(localStorage.getItem("token"));
-
-    // Function to set the authentication token
-    const setToken = (newToken) => {
-        setToken_(newToken);
-    };
+    // State to hold the authentication token and user data
+    const [token, setToken] = useState(localStorage.getItem("token"));
+    const [userData, setUserData] = useState(
+        JSON.parse(localStorage.getItem("userData"))
+    );
 
     useEffect(() => {
         if (token) {
@@ -22,13 +20,21 @@ const AuthProvider = ({ children }) => {
         }
     }, [token]);
 
+    // Function to update user data in localStorage
+    const updateUserData = (newUserData) => {
+        localStorage.setItem("userData", JSON.stringify(newUserData));
+        setUserData(newUserData);
+    };
+
     // Memoized value of the authentication context
     const contextValue = useMemo(
         () => ({
             token,
             setToken,
+            userData,
+            updateUserData,
         }),
-        [token]
+        [token, userData]
     );
 
     // Provide the authentication context to the children components

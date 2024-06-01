@@ -9,29 +9,21 @@ import { MainLayout } from "../components/layout/MainLayout";
 import { Home } from "../pages/Home";
 import { Appointments } from "../pages/Home";
 import { Login } from "../auth/login";
-import { Confessions } from "../pages/Confessions";
+import { Posts } from "../pages/Posts";
+import { ProtectedRoute } from "../routes/ProtectedRoute";
+import { Logout } from "../auth/logout";
 // import { Schedule } from "../pages/Schedule";
 // import { Confessions } from "../pages/Confessions";
 // import { Settings } from "../pages/Settings";
-
-export const ProtectedRoute = () => {
-    const { token } = useAuth();
-
-    if (!token) {
-        return <Navigate to="/login" />;
-    }
-
-    return <Outlet />;
-};
 
 const Routes = () => {
     const { token } = useAuth();
 
     const routesForPublic = [
-        {
-            path: "/login",
-            element: <Login />,
-        },
+        // {
+        //     path: "/login",
+        //     element: <Login />,
+        // },
     ];
 
     const routesForAuthenticatedOnly = [
@@ -46,9 +38,9 @@ const Routes = () => {
                         { path: "/", element: <Home /> },
                         { path: "appointments", element: <Appointments /> },
                         // { path: "schedule", element: <Schedule /> },
-                        { path: "confessions", element: <Confessions /> },
+                        { path: "confessions", element: <Posts /> },
                         // { path: "settings", element: <Settings /> },
-                        { path: "logout", element: <Login /> },
+                        { path: "logout", element: <Logout /> },
                     ],
                 },
             ],
