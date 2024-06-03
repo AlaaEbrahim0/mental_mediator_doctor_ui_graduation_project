@@ -259,7 +259,7 @@ export const Post = ({
                     onChange={handleCommentChange}
                     rows={4}
                     placeholder="Add a comment..."
-                    className="input input-bordered w-full mb-2"
+                    className="textarea textarea-bordered textarea-md md:textarea-lg w-full mb-2"
                     disabled={isCreateLoading}
                 />
                 <div className="flex flex-row items-center justify-between mt-1">

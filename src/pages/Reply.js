@@ -75,7 +75,7 @@ export const Reply = ({
 
     return (
         <div className="flex flex-col shadow-md rounded-lg mt-3 w-full p-2 md:p-4 border-base-300 border-2">
-            <div className="info flex flex-row">
+            <div className="info flex flex-col">
                 <div className="flex flex-row flex-grow">
                     <img
                         className="w-8 h-8 md:w-16 md:h-16 rounded-2xl shadow-lg"
@@ -89,28 +89,6 @@ export const Reply = ({
                         <p className="text-xs md:text-md text-info">
                             {repliedAt}
                         </p>
-                        <div className="my-1 w-full">
-                            {isEditing ? (
-                                <div className="flex flex-row items-center gap-2 md:text-xl">
-                                    <input
-                                        type="text"
-                                        value={tempReplyText}
-                                        onChange={handleReplyChange}
-                                        className="input input-bordered w-full"
-                                    />
-                                    <button onClick={handleSaveEdit}>
-                                        <MdOutlineDoneOutline className="text-success" />
-                                    </button>
-                                    <button onClick={toggleEdit}>
-                                        <IoIosCloseCircleOutline className="text-error" />
-                                    </button>
-                                </div>
-                            ) : (
-                                <p className="text-sm md:text-lg w-full break-all">
-                                    {replyText}
-                                </p>
-                            )}
-                        </div>
                     </div>
                     <div className="actions flex flex-row mt-2">
                         {userData?.userId === authorId && (
@@ -151,6 +129,30 @@ export const Reply = ({
                             </>
                         )}
                     </div>
+                </div>
+
+                <div className="my-1 p-2 w-full">
+                    {isEditing ? (
+                        <div className="flex flex-row items-center gap-2 md:text-xl">
+                            <textarea
+                                type="text"
+                                rows={2}
+                                value={tempReplyText}
+                                onChange={handleReplyChange}
+                                className="textarea textarea-xs md:textarea-lg textarea-bordered w-full"
+                            />
+                            <button onClick={handleSaveEdit}>
+                                <MdOutlineDoneOutline className="text-success" />
+                            </button>
+                            <button onClick={toggleEdit}>
+                                <IoIosCloseCircleOutline className="text-error" />
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="text-sm md:text-lg w-full break-all">
+                            {replyText}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

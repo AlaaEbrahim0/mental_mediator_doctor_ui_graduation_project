@@ -144,7 +144,7 @@ export const Comment = ({
 
     return (
         <div className="flex flex-col shadow-md rounded-lg mt-3 w-full px-2 py-4 md:p-4 glass">
-            <div className="info flex flex-row flex-1">
+            <div className="info flex flex-col flex-1">
                 <div className="flex flex-row flex-grow">
                     <img
                         className="w-8 h-8 md:w-16 md:h-16 object-cover rounded-2xl shadow-lg"
@@ -158,7 +158,7 @@ export const Comment = ({
                         <p className="text-xs md:text-md text-info">
                             {commentedAt}
                         </p>
-
+                        {/* 
                         <div className="my-1">
                             {isEditing ? (
                                 <div className="flex flex-col md:flex-row items-center gap-2 text-xl">
@@ -188,28 +188,8 @@ export const Comment = ({
                                     {commentText}
                                 </p>
                             )}
-                        </div>
-                        <div className="actions flex flex-row gap-x-2 mt-2">
-                            <></>
-                            <button
-                                className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
-                                onClick={toggleReplies}
-                                disabled={isRepliesLoading}
-                            >
-                                {isRepliesLoading && (
-                                    <span className="loading loading-spinner"></span>
-                                )}
-                                {showReplies ? "Hide Replies" : "Show Replies"}
-                            </button>
-                            <button
-                                className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
-                                onClick={scrollToAddReply}
-                            >
-                                Reply
-                            </button>
-                        </div>
+                        </div> */}
                     </div>
-
                     <div className="actions flex">
                         {authorId === userData.userId && (
                             <>
@@ -245,6 +225,57 @@ export const Comment = ({
                         />
                     </div>
                 </div>
+
+                <div className="my-1 p-2">
+                    {isEditing ? (
+                        <div className="flex flex-col md:flex-row items-center gap-2 text-xl">
+                            <textarea
+                                value={tempCommentText}
+                                rows={4}
+                                onChange={(e) =>
+                                    setTempCommentText(e.target.value)
+                                }
+                                className="textarea textarea-xs md:textarea-lg textarea-bordered w-full"
+                                disabled={
+                                    commentDeletionLoading ||
+                                    commentUpdateLoading
+                                }
+                            />
+                            <div className="flex gap-2">
+                                <button onClick={handleSaveEdit}>
+                                    <MdOutlineDoneOutline className="text-success" />
+                                </button>
+                                <button onClick={toggleEdit}>
+                                    <IoIosCloseCircleOutline className="text-error" />
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-sm md:text-lg break-all">
+                            {commentText}
+                        </p>
+                    )}
+                </div>
+
+                <div className="actions flex flex-row gap-x-2 mt-2">
+                    <></>
+                    <button
+                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
+                        onClick={toggleReplies}
+                        disabled={isRepliesLoading}
+                    >
+                        {isRepliesLoading && (
+                            <span className="loading loading-spinner"></span>
+                        )}
+                        {showReplies ? "Hide Replies" : "Show Replies"}
+                    </button>
+                    <button
+                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
+                        onClick={scrollToAddReply}
+                    >
+                        Reply
+                    </button>
+                </div>
             </div>
             {showReplies && (
                 <div className="mt-4">
@@ -277,8 +308,8 @@ export const Comment = ({
                         value={replyText}
                         onChange={handleReplyChange}
                         placeholder="Write your reply..."
-                        rows={2}
-                        className="textarea textarea-bordered w-full"
+                        rows={1}
+                        className="textarea textarea-xs md:textarea-lg textarea-bordered w-full"
                         disabled={isCreateLoading}
                     />
                     <button
