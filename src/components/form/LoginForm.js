@@ -128,11 +128,11 @@ export const LoginForm = () => {
                             "Login"
                         )}
                     </button>
-                    {/* <ul className="text-error">
+                    <ul className="text-error">
                         {error?.errors.map((error) => (
                             <li key={error.code}>{error.description}</li>
                         ))}
-                    </ul> */}
+                    </ul>
                 </Form>
             )}
         </Formik>
