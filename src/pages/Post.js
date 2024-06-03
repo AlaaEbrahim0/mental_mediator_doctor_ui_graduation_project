@@ -136,11 +136,11 @@ export const Post = ({
     };
 
     return (
-        <div className="flex flex-col mb-8 mt-4 mx-2 p-4 w-full glass shadow-md rounded-lg">
+        <div className="flex flex-col mb-8 mt-4 p-4 w-full glass shadow-md rounded-lg">
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
                     <img
-                        className="w-24 h-24 rounded-2xl shadow-md"
+                        className="w-12 h-12 md:w-24 md:h-24 rounded-2xl shadow-md"
                         src={image || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
@@ -153,8 +153,8 @@ export const Post = ({
                 </div>
 
                 <div className="dropdown dropdown-end">
-                    <div tabIndex={0} role="button" className="btn m-1">
-                        <HiOutlineMenu className="md:text-2xl" />
+                    <div tabIndex={0} role="button" className="md:btn m-1">
+                        <HiOutlineMenu className="text-md md:text-2xl" />
                     </div>
                     <ul
                         tabIndex={0}
@@ -212,10 +212,12 @@ export const Post = ({
                 className="w-full hover:cursor-pointer hover:"
                 to={`/forums/${id}`}
             >
-                <h1 className="text-2xl text-secondary font-semibold py-5">
+                <h1 className="text-sm sm:text-md md:text-2xl text-secondary font-semibold py-5 break-all">
                     {title}
                 </h1>
-                <p className="text-xl text-info-content">{content}</p>
+                <p className="text-sm md:text-xl text-info-content break-all">
+                    {content}
+                </p>
             </Link>
             {postPhoto && (
                 <img
@@ -251,17 +253,18 @@ export const Post = ({
             )}
 
             <div className="mt-4">
-                <input
+                <textarea
                     type="text"
                     value={commentText}
                     onChange={handleCommentChange}
+                    rows={4}
                     placeholder="Add a comment..."
                     className="input input-bordered w-full mb-2"
                     disabled={isCreateLoading}
                 />
                 <div className="flex flex-row items-center justify-between mt-1">
                     <button
-                        className="btn btn-sm btn-secondary btn-outline text-md max-w-52 relative"
+                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md max-w-52 relative"
                         onClick={toggleComments}
                         disabled={isCommentsLoading || commentCount === 0}
                     >
@@ -280,13 +283,13 @@ export const Post = ({
                             </>
                         )}
                         {commentCount > 0 && (
-                            <div className="badge badge-primary absolute -top-2 -right-2">
+                            <div className="badge badge-sm text-white badge-primary absolute -top-2 -right-2">
                                 {commentCount}
                             </div>
                         )}
                     </button>
                     <button
-                        className="btn btn-sm btn-primary btn-outline text-md max-w-52"
+                        className="btn btn-xs md:btn-sm btn-primary btn-outline text-md max-w-52"
                         onClick={handleAddComment}
                         disabled={isCreateLoading || !commentText}
                     >

@@ -46,7 +46,7 @@ export const UpdatePostModal = ({
     if (!isVisible) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-secondary bg-opacity-20">
+        <div className="fixed inset-0 flex items-center mt-8 justify-center bg-secondary bg-opacity-20 overflow-auto z-50">
             <div className="bg-base-100  p-6 rounded-lg w-full shadow-lg z-50 max-w-2xl mx-4 relative">
                 <h2 className="text-2xl font-bold mb-4">Update Post</h2>
                 <input

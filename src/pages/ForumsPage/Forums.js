@@ -74,21 +74,21 @@ export const Forums = () => {
             >
                 <div className="row">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                        <div className="flex justify-between my-2">
+                        <div className="flex justify-between mx-2 my-2">
                             <button
-                                className="btn w-24 btn-secondary"
+                                className="btn btn-sm md:btn ml-4 w-24 btn-secondary"
                                 onClick={handleAddPostClick}
                             >
                                 Add Post
                             </button>
 
                             <div className="flex items-center">
-                                <span className="mr-2 text-lg font-medium">
+                                <span className="mr-2 text-sm md:text-lg font-medium">
                                     Show Confessions
                                 </span>
                                 <input
                                     type="checkbox"
-                                    className="toggle toggle-lg"
+                                    className="toggle toggle-md md:toggle-lg"
                                     onChange={toggleShowConfessions}
                                 />
                             </div>

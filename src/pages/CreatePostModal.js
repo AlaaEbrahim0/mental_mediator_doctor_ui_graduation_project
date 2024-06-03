@@ -41,7 +41,7 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center mt-8 justify-center bg-secondary bg-opacity-20">
+        <div className="fixed inset-0 flex items-center mt-8 justify-center bg-secondary bg-opacity-20 overflow-auto z-50">
             <div className="bg-base-100 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4 ">
                 <h2 className="text-2xl font-bold mb-4">Create a New Post</h2>
                 <input

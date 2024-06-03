@@ -10,10 +10,10 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                 <FaBars />
             </button>
             <div className="flex-1">
-                <h3 className="btn btn-ghost text-2xl">{title}</h3>
+                <h3 className="btn btn-ghost text-xl md:text-2xl">{title}</h3>
             </div>
 
-            <div className="gap-x-5">
+            <div className="gap-x-2 md:gap-x-5">
                 <div className="form-control">
                     <label className="input bg-neutral input-bordered flex items-center gap-2 w-full">
                         <IoSearchSharp className="text-xl text-info" />
@@ -25,7 +25,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                     </label>
                 </div>
                 <button>
-                    <FaBell className="text-xl text-secondary" />
+                    <FaBell className="text-sm md:text-xl text-secondary" />
                 </button>
 
                 <div className="dropdown dropdown-end">
@@ -34,7 +34,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                         role="button"
                         className="btn btn-ghost btn-circle avatar"
                     >
-                        <div className="w-10 rounded-full">
+                        <div className="w-8 md:w-10 rounded-full">
                             <img
                                 alt="Tailwind CSS Navbar component"
                                 src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"

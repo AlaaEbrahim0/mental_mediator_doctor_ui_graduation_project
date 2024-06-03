@@ -74,22 +74,24 @@ export const Reply = ({
     };
 
     return (
-        <div className="flex flex-col shadow-md rounded-lg mt-3 p-4 border-base-300 border-2">
+        <div className="flex flex-col shadow-md rounded-lg mt-3 w-full p-2 md:p-4 border-base-300 border-2">
             <div className="info flex flex-row">
                 <div className="flex flex-row flex-grow">
                     <img
-                        className="w-16 h-16 rounded-2xl shadow-lg"
+                        className="w-8 h-8 md:w-16 md:h-16 rounded-2xl shadow-lg"
                         src={image || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
                     <div className="ml-4 flex flex-col justify-center w-full">
-                        <h1 className="text-xl text-secondary font-bold">
+                        <h1 className="text-md md:text-xl text-secondary font-bold">
                             {username}
                         </h1>
-                        <p className="text-info">{repliedAt}</p>
+                        <p className="text-xs md:text-md text-info">
+                            {repliedAt}
+                        </p>
                         <div className="my-1 w-full">
                             {isEditing ? (
-                                <div className="flex flex-row items-center gap-2 text-xl">
+                                <div className="flex flex-row items-center gap-2 md:text-xl">
                                     <input
                                         type="text"
                                         value={tempReplyText}
@@ -104,7 +106,9 @@ export const Reply = ({
                                     </button>
                                 </div>
                             ) : (
-                                <p>{replyText}</p>
+                                <p className="text-sm md:text-lg w-full break-all">
+                                    {replyText}
+                                </p>
                             )}
                         </div>
                     </div>
@@ -113,7 +117,7 @@ export const Reply = ({
                             <>
                                 {!isEditing && (
                                     <button
-                                        className="btn btn-sm btn-secondary btn-outline text-md"
+                                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
                                         onClick={toggleEdit}
                                     >
                                         {replyUpdateLoading ? (
@@ -124,7 +128,7 @@ export const Reply = ({
                                     </button>
                                 )}
                                 <button
-                                    className="btn btn-sm ml-2 btn-error text-white text-md"
+                                    className="btn btn-xs md:btn-sm ml-2 btn-error text-white text-md"
                                     onClick={() =>
                                         document
                                             .getElementById(
