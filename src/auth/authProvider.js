@@ -14,19 +14,19 @@ const AuthProvider = ({ children }) => {
         if (token) {
             axios.defaults.headers.common["Authorization"] = "Bearer " + token;
             localStorage.setItem("token", token);
+            localStorage.setItem("userData", JSON.stringify(userData));
         } else {
             delete axios.defaults.headers.common["Authorization"];
             localStorage.removeItem("token");
+            localStorage.removeItem("userData");
         }
-    }, [token]);
+    }, [token, userData]);
 
-    // Function to update user data in localStorage
     const updateUserData = (newUserData) => {
         localStorage.setItem("userData", JSON.stringify(newUserData));
         setUserData(newUserData);
     };
 
-    // Memoized value of the authentication context
     const contextValue = useMemo(
         () => ({
             token,

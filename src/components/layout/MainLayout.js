@@ -10,8 +10,8 @@ const getTitle = (path) => {
             return "Appointments";
         case "/schedule":
             return "Schedule";
-        case "/confessions":
-            return "Confessions";
+        case "/forums":
+            return "Forums";
         case "/settings":
             return "Settings";
         case "/":
@@ -34,11 +34,11 @@ export function MainLayout() {
                     className={`flex-1 transition-all lg:static absolute top-0 left-0 w-full duration-300`}
                 >
                     <TopBar
-                        className="sticky"
+                        // className="sticky"
                         title={title}
                         toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
                     />
-                    <div className="p-2 lg:p-4 overflow-auto h-full">
+                    <div className="p-2 lg:p-4 overflow-auto">
                         <Outlet />
                     </div>
                 </div>

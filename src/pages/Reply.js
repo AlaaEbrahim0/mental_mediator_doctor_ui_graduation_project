@@ -7,6 +7,9 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
 import { useUpdateReply } from "../api/comments/putReply";
 import toast from "react-hot-toast";
+import { useAuth } from "../auth/authProvider";
+
+const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export const Reply = ({
     id = -1,
@@ -17,10 +20,13 @@ export const Reply = ({
     commentId = -1,
     postId = -1,
     handleDeleteReply,
+    image,
 }) => {
     const [replyText, setReplyText] = useState(content);
     const [isEditing, setIsEditing] = useState(false);
     const [tempReplyText, setTempReplyText] = useState(content);
+
+    const { userData } = useAuth();
 
     const handleReplyChange = (e) => {
         setTempReplyText(e.target.value);
@@ -73,7 +79,7 @@ export const Reply = ({
                 <div className="flex flex-row flex-grow">
                     <img
                         className="w-16 h-16 rounded-2xl shadow-lg"
-                        src="images/doctorPhoto.png"
+                        src={image || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
                     <div className="ml-4 flex flex-col justify-center w-full">
@@ -96,12 +102,6 @@ export const Reply = ({
                                     <button onClick={toggleEdit}>
                                         <IoIosCloseCircleOutline className="text-error" />
                                     </button>
-                                    {replyUpdateLoading && (
-                                        <span className="loading loading-spinner text-primary"></span>
-                                    )}
-                                    {replyDeletionLoading && (
-                                        <span className="loading loading-spinner text-primary"></span>
-                                    )}
                                 </div>
                             ) : (
                                 <p>{replyText}</p>
@@ -109,28 +109,43 @@ export const Reply = ({
                         </div>
                     </div>
                     <div className="actions flex flex-row mt-2">
-                        {!isEditing && (
-                            <button
-                                className="btn btn-sm btn-secondary btn-outline text-md"
-                                onClick={toggleEdit}
-                            >
-                                <FaEdit />
-                            </button>
+                        {userData?.userId === authorId && (
+                            <>
+                                {!isEditing && (
+                                    <button
+                                        className="btn btn-sm btn-secondary btn-outline text-md"
+                                        onClick={toggleEdit}
+                                    >
+                                        {replyUpdateLoading ? (
+                                            <span className="loading loading-spinner text-primary"></span>
+                                        ) : (
+                                            <FaEdit />
+                                        )}
+                                    </button>
+                                )}
+                                <button
+                                    className="btn btn-sm ml-2 btn-error text-white text-md"
+                                    onClick={() =>
+                                        document
+                                            .getElementById(
+                                                "delete-reply-modal-" + id
+                                            )
+                                            .showModal()
+                                    }
+                                >
+                                    {replyDeletionLoading ? (
+                                        <span className="loading loading-spinner text-primary"></span>
+                                    ) : (
+                                        <RiDeleteBin5Line />
+                                    )}
+                                </button>
+                                <CustomDeletionModal
+                                    id={"delete-reply-modal-" + id}
+                                    handleConfirm={handleDelete}
+                                    loading={replyDeletionLoading}
+                                />
+                            </>
                         )}
-                        <button
-                            className="btn btn-sm ml-2 btn-error text-white text-md"
-                            onClick={() =>
-                                document
-                                    .getElementById("delete-reply-modal-" + id)
-                                    .showModal()
-                            }
-                        >
-                            <RiDeleteBin5Line />
-                        </button>
-                        <CustomDeletionModal
-                            id={"delete-reply-modal-" + id}
-                            handleConfirm={handleDelete}
-                        />
                     </div>
                 </div>
             </div>

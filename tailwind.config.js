@@ -34,7 +34,7 @@ module.exports = {
                     warning: "#ff9e69",
                     error: "#ec4f5f",
                     "base-100": "#f1f4ff",
-                    "base-200": "#e6ebff",
+                    "base-200": "#E9EDFF",
                     "base-300": "#d7e0ff",
                 },
             },

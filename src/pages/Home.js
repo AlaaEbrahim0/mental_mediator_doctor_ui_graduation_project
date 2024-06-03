@@ -2,7 +2,7 @@ import { MainLayout } from "../components/layout/MainLayout";
 import toast from "react-hot-toast";
 export function Home() {
     return (
-        <div class="grid grid-cols-4 gap-4 ">
+        <div className="grid grid-cols-4 gap-4 ">
             <div className="p-5 text-4xl font-bold bg-primary">01</div>
             <div className="p-5 text-4xl font-bold bg-primary">02</div>
             <div className="p-5 text-4xl font-bold bg-primary">03</div>
@@ -17,7 +17,7 @@ export function Home() {
 }
 export function Appointments() {
     return (
-        <div class="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-4">
             <div>01</div>
             <div>02</div>
             <div>03</div>

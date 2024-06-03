@@ -1,4 +1,4 @@
-export const CustomDeletionModal = ({ id, handleConfirm }) => {
+export const CustomDeletionModal = ({ id, handleConfirm, loading }) => {
     return (
         <dialog id={id} className="modal">
             <div className="modal-box bg-white rounded-lg shadow-lg p-6 w-80">
@@ -14,7 +14,11 @@ export const CustomDeletionModal = ({ id, handleConfirm }) => {
                     <button
                         className="btn btn-sm btn-error"
                         onClick={handleConfirm}
+                        disabled={loading}
                     >
+                        {loading && (
+                            <span className="loading loading-spinner text-error"></span>
+                        )}
                         Confirm Delete
                     </button>
                 </div>

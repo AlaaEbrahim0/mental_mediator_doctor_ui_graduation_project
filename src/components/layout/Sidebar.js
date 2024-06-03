@@ -6,32 +6,16 @@ import { FiSettings } from "react-icons/fi";
 import { HiOutlineLogin } from "react-icons/hi";
 import { NavLink } from "react-router-dom";
 import { IoIosClose } from "react-icons/io";
+import { useAuth } from "../../auth/authProvider";
+
+const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export function Sidebar({ isOpen, setIsOpen }) {
     const [active, setActive] = useState(null);
     const iconStyles = "inline text-2xl mr-4";
     const sidebarRef = useRef(null);
 
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (
-                sidebarRef.current &&
-                !sidebarRef.current.contains(event.target)
-            ) {
-                setIsOpen(false);
-            }
-        }
-
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen, setIsOpen]);
+    const { userData } = useAuth();
 
     const menuItems = [
         {
@@ -50,9 +34,9 @@ export function Sidebar({ isOpen, setIsOpen }) {
             link: "/schedule",
         },
         {
-            name: "Confessions",
+            name: "Forums",
             icon: <BiMessageSquareDetail className={iconStyles} />,
-            link: "/confessions",
+            link: "/forums",
         },
         {
             name: "Settings",
@@ -69,18 +53,18 @@ export function Sidebar({ isOpen, setIsOpen }) {
     return (
         <div
             ref={sidebarRef}
-            className={`bg-secondary text-white lg:sticky top-0 left-0 h-screen max-w-64 z-40 overflow-y-auto transition-transform duration-300 ${
+            className={`bg-secondary fixed text-white  lg:sticky top-0 left-0 h-screen max-w-64 z-40 overflow-y-auto transition-transform duration-300 ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
             } lg:translate-x-0`}
         >
             <div className="doctor-info flex flex-col justify-center align-center p-8">
                 <img
                     className="rounded-full bg-gradient-to-b from-primary"
-                    src="images/doctorPhoto.png"
+                    src={userData.photoUrl || imagesDir + "/doctorPhoto.png"}
                     alt="Doctor"
                 />
                 <h3 className="text-center text-lg text-primary mt-3">
-                    Dr. John Doe
+                    {userData.userName}
                 </h3>
                 <p className="text-center text-sm text-info">Cardiologist</p>
             </div>

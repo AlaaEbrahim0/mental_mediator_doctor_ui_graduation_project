@@ -5,7 +5,6 @@ import { useAuth } from "../../auth/authProvider";
 const url = process.env.REACT_APP_API_URL;
 const SignIn = async (data) => {
     const { email, password } = data;
-    const { updateUserData } = useAuth();
     try {
         const response = await axios.post(
             `${url}/api/auth/signin`,
@@ -19,7 +18,6 @@ const SignIn = async (data) => {
                 },
             }
         );
-        localStorage.setItem("userData", JSON.stringify(response.data));
         return response.data;
     } catch (error) {
         throw error.response.data;

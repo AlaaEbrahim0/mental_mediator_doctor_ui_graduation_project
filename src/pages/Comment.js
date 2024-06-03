@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Reply } from "./Reply";
 import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
 import { useGetReplies } from "../api/getReplies";
@@ -10,16 +10,22 @@ import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
+import { useAuth } from "../auth/authProvider";
+import { BiMessageAltAdd } from "react-icons/bi";
 import toast from "react-hot-toast";
+
+const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export const Comment = ({
     id = -1,
     content = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam accusamus natus mollitia voluptatibus consectetur aliquid, impedit qui assumenda incidunt officia!",
     commentedAt = "5 hours ago",
-    username = "John Doe",
+    authorName = "John Doe",
     authorId = "author-1",
     postId = -1,
+    photoUrl,
     handleDeleteComment,
+    handleCommentDeletion, // New prop for handling comment deletion
 }) => {
     const [replyText, setReplyText] = useState("");
     const [showReplyInput, setShowReplyInput] = useState(false);
@@ -28,6 +34,8 @@ export const Comment = ({
     const [commentText, setCommentText] = useState(content);
     const [tempCommentText, setTempCommentText] = useState(content);
     const addReplyRef = useRef(null);
+
+    const { userData } = useAuth();
 
     const {
         isLoading: commentDeletionLoading,
@@ -87,7 +95,6 @@ export const Comment = ({
     };
 
     const handleSaveEdit = async () => {
-        debugger;
         try {
             await UpdateCommentExecute(postId, id, tempCommentText);
             setCommentText(tempCommentText);
@@ -104,6 +111,7 @@ export const Comment = ({
     const handleDelete = async () => {
         await deleteCommentExecute(postId, id);
         await handleDeleteComment();
+        handleCommentDeletion(); // Notify parent about the deletion
     };
 
     const toggleReplies = async () => {
@@ -140,12 +148,12 @@ export const Comment = ({
                 <div className="flex flex-row flex-grow">
                     <img
                         className="w-16 h-16 object-cover rounded-2xl shadow-lg"
-                        src="images/doctorPhoto.png"
+                        src={photoUrl || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
                     <div className="ml-4 flex flex-col justify-center flex-grow">
                         <h1 className="text-xl text-secondary font-bold">
-                            {username}
+                            {authorName}
                         </h1>
                         <p className="text-info">{commentedAt}</p>
 
@@ -159,6 +167,10 @@ export const Comment = ({
                                             setTempCommentText(e.target.value)
                                         }
                                         className="input input-bordered w-full"
+                                        disabled={
+                                            commentDeletionLoading ||
+                                            commentUpdateLoading
+                                        }
                                     />
                                     <button onClick={handleSaveEdit}>
                                         <MdOutlineDoneOutline className="text-success" />
@@ -195,33 +207,38 @@ export const Comment = ({
                             </div>
                         </div>
                     </div>
-                    {commentUpdateLoading && (
-                        <span className="loading loading-spinner text-primary"></span>
-                    )}
-                    {commentDeletionLoading && (
-                        <span className="loading loading-spinner text-primary"></span>
-                    )}
                     <div className="actions flex">
-                        <button
-                            className="btn btn-xs lg:btn-sm btn-secondary btn-outline"
-                            onClick={toggleEdit}
-                        >
-                            <FaEdit />
-                        </button>
-                        <button
-                            className="btn btn-xs lg:btn-sm ml-2 btn-error text-white text-md"
-                            onClick={() =>
-                                document
-                                    .getElementById("delete-reply-modal-" + id)
-                                    .showModal()
-                            }
-                        >
-                            <RiDeleteBin5Line />
-                        </button>
+                        {authorId === userData.userId && (
+                            <>
+                                <button
+                                    className="btn btn-xs md:btn-sm btn-secondary btn-outline"
+                                    onClick={toggleEdit}
+                                >
+                                    {commentUpdateLoading ? (
+                                        <span className="loading loading-spinner text-primary"></span>
+                                    ) : (
+                                        <FaEdit />
+                                    )}
+                                </button>
+                                <button
+                                    className="btn btn-xs md:btn-sm ml-2 btn-error text-white text-md"
+                                    onClick={() =>
+                                        document
+                                            .getElementById(
+                                                "delete-reply-modal-" + id
+                                            )
+                                            .showModal()
+                                    }
+                                >
+                                    <RiDeleteBin5Line />
+                                </button>
+                            </>
+                        )}
 
                         <CustomDeletionModal
                             id={"delete-reply-modal-" + id}
                             handleConfirm={handleDelete}
+                            loading={commentDeletionLoading}
                         />
                     </div>
                 </div>
@@ -244,29 +261,33 @@ export const Comment = ({
                                 handleDeleteReply={async () =>
                                     await getRepliesExecute(postId, id)
                                 }
+                                image={reply.photoUrl}
                             />
                         ))}
                 </div>
             )}
+
             {showReplyInput && (
                 <div className="mt-4">
-                    <textarea
+                    <input
                         ref={addReplyRef}
                         value={replyText}
                         onChange={handleReplyChange}
-                        placeholder="Add a reply..."
-                        className="textarea textarea-bordered w-full mb-2"
+                        placeholder="Write your reply..."
+                        className="input input-bordered w-full"
+                        disabled={isCreateLoading}
                     />
                     <button
-                        className="btn btn-sm btn-primary btn-outline"
+                        className="btn btn-sm btn-primary btn-outline mt-3 text-md max-w-52"
                         onClick={handleAddReply}
-                        disabled={isCreateLoading}
+                        disabled={isCreateLoading || !replyText}
                     >
                         {isCreateLoading ? (
                             <span className="loading loading-spinner"></span>
                         ) : (
-                            "Reply"
+                            <BiMessageAltAdd className="text-2xl" />
                         )}
+                        Reply
                     </button>
                 </div>
             )}

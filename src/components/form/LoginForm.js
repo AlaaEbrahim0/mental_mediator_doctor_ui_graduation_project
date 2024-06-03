@@ -52,7 +52,7 @@ const FormField = ({
 );
 
 export const LoginForm = () => {
-    const { setToken } = useAuth();
+    const { setToken, updateUserData } = useAuth();
     const navigate = useNavigate();
 
     const { isLoading, error, execute } = useSignIn();
@@ -61,8 +61,8 @@ export const LoginForm = () => {
         try {
             debugger;
             const data = await execute(values);
-
             setToken(data.token);
+            updateUserData(data);
             navigate("/", { replace: true });
         } catch (error) {
             console.log(error);
@@ -113,7 +113,7 @@ export const LoginForm = () => {
                                 Remember me
                             </span>
                         </label>
-                    <a className="text-primary font-semibold" href="#">6=
+                        <a className="text-primary font-semibold" href="#">
                             Forget Your Password
                         </a>
                     </div>
