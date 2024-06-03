@@ -65,7 +65,7 @@ export const LoginForm = () => {
             updateUserData(data);
             navigate("/", { replace: true });
         } catch (error) {
-            console.log(error);
+            console.error(error);
         } finally {
             setSubmitting(false);
         }
@@ -113,7 +113,7 @@ export const LoginForm = () => {
                                 Remember me
                             </span>
                         </label>
-                        <a  className="text-primary font-semibold" href="#">
+                        <a className="text-primary font-semibold" href="#">
                             Forget Your Password
                         </a>
                     </div>
@@ -128,11 +128,11 @@ export const LoginForm = () => {
                             "Login"
                         )}
                     </button>
-                    <ul className="text-error">
+                    {/* <ul className="text-error">
                         {error?.errors.map((error) => (
                             <li key={error.code}>{error.description}</li>
                         ))}
-                    </ul>
+                    </ul> */}
                 </Form>
             )}
         </Formik>
