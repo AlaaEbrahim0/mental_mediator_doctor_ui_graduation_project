@@ -1,9 +1,11 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"; // import eye icons
 import { useAuth } from "../../auth/authProvider";
 import { useNavigate } from "react-router-dom";
 import { useSignIn } from "../../api/auth/signIn";
+import { useState } from "react"; // import useState
 
 const validate = (values) => {
     const errors = {};
@@ -31,6 +33,8 @@ const FormField = ({
     placeholder,
     error,
     touched,
+    onToggleVisibility,
+    isPasswordVisible,
 }) => (
     <label className="form-control w-full">
         <div className="label">
@@ -46,6 +50,15 @@ const FormField = ({
                 className="grow"
                 placeholder={placeholder}
             />
+            {name === "password" && (
+                <span onClick={onToggleVisibility} className="cursor-pointer">
+                    {isPasswordVisible ? (
+                        <AiFillEyeInvisible className="text-secondary text-2xl" />
+                    ) : (
+                        <AiFillEye className="text-secondary text-2xl" />
+                    )}
+                </span>
+            )}
         </label>
         <ErrorMessage name={name} component="div" className="text-red-500" />
     </label>
@@ -54,8 +67,12 @@ const FormField = ({
 export const LoginForm = () => {
     const { setToken, updateUserData } = useAuth();
     const navigate = useNavigate();
-
     const { isLoading, error, execute } = useSignIn();
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false); // state for password visibility
+
+    const handleTogglePasswordVisibility = () => {
+        setIsPasswordVisible((prevState) => !prevState);
+    };
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
@@ -93,15 +110,16 @@ export const LoginForm = () => {
                     <FormField
                         label="Password"
                         name="password"
-                        type="password"
+                        type={isPasswordVisible ? "text" : "password"}
                         icon={
                             <RiLockPasswordLine className="text-secondary text-2xl mr-1" />
                         }
                         placeholder="********"
                         error={errors.password}
                         touched={touched.password}
+                        onToggleVisibility={handleTogglePasswordVisibility}
+                        isPasswordVisible={isPasswordVisible}
                     />
-
                     <div className="actions flex justify-between w-full my-3 px-3">
                         <label className="cursor-pointer flex items-center">
                             <Field
@@ -113,7 +131,10 @@ export const LoginForm = () => {
                                 Remember me
                             </span>
                         </label>
-                        <a className="text-primary font-semibold" href="#">
+                        <a
+                            className="text-primary font-semibold text-sm"
+                            href="#"
+                        >
                             Forget Your Password
                         </a>
                     </div>

@@ -1,7 +1,7 @@
 import { LoginForm } from "../components/form/LoginForm";
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 export const Login = () => (
-    <div className="flex flex-row h-screen overflow-hidden">
+    <div className="flex flex-row h-screen justify-center">
         <div className="p-16 hidden md:flex relative animated-gradient justify-center items-center">
             <img
                 src={imagesDir + "/loginPhoto.png"}
@@ -9,9 +9,9 @@ export const Login = () => (
                 alt="Login"
             />
         </div>
-        <div className="flex-col p-8 justify-center  max-w-lg">
+        <div className="flex-row p-8 justify-center max-w-lg">
             <div className="welcome-text py-8">
-                <h3 className="text-secondary text-xl font-bold">
+                <h3 className="text-secondary mb-4 text-3xl font-bold">
                     Login To Your Account
                 </h3>
                 <p className="text-info">
