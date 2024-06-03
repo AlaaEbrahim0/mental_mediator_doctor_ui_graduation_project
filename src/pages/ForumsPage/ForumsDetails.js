@@ -16,7 +16,7 @@ export const ForumsDetails = () => {
     console.log(post);
 
     return (
-        <div className="row justify-center mx-auto max-w-3xl overflow-y-hidden">
+        <div className="row justify-center mx-auto max-w-3xl">
             {isLoading && <PostSkeleton />}
             {!isLoading && (
                 <Post

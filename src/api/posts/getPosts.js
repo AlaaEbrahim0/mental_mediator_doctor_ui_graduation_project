@@ -3,10 +3,14 @@ import axios from "axios";
 
 const url = process.env.REACT_APP_API_URL;
 
-const getPosts = async (pageNumber, pageSize) => {
+const getPosts = async (pageNumber, pageSize, confessionsOnly) => {
     try {
         const response = await axios.get(`${url}/api/posts`, {
-            params: { pageNumber, pageSize },
+            params: {
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                confessionsOnly: confessionsOnly,
+            },
         });
         return response.data;
     } catch (error) {
@@ -21,10 +25,15 @@ export const useGetPosts = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
-    const execute = async (pageNumber = 1, pageSize = 20) => {
+    const execute = async (
+        pageNumber = 1,
+        pageSize = 20,
+        showConfessions = false
+    ) => {
         try {
+            debugger;
             setIsLoading(true);
-            const posts = await getPosts(pageNumber, pageSize);
+            const posts = await getPosts(pageNumber, pageSize, showConfessions);
             setData((prevData) => [...prevData, ...posts]);
             setIsLoading(false);
             setPage(pageNumber);
@@ -38,6 +47,12 @@ export const useGetPosts = () => {
         }
     };
 
+    const reset = () => {
+        setData([]);
+        setPage(1);
+        setHasMore(true);
+    };
+
     return {
         isLoading,
         error,
@@ -46,5 +61,6 @@ export const useGetPosts = () => {
         page,
         hasMore,
         execute: useCallback(execute, []),
+        reset,
     };
 };

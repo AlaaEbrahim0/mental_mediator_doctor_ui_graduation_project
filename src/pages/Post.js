@@ -136,7 +136,7 @@ export const Post = ({
     };
 
     return (
-        <div className="flex flex-col mb-8 mt-4 mx-2 p-4 glass shadow-md rounded-lg">
+        <div className="flex flex-col mb-8 mt-4 mx-2 p-4 w-full glass shadow-md rounded-lg">
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
                     <img

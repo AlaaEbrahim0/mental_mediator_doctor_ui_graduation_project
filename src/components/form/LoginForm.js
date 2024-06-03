@@ -113,7 +113,7 @@ export const LoginForm = () => {
                                 Remember me
                             </span>
                         </label>
-                        <a className="text-primary font-semibold" href="#">
+                        <a  className="text-primary font-semibold" href="#">
                             Forget Your Password
                         </a>
                     </div>

@@ -9,25 +9,24 @@ import { useCreatePost } from "../../api/comments/createPost";
 import { Post } from "../Post";
 
 export const Forums = () => {
-    const { isLoading, error, data, setData, page, hasMore, execute } =
+    const { isLoading, error, data, setData, page, hasMore, execute, reset } =
         useGetPosts();
     const [isModalVisible, setModalVisible] = useState(false);
+    const [showConfessions, setShowConfessions] = useState(false);
     const initialFetchRef = useRef(false);
-
-    console.log(data);
 
     useEffect(() => {
         if (!initialFetchRef.current) {
-            execute();
+            execute(1, 20, showConfessions);
             initialFetchRef.current = true;
         }
-    }, [execute]);
+    }, [execute, showConfessions]);
 
     const loadMore = useCallback(() => {
         if (hasMore && !isLoading) {
-            execute(page + 1);
+            execute(page + 1, 20, showConfessions);
         }
-    }, [execute, page, hasMore, isLoading]);
+    }, [execute, page, hasMore, isLoading, showConfessions]);
 
     const handleAddPostClick = () => setModalVisible(true);
     const handleCloseModal = () => setModalVisible(false);
@@ -55,6 +54,12 @@ export const Forums = () => {
         }
     };
 
+    const toggleShowConfessions = () => {
+        setShowConfessions((prevState) => !prevState);
+        reset();
+        execute(1, 20, !showConfessions);
+    };
+
     if (error) {
         return <div>Error loading posts</div>;
     }
@@ -66,17 +71,27 @@ export const Forums = () => {
                 next={loadMore}
                 hasMore={!isLoading && hasMore}
                 loader={<PostSkeleton />}
-                // endMessage={<p className="text-center">No more posts</p>}
             >
                 <div className="row">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                        <div>
+                        <div className="flex justify-between my-2">
                             <button
-                                className="btn w-24 btn-secondary my-2"
+                                className="btn w-24 btn-secondary"
                                 onClick={handleAddPostClick}
                             >
                                 Add Post
                             </button>
+
+                            <div className="flex items-center">
+                                <span className="mr-2 text-lg font-medium">
+                                    Show Confessions
+                                </span>
+                                <input
+                                    type="checkbox"
+                                    className="toggle toggle-lg"
+                                    onChange={toggleShowConfessions}
+                                />
+                            </div>
                         </div>
                         {data &&
                             data.map((post, index) => (
