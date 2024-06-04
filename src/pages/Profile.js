@@ -112,7 +112,6 @@ export function Profile() {
                 toast.success("Profile updated successfully!");
                 console.log("Profile updated successfully!");
             } catch (error) {
-                // Handle error
                 console.error("Error updating profile:", error);
             }
         },
@@ -159,7 +158,7 @@ export function Profile() {
             ) : (
                 <form
                     onSubmit={formik.handleSubmit}
-                    className="flex justify-center shadow-lg p-4 glass rounded-lg max-w-xl mt-4 mx-auto  mb-8"
+                    className="flex justify-center form-border-gradient shadow-md p-4 glass rounded-lg max-w-xl mt-4 mx-auto  mb-8"
                 >
                     <div className="grid grid-cols-2 gap-x-4 w-full">
                         <div
@@ -194,7 +193,7 @@ export function Profile() {
                             <input
                                 type="text"
                                 name="firstName"
-                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className="input input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
                                 value={formik.values.firstName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -215,7 +214,7 @@ export function Profile() {
                             <input
                                 type="text"
                                 name="lastName"
-                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className="input input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
                                 value={formik.values.lastName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -237,7 +236,7 @@ export function Profile() {
                                 type="text"
                                 name="email"
                                 disabled
-                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full"
+                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -252,7 +251,7 @@ export function Profile() {
                             <textarea
                                 name="biography"
                                 rows="3"
-                                className="textarea lg:textarea-lg textarea-bordered hover:textarea-primary focus-within:textarea-primary w-full"
+                                className="textarea textarea-bordered hover:textarea-primary focus-within:textarea-primary w-full"
                                 value={formik.values.biography}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -266,7 +265,7 @@ export function Profile() {
                             </div>
                             <select
                                 name="gender"
-                                className="select select-md lg:select-lg select-bordered hover:select-primary focus-within:select-primary"
+                                className="select select-md select-bordered hover:select-primary focus-within:select-primary"
                                 value={formik.values.gender}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -303,7 +302,7 @@ export function Profile() {
                                         .toISOString()
                                         .split("T")[0]
                                 }
-                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className="input  input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
                                 value={
                                     new Date(formik.values.birthDate)
                                         .toISOString()
@@ -327,7 +326,7 @@ export function Profile() {
                             </div>
                             <select
                                 name="specialization"
-                                className="select lg:select-lg select-bordered hover:select-primary focus-within:select-primary select- w-full"
+                                className="select select-bordered hover:select-primary focus-within:select-primary select- w-full"
                                 value={formik.values.specialization}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}

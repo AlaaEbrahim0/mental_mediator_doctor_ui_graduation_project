@@ -72,7 +72,11 @@ export const Forums = () => {
                 dataLength={data.length}
                 next={loadMore}
                 hasMore={!isLoading && hasMore}
-                loader={<PostSkeleton />}
+                loader={
+                    <div className="flex justify-center w-full">
+                        <PostSkeleton />
+                    </div>
+                }
             >
                 <div className="row">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">

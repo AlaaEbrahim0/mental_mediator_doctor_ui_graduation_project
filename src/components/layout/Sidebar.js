@@ -90,11 +90,11 @@ export function Sidebar({ isOpen, setIsOpen }) {
                             )?.[0] || ""}
                         </p>
                     </div>
-                    <ul className="px-4">
+                    <ul>
                         {menuItems.map((item, index) => (
                             <li
                                 key={index}
-                                className={`text-lg px-4 p-3 my-1 w-full ${
+                                className={`text-xl px-8 py-4 w-full ${
                                     active === index
                                         ? "bg-primary text-black font-bold"
                                         : "text-white hover:bg-primary hover:text-black hover:font-bold"

@@ -19,7 +19,7 @@ const GetProfile = async (token) => {
         return response.data;
     } catch (error) {
         console.log(error);
-        throw error.response.data;
+        // throw error.response.data;
     }
 };
 
