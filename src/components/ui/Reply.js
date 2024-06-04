@@ -89,7 +89,7 @@ export const Reply = ({
                         </p>
                     </div>
                     <div className="actions flex flex-row mt-2">
-                        {currentUserId.id === authorId && (
+                        {currentUserId === authorId && (
                             <>
                                 {!isEditing && (
                                     <button
