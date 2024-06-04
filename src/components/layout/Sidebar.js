@@ -11,7 +11,7 @@ import { useUserProfile } from "../../context/profileContext";
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export function Sidebar({ isOpen, setIsOpen }) {
-    const [active, setActive] = useState(null);
+    const [active, setActive] = useState(false);
     const iconStyles = "inline text-2xl mr-4";
     const sidebarRef = useRef(null);
 
@@ -64,7 +64,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
     return (
         <div
             ref={sidebarRef}
-            className={`bg-secondary fixed text-white lg:sticky top-0 left-0 h-screen z-40 overflow-y-auto transition-transform duration-300 ${
+            className={`bg-secondary fixed text-white lg:sticky top-0 left-0  h-screen z-40 overflow-y-auto transition-transform duration-300 ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
             } lg:translate-x-0`}
         >
@@ -72,7 +72,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
                 <>
                     <div className="doctor-info flex flex-col justify-center align-center p-8 w-full">
                         <img
-                            className="rounded-full w-36 h-36 object-cover bg-gradient-to-b from-primary"
+                            className="rounded-full w-52 h-52 object-cover bg-gradient-to-b from-primary"
                             src={
                                 userProfileData.photoUrl ||
                                 `${imagesDir}/profile.webp`
@@ -90,7 +90,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
                             )?.[0] || ""}
                         </p>
                     </div>
-                    <ul>
+                    <ul className="px-4">
                         {menuItems.map((item, index) => (
                             <li
                                 key={index}

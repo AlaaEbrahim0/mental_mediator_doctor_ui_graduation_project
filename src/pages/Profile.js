@@ -159,7 +159,7 @@ export function Profile() {
             ) : (
                 <form
                     onSubmit={formik.handleSubmit}
-                    className="flex justify-center max-w-xl mx-auto mb-8"
+                    className="flex justify-center max-w-xl mt-8 mx-auto mb-8"
                 >
                     <div className="grid grid-cols-2 gap-x-4 w-full">
                         <div
@@ -168,7 +168,7 @@ export function Profile() {
                         >
                             <img
                                 src={photoPreview}
-                                className="w-32 h-32 object-cover mx-auto rounded-full cursor-pointer"
+                                className="w-32 h-32 mb-2 object-cover mx-auto rounded-full cursor-pointer"
                                 alt="Profile"
                             />
                             <input
