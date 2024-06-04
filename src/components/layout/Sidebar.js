@@ -17,8 +17,6 @@ export function Sidebar({ isOpen, setIsOpen }) {
 
     const { userProfileData, isLoading } = useUserProfile();
 
-    useEffect(() => {}, [userProfileData]);
-
     console.log(userProfileData);
 
     const menuItems = [
