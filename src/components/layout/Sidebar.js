@@ -64,13 +64,13 @@ export function Sidebar({ isOpen, setIsOpen }) {
     return (
         <div
             ref={sidebarRef}
-            className={`bg-secondary fixed text-white lg:sticky top-0 left-0 h-screen min-w-[300px] z-40 overflow-y-auto transition-transform duration-300 ${
+            className={`bg-secondary fixed text-white lg:sticky top-0 left-0 h-screen z-40 overflow-y-auto transition-transform duration-300 ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
             } lg:translate-x-0`}
         >
             {!isLoading && userProfileData && (
                 <>
-                    <div className="doctor-info flex flex-col justify-center items-center p-8 w-full">
+                    <div className="doctor-info flex flex-col justify-center align-center p-8 w-full">
                         <img
                             className="rounded-full w-36 h-36 object-cover bg-gradient-to-b from-primary"
                             src={
