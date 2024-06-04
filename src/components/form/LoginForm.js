@@ -66,7 +66,7 @@ const FormField = ({
 );
 
 export const LoginForm = () => {
-    const { setToken } = useAuth();
+    const { setToken, setUserId } = useAuth();
     const navigate = useNavigate();
     const { isLoading, error, execute } = useSignIn();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false); // state for password visibility
@@ -81,6 +81,7 @@ export const LoginForm = () => {
             debugger;
             const data = await execute(values);
             setToken(data.token);
+            setUserId(data.userId);
             initializeUserProfile(data.token);
             navigate("/", { replace: true });
         } catch (error) {

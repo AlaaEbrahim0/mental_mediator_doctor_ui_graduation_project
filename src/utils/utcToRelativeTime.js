@@ -1,11 +1,9 @@
 export function convertUtcToRelativeTime(utcDateTime) {
     debugger;
     if (!utcDateTime) {
-        console.error("Invalid date input:", utcDateTime);
         return "Unknown time";
     }
-    const now = new Date()
-    console.log(now, utcDateTime);
+    const now = new Date();
     const pastDate = new Date(utcDateTime);
 
     const diffInSeconds = Math.floor(

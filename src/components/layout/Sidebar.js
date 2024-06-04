@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { GrSchedules, GrSchedule } from "react-icons/gr";
 import { BiMessageSquareDetail } from "react-icons/bi";
@@ -17,56 +17,65 @@ export function Sidebar({ isOpen, setIsOpen }) {
 
     const { userProfileData, isLoading } = useUserProfile();
 
-    console.log(userProfileData);
+    const menuItems = useMemo(
+        () => [
+            {
+                name: "Overview",
+                icon: <MdOutlineSpaceDashboard className={iconStyles} />,
+                link: "/",
+            },
+            {
+                name: "Appointments",
+                icon: <GrSchedules className={iconStyles} />,
+                link: "/appointments",
+            },
+            {
+                name: "Schedule",
+                icon: <GrSchedule className={iconStyles} />,
+                link: "/schedule",
+            },
+            {
+                name: "Forums",
+                icon: <BiMessageSquareDetail className={iconStyles} />,
+                link: "/forums",
+            },
+            {
+                name: "Profile",
+                icon: <FiSettings className={iconStyles} />,
+                link: "/profile",
+            },
+            {
+                name: "Logout",
+                icon: <HiOutlineLogin className={iconStyles} />,
+                link: "/logout",
+            },
+        ],
+        []
+    );
 
-    const menuItems = [
-        {
-            name: "Overview",
-            icon: <MdOutlineSpaceDashboard className={iconStyles} />,
-            link: "/",
-        },
-        {
-            name: "Appointments",
-            icon: <GrSchedules className={iconStyles} />,
-            link: "/appointments",
-        },
-        {
-            name: "Schedule",
-            icon: <GrSchedule className={iconStyles} />,
-            link: "/schedule",
-        },
-        {
-            name: "Forums",
-            icon: <BiMessageSquareDetail className={iconStyles} />,
-            link: "/forums",
-        },
-        {
-            name: "Profile",
-            icon: <FiSettings className={iconStyles} />,
-            link: "/profile",
-        },
-        {
-            name: "Logout",
-            icon: <HiOutlineLogin className={iconStyles} />,
-            link: "/logout",
-        },
-    ];
+    const handleMenuItemClick = (index) => {
+        setActive(index);
+    };
+
+    const closeSidebar = () => {
+        setIsOpen(false);
+    };
 
     return (
         <div
             ref={sidebarRef}
-            className={`bg-secondary fixed text-white lg:sticky top-0 left-0 h-screen max-w-64 z-40 overflow-y-auto transition-transform duration-300 ${
+            className={`bg-secondary fixed text-white lg:sticky top-0 left-0 h-screen min-w-[300px] z-40 overflow-y-auto transition-transform duration-300 ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
             } lg:translate-x-0`}
         >
             {!isLoading && userProfileData && (
                 <>
-                    <div className="doctor-info flex flex-col justify-center align-center p-8 w-full">
+                    <div className="doctor-info flex flex-col justify-center items-center p-8 w-full">
                         <img
-                            className="rounded-full bg-gradient-to-b from-primary"
+                            className="rounded-full w-36 h-36 object-cover bg-gradient-to-b from-primary"
                             src={
                                 userProfileData.photoUrl ||
-                                `${imagesDir}/doctorPhoto.png`
+                                `${imagesDir}/profile.webp`
                             }
                             alt="Doctor"
                         />
@@ -90,7 +99,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
                                         ? "bg-primary text-black font-bold"
                                         : "text-white hover:bg-primary hover:text-black hover:font-bold"
                                 }`}
-                                onClick={() => setActive(index)}
+                                onClick={() => handleMenuItemClick(index)}
                             >
                                 {item.icon}
                                 <NavLink to={item.link}>{item.name}</NavLink>
@@ -99,7 +108,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
                     </ul>
                     <button
                         className="lg:hidden absolute top-0 right-0 m-4 text-white"
-                        onClick={() => setIsOpen(false)}
+                        onClick={closeSidebar}
                     >
                         <IoIosClose className="text-4xl" />
                     </button>

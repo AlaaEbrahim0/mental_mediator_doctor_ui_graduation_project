@@ -7,17 +7,17 @@ import { PostSkeleton } from "../components/ui/PostSkeleton";
 import { CreatePostModal } from "../components/ui/CreatePostModal";
 import { useCreatePost } from "../api/comments/createPost";
 import { Post } from "../components/ui/Post";
-import { useUserProfile } from "../context/profileContext";
+import { useAuth } from "../auth/authProvider";
 
 export const Forums = () => {
     const { isLoading, error, data, setData, page, hasMore, execute, reset } =
         useGetPosts();
 
+    const { userId } = useAuth();
+
     const [isModalVisible, setModalVisible] = useState(false);
     const [showConfessions, setShowConfessions] = useState(false);
     const initialFetchRef = useRef(false);
-
-    const { userProfileData } = useUserProfile();
 
     useEffect(() => {
         if (!initialFetchRef.current) {
@@ -68,76 +68,74 @@ export const Forums = () => {
 
     return (
         <>
-            {userProfileData && (
-                <InfiniteScroll
-                    dataLength={data.length}
-                    next={loadMore}
-                    hasMore={!isLoading && hasMore}
-                    loader={<PostSkeleton />}
-                >
-                    <div className="row">
-                        <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                            <div className="flex justify-between mx-2 my-2">
-                                <button
-                                    className="btn btn-sm md:btn ml-4 w-24"
-                                    onClick={handleAddPostClick}
-                                >
-                                    Add Post
-                                </button>
+            <InfiniteScroll
+                dataLength={data.length}
+                next={loadMore}
+                hasMore={!isLoading && hasMore}
+                loader={<PostSkeleton />}
+            >
+                <div className="row">
+                    <div className="lg:flex lg:flex-col xl:col xl:col-8">
+                        <div className="flex justify-between mx-2 my-2">
+                            <button
+                                className="btn btn-sm md:btn ml-4 w-24"
+                                onClick={handleAddPostClick}
+                            >
+                                Add Post
+                            </button>
 
-                                <div className="flex items-center">
-                                    <span className="mr-2 text-sm md:text-lg font-medium">
-                                        Show Confessions
-                                    </span>
-                                    <input
-                                        type="checkbox"
-                                        className="toggle toggle-md md:toggle-lg"
-                                        onChange={toggleShowConfessions}
-                                    />
-                                </div>
+                            <div className="flex items-center">
+                                <span className="mr-2 text-sm md:text-lg font-medium">
+                                    Show Confessions
+                                </span>
+                                <input
+                                    type="checkbox"
+                                    className="toggle toggle-md md:toggle-lg"
+                                    onChange={toggleShowConfessions}
+                                />
                             </div>
-                            {data &&
-                                data.map((post, index) => (
-                                    <Post
-                                        key={"post-" + post.id + "-" + index}
-                                        id={post.id}
-                                        authorName={post.username}
-                                        authorId={post.appUserId}
-                                        title={post.title}
-                                        content={post.content}
-                                        date={convertUtcToRelativeTime(
-                                            post.postedOn
-                                        )}
-                                        image={post.photoUrl}
-                                        postPhoto={post.postPhotoUrl}
-                                        commentCount={post.commentsCount}
-                                        setData={setData}
-                                        currentUserId={userProfileData.id}
-                                    />
-                                ))}
+                        </div>
+                        {data &&
+                            data.map((post, index) => (
+                                <Post
+                                    key={"post-" + post.id + "-" + index}
+                                    id={post.id}
+                                    authorName={post.username}
+                                    authorId={post.appUserId}
+                                    title={post.title}
+                                    content={post.content}
+                                    date={convertUtcToRelativeTime(
+                                        post.postedOn
+                                    )}
+                                    image={post.photoUrl}
+                                    postPhoto={post.postPhotoUrl}
+                                    commentCount={post.commentsCount}
+                                    setData={setData}
+                                    currentUserId={userId}
+                                />
+                            ))}
 
-                            {isLoading && page === 1 && (
-                                <>
-                                    <PostSkeleton />
-                                    <PostSkeleton />
-                                    <PostSkeleton />
-                                </>
-                            )}
-                        </div>
-                        <div className="hidden md:flex md:flex-col xl:col xl:col-4">
-                            <PostSkeleton />
-                            <PostSkeleton />
-                            <PostSkeleton />
-                        </div>
+                        {isLoading && page === 1 && (
+                            <>
+                                <PostSkeleton />
+                                <PostSkeleton />
+                                <PostSkeleton />
+                            </>
+                        )}
                     </div>
-                    <CreatePostModal
-                        isVisible={isModalVisible}
-                        onClose={handleCloseModal}
-                        onCreate={handleCreatePost}
-                        loading={isCreatePostLoading}
-                    />
-                </InfiniteScroll>
-            )}
+                    <div className="hidden md:flex md:flex-col xl:col xl:col-4">
+                        <PostSkeleton />
+                        <PostSkeleton />
+                        <PostSkeleton />
+                    </div>
+                </div>
+                <CreatePostModal
+                    isVisible={isModalVisible}
+                    onClose={handleCloseModal}
+                    onCreate={handleCreatePost}
+                    loading={isCreatePostLoading}
+                />
+            </InfiniteScroll>
         </>
     );
 };

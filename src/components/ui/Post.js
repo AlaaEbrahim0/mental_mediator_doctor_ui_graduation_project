@@ -76,6 +76,7 @@ export const Post = ({
             await getCommentsExecute(id);
             setShowComments(true);
         } catch (e) {
+            console.log(e);
             toast.error(e.errors[0].description, {
                 duration: 4000,
                 position: "top-center",
@@ -243,10 +244,11 @@ export const Post = ({
                                 handleDeleteComment={async () =>
                                     await getCommentsExecute(id)
                                 }
-                                image={comment.photoUrl}
+                                photoUrl={comment.photoUrl}
                                 handleCommentDeletion={() =>
                                     setCommentCount(commentCount - 1)
                                 }
+                                currentUserId={currentUserId}
                             />
                         ))}
                 </div>

@@ -7,26 +7,24 @@ import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
 import { useUpdateReply } from "../../api/comments/putReply";
 import toast from "react-hot-toast";
-import { useUserProfile } from "../../context/profileContext";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export const Reply = ({
     id = -1,
-    content = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam accusamus natus mollitia voluptatibus consectetur aliquid, impedit qui assumenda incidunt officia!",
-    repliedAt = "5 hours ago",
-    username = "John Doe",
-    authorId = "author-1",
+    content,
+    repliedAt,
+    username,
+    authorId,
     commentId = -1,
     postId = -1,
     handleDeleteReply,
     image,
+    currentUserId,
 }) => {
     const [replyText, setReplyText] = useState(content);
     const [isEditing, setIsEditing] = useState(false);
     const [tempReplyText, setTempReplyText] = useState(content);
-
-    const { userProfileData } = useUserProfile();
 
     const handleReplyChange = (e) => {
         setTempReplyText(e.target.value);
@@ -91,7 +89,7 @@ export const Reply = ({
                         </p>
                     </div>
                     <div className="actions flex flex-row mt-2">
-                        {userProfileData.id === authorId && (
+                        {currentUserId.id === authorId && (
                             <>
                                 {!isEditing && (
                                     <button
