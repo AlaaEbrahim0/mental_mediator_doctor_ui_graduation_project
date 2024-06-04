@@ -159,7 +159,7 @@ export function Profile() {
             ) : (
                 <form
                     onSubmit={formik.handleSubmit}
-                    className="flex justify-center max-w-xl mt-8 mx-auto mb-8"
+                    className="flex justify-center shadow-lg p-4 glass rounded-lg max-w-xl mt-4 mx-auto  mb-8"
                 >
                     <div className="grid grid-cols-2 gap-x-4 w-full">
                         <div
@@ -187,12 +187,14 @@ export function Profile() {
                         </div>
                         <label className="form-control w-full max-w-lg">
                             <div className="label">
-                                <span className="label-text">First Name</span>
+                                <span className="label-text text-lg ">
+                                    First Name
+                                </span>
                             </div>
                             <input
                                 type="text"
                                 name="firstName"
-                                className="input input-md input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
                                 value={formik.values.firstName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -206,12 +208,14 @@ export function Profile() {
                         </label>
                         <label className="form-control w-full max-w-lg">
                             <div className="label">
-                                <span className="label-text">Last Name</span>
+                                <span className="label-text text-lg ">
+                                    Last Name
+                                </span>
                             </div>
                             <input
                                 type="text"
                                 name="lastName"
-                                className="input input-md input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
                                 value={formik.values.lastName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -225,13 +229,15 @@ export function Profile() {
                         </label>
                         <label className="form-control col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text">Email</span>
+                                <span className="label-text text-lg ">
+                                    Email
+                                </span>
                             </div>
                             <input
                                 type="text"
                                 name="email"
                                 disabled
-                                className="input input-md input-bordered hover:input-primary focus-within:input-primary w-full"
+                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -239,12 +245,14 @@ export function Profile() {
                         </label>
                         <label className="form-control col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text">Biography</span>
+                                <span className="label-text text-lg ">
+                                    Biography
+                                </span>
                             </div>
                             <textarea
                                 name="biography"
                                 rows="3"
-                                className="textarea textarea-md textarea-bordered hover:textarea-primary focus-within:textarea-primary w-full"
+                                className="textarea lg:textarea-lg textarea-bordered hover:textarea-primary focus-within:textarea-primary w-full"
                                 value={formik.values.biography}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -252,11 +260,13 @@ export function Profile() {
                         </label>
                         <label className="form-control w-full max-w-lg">
                             <div className="label">
-                                <span className="label-text">Gender</span>
+                                <span className="label-text text-lg ">
+                                    Gender
+                                </span>
                             </div>
                             <select
                                 name="gender"
-                                className="select select-md select-bordered hover:select-primary focus-within:select-primary"
+                                className="select select-md lg:select-lg select-bordered hover:select-primary focus-within:select-primary"
                                 value={formik.values.gender}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -281,7 +291,9 @@ export function Profile() {
                         </label>
                         <label className="form-control w-full max-w-lg">
                             <div className="label">
-                                <span className="label-text">Birth Date</span>
+                                <span className="label-text text-lg ">
+                                    Birth Date
+                                </span>
                             </div>
                             <input
                                 type="date"
@@ -291,7 +303,7 @@ export function Profile() {
                                         .toISOString()
                                         .split("T")[0]
                                 }
-                                className="input input-md input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className="input lg:input-lg input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
                                 value={
                                     new Date(formik.values.birthDate)
                                         .toISOString()
@@ -309,13 +321,13 @@ export function Profile() {
                         </label>
                         <label className="form-control col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text">
+                                <span className="label-text text-lg ">
                                     Specialization
                                 </span>
                             </div>
                             <select
                                 name="specialization"
-                                className="select select-md select-bordered hover:select-primary focus-within:select-primary select- w-full"
+                                className="select lg:select-lg select-bordered hover:select-primary focus-within:select-primary select- w-full"
                                 value={formik.values.specialization}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}

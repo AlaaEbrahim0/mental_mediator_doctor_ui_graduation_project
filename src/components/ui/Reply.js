@@ -76,7 +76,7 @@ export const Reply = ({
             <div className="info flex flex-col">
                 <div className="flex flex-row flex-grow">
                     <img
-                        className="w-8 h-8 md:w-16 md:h-16 rounded-2xl shadow-lg"
+                        className="w-12 h-12 md:w-16 md:h-16 rounded-2xl shadow-lg"
                         src={image || imagesDir + "/profile.webp"}
                         alt="Author"
                     />

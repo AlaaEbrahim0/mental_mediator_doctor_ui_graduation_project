@@ -19,7 +19,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                     <input
                         type="text"
                         className="grow w-full placeholder:text-sm"
-                        placeholder="Search Appointment, Confessions etc..."
+                        placeholder="Search "
                     />
                 </label>
             </div>

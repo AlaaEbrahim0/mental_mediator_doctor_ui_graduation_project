@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
+import { useAuth } from "../auth/authProvider";
 
 const url = process.env.REACT_APP_API_URL;
 const GetProfile = async (token) => {

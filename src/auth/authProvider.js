@@ -9,9 +9,9 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (token) {
-            axios.defaults.headers.common["Authorization"] = "Bearer " + token;
             localStorage.setItem("token", token);
             localStorage.setItem("userId", userId);
+            axios.defaults.headers.common["Authorization"] = "Bearer " + token;
         } else {
             delete axios.defaults.headers.common["Authorization"];
             localStorage.removeItem("token");

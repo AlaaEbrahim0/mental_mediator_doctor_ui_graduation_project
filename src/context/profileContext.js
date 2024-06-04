@@ -9,14 +9,19 @@ export const UserProfileProvider = ({ children }) => {
     const [userProfileData, setUserProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [updateLoading, setUpdateLoading] = useState(false);
 
     const { data, execute: getProfile } = useGetProfile();
-    const { updatedData, execute: updateProfile } = useUpdateProfile();
+    const {
+        updatedData,
+        execute: updateProfile,
+        updateIsLoading,
+    } = useUpdateProfile();
 
+    const [updateLoading, setUpdateLoading] = useState(updateIsLoading);
     useEffect(() => {
         const getUserProfile = async () => {
             try {
+                debugger;
                 setIsLoading(true);
                 const data = await getProfile();
                 setUserProfileData(data);

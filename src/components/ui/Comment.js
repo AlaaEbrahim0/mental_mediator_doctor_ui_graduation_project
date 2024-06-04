@@ -146,7 +146,7 @@ export const Comment = ({
             <div className="info flex flex-col flex-1">
                 <div className="flex flex-row flex-grow">
                     <img
-                        className="w-8 h-8 md:w-16 md:h-16 object-cover rounded-2xl shadow-lg"
+                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-2xl shadow-lg"
                         src={photoUrl || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
