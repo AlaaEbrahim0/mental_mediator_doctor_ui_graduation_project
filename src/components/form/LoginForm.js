@@ -6,6 +6,7 @@ import { useAuth } from "../../auth/authProvider";
 import { useNavigate } from "react-router-dom";
 import { useSignIn } from "../../api/auth/signIn";
 import { useState } from "react"; // import useState
+import { useUserProfile } from "../../context/profileContext";
 
 const validate = (values) => {
     const errors = {};
@@ -69,6 +70,7 @@ export const LoginForm = () => {
     const navigate = useNavigate();
     const { isLoading, error, execute } = useSignIn();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false); // state for password visibility
+    const { initializeUserProfile } = useUserProfile();
 
     const handleTogglePasswordVisibility = () => {
         setIsPasswordVisible((prevState) => !prevState);
@@ -79,6 +81,7 @@ export const LoginForm = () => {
             debugger;
             const data = await execute(values);
             setToken(data.token);
+            initializeUserProfile(data.token);
             navigate("/", { replace: true });
         } catch (error) {
             console.error(error);

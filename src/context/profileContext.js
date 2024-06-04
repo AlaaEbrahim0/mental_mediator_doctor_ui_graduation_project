@@ -17,7 +17,7 @@ export const UserProfileProvider = ({ children }) => {
     useEffect(() => {
         const getUserProfile = async () => {
             try {
-                setUpdateLoading(true);
+                setIsLoading(true);
                 const data = await getProfile();
                 setUserProfileData(data);
             } catch (err) {
@@ -30,6 +30,15 @@ export const UserProfileProvider = ({ children }) => {
             getUserProfile();
         }
     }, [getProfile, userProfileData]);
+
+    const reset = () => {
+        setUserProfileData(null);
+    };
+
+    const initializeUserProfile = async (token) => {
+        const data = await getProfile(token);
+        setUserProfileData(data);
+    };
 
     const updateUserProfile = async (profileUpdates) => {
         try {
@@ -51,6 +60,8 @@ export const UserProfileProvider = ({ children }) => {
                 error,
                 updateUserProfile,
                 updateLoading,
+                reset,
+                initializeUserProfile,
             }}
         >
             {children}

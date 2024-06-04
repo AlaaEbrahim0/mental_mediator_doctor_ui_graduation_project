@@ -46,6 +46,7 @@ export const useSignIn = () => {
                 };
                 throw error;
             }
+            
             return response;
         } catch (e) {
             setError(e); // Set the error state with the response data
