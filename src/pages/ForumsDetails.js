@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useGetPostById } from "../../api/posts/getPostById";
-import { PostSkeleton } from "../PostSkeleton";
-import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
-import { Post } from "../Post";
+import { useGetPostById } from "../api/posts/getPostById";
+import { PostSkeleton } from "../components/ui/PostSkeleton";
+import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
+import { Post } from "../components/ui/Post";
 import { useParams } from "react-router-dom";
 
 export const ForumsDetails = () => {
@@ -14,6 +14,7 @@ export const ForumsDetails = () => {
     }, [execute, id]);
 
     console.log(post);
+    console.log(post.postedOn);
 
     return (
         <div className="row justify-center mx-auto max-w-3xl">

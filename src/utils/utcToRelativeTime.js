@@ -1,28 +1,42 @@
-export function convertUtcToRelativeTime(utcTimeString) {
-    const utcTime = new Date(utcTimeString);
-    const now = new Date();
-    const timeDifference = now.getTime() - utcTime.getTime(); // Time difference in milliseconds
+export function convertUtcToRelativeTime(utcDateTime) {
+    debugger;
+    if (!utcDateTime) {
+        console.error("Invalid date input:", utcDateTime);
+        return "Unknown time";
+    }
+    const now = new Date()
+    console.log(now, utcDateTime);
+    const pastDate = new Date(utcDateTime);
 
-    const totalSeconds = Math.floor(timeDifference / 1000);
-    const totalMinutes = Math.floor(totalSeconds / 60);
-    const totalHours = Math.floor(totalMinutes / 60);
-    const totalDays = Math.floor(totalHours / 24);
-    const totalMonths = Math.floor(totalDays / 30); // Approximation, not exact
-    const totalYears = Math.floor(totalMonths / 12); // Approximation, not exact
+    const diffInSeconds = Math.floor(
+        (now.getTime() - pastDate.getTime()) / 1000
+    );
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    const diffInMonths = Math.floor(diffInDays / 30);
+    const diffInYears = Math.floor(diffInMonths / 12);
 
-    if (totalYears >= 1) {
-        return totalYears === 1 ? "1 year ago" : totalYears + " years ago";
-    } else if (totalMonths >= 1) {
-        return totalMonths === 1 ? "1 month ago" : totalMonths + " months ago";
-    } else if (totalDays >= 1) {
-        return totalDays === 1 ? "1 day ago" : totalDays + " days ago";
-    } else if (totalHours >= 1) {
-        return totalHours === 1 ? "1 hour ago" : totalHours + " hours ago";
-    } else if (totalMinutes >= 1) {
-        return totalMinutes === 1
+    if (diffInYears > 0) {
+        return diffInYears === 1 ? "1 year ago" : `${diffInYears} years ago`;
+    } else if (diffInMonths > 0) {
+        return diffInMonths === 1
+            ? "1 month ago"
+            : `${diffInMonths} months ago`;
+    } else if (diffInWeeks > 0) {
+        return diffInWeeks === 1 ? "1 week ago" : `${diffInWeeks} weeks ago`;
+    } else if (diffInDays > 0) {
+        return diffInDays === 1 ? "1 day ago" : `${diffInDays} days ago`;
+    } else if (diffInHours > 0) {
+        return diffInHours === 1 ? "1 hour ago" : `${diffInHours} hours ago`;
+    } else if (diffInMinutes > 0) {
+        return diffInMinutes === 1
             ? "1 minute ago"
-            : totalMinutes + " minutes ago";
+            : `${diffInMinutes} minutes ago`;
     } else {
-        return totalSeconds <= 1 ? "Just now" : totalSeconds + " seconds ago";
+        return diffInSeconds === 1
+            ? "1 second ago"
+            : `${diffInSeconds} seconds ago`;
     }
 }

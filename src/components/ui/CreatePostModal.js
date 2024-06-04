@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { BiImageAdd } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
-import { useCreatePost } from "../api/comments/createPost";
+import { useCreatePost } from "../../api/comments/createPost";
 export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");

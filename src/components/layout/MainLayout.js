@@ -3,6 +3,7 @@ import { CustomToast } from "../ui/CustomToast";
 import { TopBar } from "./TopBar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { useUserProfile } from "../../context/profileContext";
 
 const getTitle = (path) => {
     switch (path) {
@@ -12,8 +13,8 @@ const getTitle = (path) => {
             return "Schedule";
         case "/forums":
             return "Forums";
-        case "/settings":
-            return "Settings";
+        case "/profile":
+            return "Profile";
         case "/":
         default:
             return "Overview";

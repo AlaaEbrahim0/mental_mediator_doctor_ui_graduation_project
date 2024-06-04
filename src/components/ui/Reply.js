@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { CustomDeletionModal } from "../components/ui/CustomDeletionModal";
-import { useDeleteReply } from "../api/comments/deletReply";
+import { CustomDeletionModal } from "./CustomDeletionModal";
+import { useDeleteReply } from "../../api/comments/deletReply";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
-import { useUpdateReply } from "../api/comments/putReply";
+import { useUpdateReply } from "../../api/comments/putReply";
 import toast from "react-hot-toast";
-import { useAuth } from "../auth/authProvider";
+import { useUserProfile } from "../../context/profileContext";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -26,7 +26,7 @@ export const Reply = ({
     const [isEditing, setIsEditing] = useState(false);
     const [tempReplyText, setTempReplyText] = useState(content);
 
-    const { userData } = useAuth();
+    const { userProfileData } = useUserProfile();
 
     const handleReplyChange = (e) => {
         setTempReplyText(e.target.value);
@@ -91,7 +91,7 @@ export const Reply = ({
                         </p>
                     </div>
                     <div className="actions flex flex-row mt-2">
-                        {userData?.userId === authorId && (
+                        {userProfileData.id === authorId && (
                             <>
                                 {!isEditing && (
                                     <button

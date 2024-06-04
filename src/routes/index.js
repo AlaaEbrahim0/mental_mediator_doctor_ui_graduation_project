@@ -9,13 +9,11 @@ import { MainLayout } from "../components/layout/MainLayout";
 import { Home } from "../pages/Home";
 import { Appointments } from "../pages/Home";
 import { Login } from "../auth/login";
-import { Forums } from "../pages/ForumsPage/Forums";
+import { Forums } from "../pages/Forums";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
 import { Logout } from "../auth/logout";
-import { ForumsDetails } from "../pages/ForumsPage/ForumsDetails";
-// import { Schedule } from "../pages/Schedule";
-// import { Confessions } from "../pages/Confessions";
-// import { Settings } from "../pages/Settings";
+import { ForumsDetails } from "../pages/ForumsDetails";
+import { Profile } from "../pages/Profile";
 
 const Routes = () => {
     const { token } = useAuth();
@@ -38,6 +36,7 @@ const Routes = () => {
                     children: [
                         { path: "/", element: <Home /> },
                         { path: "appointments", element: <Appointments /> },
+                        { path: "profile", element: <Profile /> },
                         { path: "forums", element: <Forums /> },
                         { path: "forums/:id", element: <ForumsDetails /> },
                         { path: "logout", element: <Logout /> },

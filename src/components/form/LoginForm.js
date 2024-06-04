@@ -65,7 +65,7 @@ const FormField = ({
 );
 
 export const LoginForm = () => {
-    const { setToken, updateUserData } = useAuth();
+    const { setToken } = useAuth();
     const navigate = useNavigate();
     const { isLoading, error, execute } = useSignIn();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false); // state for password visibility
@@ -79,7 +79,6 @@ export const LoginForm = () => {
             debugger;
             const data = await execute(values);
             setToken(data.token);
-            updateUserData(data);
             navigate("/", { replace: true });
         } catch (error) {
             console.error(error);

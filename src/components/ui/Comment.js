@@ -1,18 +1,19 @@
 import React, { useState, useRef } from "react";
 import { Reply } from "./Reply";
-import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
-import { useGetReplies } from "../api/getReplies";
-import { CustomDeletionModal } from "../components/ui/CustomDeletionModal";
-import { useCreateReply } from "../api/postReply";
-import { useUpdateComment } from "../api/comments/putComment";
-import { useDeleteComment } from "../api/comments/deleteComment";
+import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
+import { useGetReplies } from "../../api/getReplies";
+import { CustomDeletionModal } from "./CustomDeletionModal";
+import { useCreateReply } from "../../api/postReply";
+import { useUpdateComment } from "../../api/comments/putComment";
+import { useDeleteComment } from "../../api/comments/deleteComment";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
-import { useAuth } from "../auth/authProvider";
+import { useAuth } from "../../auth/authProvider";
 import { BiMessageAltAdd } from "react-icons/bi";
 import toast from "react-hot-toast";
+import { useUserProfile } from "../../context/profileContext";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -35,7 +36,7 @@ export const Comment = ({
     const [tempCommentText, setTempCommentText] = useState(content);
     const addReplyRef = useRef(null);
 
-    const { userData } = useAuth();
+    const { userProfileData } = useUserProfile();
 
     const {
         isLoading: commentDeletionLoading,
@@ -191,7 +192,7 @@ export const Comment = ({
                         </div> */}
                     </div>
                     <div className="actions flex">
-                        {authorId === userData.userId && (
+                        {authorId === userProfileData.id && (
                             <>
                                 <button
                                     className="btn btn-xs md:btn-sm btn-secondary btn-outline"
@@ -286,7 +287,7 @@ export const Comment = ({
                                 id={reply.id}
                                 content={reply.content}
                                 username={reply.username}
-                                authorId={reply.appUserId}
+                                authorId={reply.app}
                                 repliedAt={convertUtcToRelativeTime(
                                     reply.repliedAt
                                 )}

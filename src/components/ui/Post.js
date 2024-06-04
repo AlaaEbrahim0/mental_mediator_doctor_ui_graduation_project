@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { HiOutlineMenu } from "react-icons/hi";
 import { BiHide, BiShow, BiMessageAltAdd } from "react-icons/bi";
-import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
+import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 import { Comment } from "./Comment";
-import { useGetComments } from "../api/comments/getComments";
+import { useGetComments } from "../../api/comments/getComments";
 import { Link } from "react-router-dom";
-import { useCreateComment } from "../api/comments/postComment";
+import { useCreateComment } from "../../api/comments/postComment";
 import toast from "react-hot-toast";
-import { useAuth } from "../auth/authProvider";
-import { useUpdatePost } from "../api/comments/updatePost";
+import { useAuth } from "../../auth/authProvider";
+import { useUpdatePost } from "../../api/comments/updatePost";
 import { NavLink } from "react-router-dom";
 import UpdatePostModal from "./UpdatePostModal"; // Import the UpdatePostModal component
-import { useDeletePost } from "../api/comments/deletePost";
-import { CustomDeletionModal } from "../components/ui/CustomDeletionModal";
+import { useDeletePost } from "../../api/comments/deletePost";
+import { CustomDeletionModal } from "./CustomDeletionModal";
+import { useUserProfile } from "../../context/profileContext";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 console.log(imagesDir);
@@ -28,6 +29,7 @@ export const Post = ({
     postPhoto,
     commentCount: initialCommentCount,
     setData,
+    currentUserId,
 }) => {
     const [commentText, setCommentText] = useState("");
     const [showComments, setShowComments] = useState(false);
@@ -39,8 +41,6 @@ export const Post = ({
         error: updatePostError,
         execute: updatePostExecute,
     } = useUpdatePost();
-
-    const { userData } = useAuth();
 
     const {
         isLoading: isCommentsLoading,
@@ -160,7 +160,7 @@ export const Post = ({
                         tabIndex={0}
                         className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
                     >
-                        {authorId === userData.userId && (
+                        {authorId === currentUserId && (
                             <>
                                 <li className="mb-1">
                                     <button

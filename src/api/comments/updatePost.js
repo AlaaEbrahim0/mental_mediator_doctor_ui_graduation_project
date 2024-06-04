@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 
 const url = process.env.REACT_APP_API_URL;
+const token = localStorage.getItem("token");
 
 const UpdatePost = async (id, title, content, postPhoto) => {
     try {
@@ -13,6 +14,7 @@ const UpdatePost = async (id, title, content, postPhoto) => {
         const response = await axios.put(`${url}/api/posts/${id}`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
             },
         });
         return response.data;
