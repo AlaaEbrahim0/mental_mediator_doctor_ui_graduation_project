@@ -37,7 +37,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                         <MdOutlineNotificationsNone className="text-3xl text-secondary" />
                     </div>
                 </div>
-                <div className="dropdown-content mt-4 z-[1] menu p-4 shadow bg-white opacity-95 rounded-box w-96">
+                <div className="dropdown-content mt-4 z-[1] menu p-1 shadow-lg bg-base-100  rounded-box w-96">
                     <NotificationsList notifications={notifications} />
                 </div>
             </div>

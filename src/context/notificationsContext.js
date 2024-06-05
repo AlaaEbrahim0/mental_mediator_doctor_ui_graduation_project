@@ -12,14 +12,14 @@ export const NotificationsProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = async (pageNumber = 1, pageSize = 20) => {
         try {
             debugger;
             setLoading(true);
             const response = await axios.get(
                 `${url}/api/notifications/users/me`,
                 {
-                    params: { pageSize: 20 },
+                    params: { pageNumber, pageSize: 20 },
                 }
             );
             const notificationsData = response.data;

@@ -3,11 +3,13 @@ import { useGetPostById } from "../api/posts/getPostById";
 import { PostSkeleton } from "../components/ui/PostSkeleton";
 import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
 import { Post } from "../components/ui/Post";
+import { useAuth } from "../auth/authProvider";
 import { useParams } from "react-router-dom";
 
 export const ForumsDetails = () => {
     const { isLoading, error, data: post, setData, execute } = useGetPostById();
     const { id } = useParams();
+    const { userId } = useAuth();
 
     useEffect(() => {
         execute(id);
@@ -33,6 +35,7 @@ export const ForumsDetails = () => {
                     commentCount={post.commentsCount}
                     data={post}
                     setData={setData}
+                    currentUserId={userId}
                 />
             )}
         </div>
