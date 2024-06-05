@@ -78,7 +78,6 @@ export const LoginForm = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            debugger;
             const data = await execute(values);
             setToken(data.token);
             setUserId(data.userId);

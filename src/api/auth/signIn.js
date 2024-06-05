@@ -4,7 +4,6 @@ import { useAuth } from "../../auth/authProvider";
 
 const url = process.env.REACT_APP_API_URL;
 const SignIn = async (data) => {
-    debugger;
     const { email, password } = data;
     try {
         const response = await axios.post(
@@ -46,7 +45,7 @@ export const useSignIn = () => {
                 };
                 throw error;
             }
-            
+
             return response;
         } catch (e) {
             setError(e); // Set the error state with the response data

@@ -51,9 +51,7 @@ export const Reply = ({
     };
 
     const handleSaveEdit = async () => {
-        debugger;
         try {
-            debugger;
             await UpdateReplyExecute(postId, commentId, id, tempReplyText);
             setReplyText(tempReplyText);
             setIsEditing(false);

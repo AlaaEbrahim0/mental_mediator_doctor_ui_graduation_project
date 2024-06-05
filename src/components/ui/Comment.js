@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { Reply } from "./Reply";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 import { useGetReplies } from "../../api/getReplies";
+import { BiHide, BiShow, BiMessageAltAdd } from "react-icons/bi";
+
 import { CustomDeletionModal } from "./CustomDeletionModal";
 import { useCreateReply } from "../../api/postReply";
 import { useUpdateComment } from "../../api/comments/putComment";
@@ -11,7 +13,6 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
 import { useAuth } from "../../auth/authProvider";
-import { BiMessageAltAdd } from "react-icons/bi";
 import toast from "react-hot-toast";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
@@ -24,6 +25,7 @@ export const Comment = ({
     authorId = "author-1",
     postId = -1,
     photoUrl,
+    repliesCount: initialRepliesCount,
     handleDeleteComment,
     handleCommentDeletion,
     currentUserId,
@@ -34,6 +36,8 @@ export const Comment = ({
     const [isEditing, setIsEditing] = useState(false);
     const [commentText, setCommentText] = useState(content);
     const [tempCommentText, setTempCommentText] = useState(content);
+    const [repliesCount, setRepliesCount] = useState(initialRepliesCount);
+
     const addReplyRef = useRef(null);
 
     const {
@@ -75,6 +79,7 @@ export const Comment = ({
         try {
             await createReplyExecute(postId, id, replyText);
             setReplyText("");
+            setRepliesCount((prevCount) => prevCount + 1);
             await getRepliesExecute(postId, id);
             setShowReplies(true);
         } catch (e) {
@@ -257,21 +262,37 @@ export const Comment = ({
                 </div>
 
                 <div className="actions flex flex-row gap-x-2 mt-2">
-                    <></>
                     <button
-                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
+                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md max-w-52 relative"
                         onClick={toggleReplies}
-                        disabled={isRepliesLoading}
+                        disabled={isRepliesLoading || repliesCount === 0}
                     >
                         {isRepliesLoading && (
                             <span className="loading loading-spinner"></span>
                         )}
-                        {showReplies ? "Hide Replies" : "Show Replies"}
+                        {showReplies ? (
+                            <>
+                                <BiHide className="text-2xl" />
+                                Hide Replies
+                            </>
+                        ) : (
+                            <>
+                                <BiShow className="text-2xl" />
+                                Show Replies
+                            </>
+                        )}
+                        {repliesCount > 0 && (
+                            <div className="badge badge-sm text-white badge-primary absolute -top-2 -right-2">
+                                {repliesCount}
+                            </div>
+                        )}
                     </button>
                     <button
-                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
+                        className="btn btn-xs md:btn-sm btn-primary btn-outline text-md max-w-52"
                         onClick={scrollToAddReply}
+                        disabled={isCreateLoading || !commentText}
                     >
+                        <BiMessageAltAdd className="text-2xl" />
                         Reply
                     </button>
                 </div>

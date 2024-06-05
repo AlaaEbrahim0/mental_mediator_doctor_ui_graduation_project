@@ -21,7 +21,6 @@ export const UserProfileProvider = ({ children }) => {
     useEffect(() => {
         const getUserProfile = async () => {
             try {
-                debugger;
                 setIsLoading(true);
                 const data = await getProfile();
                 setUserProfileData(data);

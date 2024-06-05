@@ -29,7 +29,6 @@ export const useCreateComment = () => {
 
     const execute = async (postId, comment) => {
         try {
-            debugger;
             setIsLoading(true);
             const response = await CreateComment(postId, comment);
             setData(response);

@@ -96,7 +96,6 @@ export const Post = ({
     }, [initialCommentCount]);
 
     const handleDeletePost = async (id) => {
-        debugger;
         try {
             await deletePostExecute(id);
             setData((prev) => prev.filter((post) => post.id !== id));
@@ -110,7 +109,6 @@ export const Post = ({
     };
 
     const handleUpdatePost = async (id, title, content, postPhoto) => {
-        debugger;
         if (!title || !content) {
             return;
         }
@@ -249,6 +247,7 @@ export const Post = ({
                                     setCommentCount(commentCount - 1)
                                 }
                                 currentUserId={currentUserId}
+                                repliesCount={comment.repliesCount}
                             />
                         ))}
                 </div>

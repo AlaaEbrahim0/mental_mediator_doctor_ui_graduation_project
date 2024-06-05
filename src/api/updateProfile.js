@@ -6,7 +6,6 @@ const token = localStorage.getItem("token");
 
 const UpdateProfile = async (updateData) => {
     try {
-        debugger;
         const formData = new FormData();
         formData.append("FirstName", updateData.firstName);
         formData.append("LastName", updateData.lastName);

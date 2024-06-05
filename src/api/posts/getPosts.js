@@ -31,7 +31,6 @@ export const useGetPosts = () => {
         showConfessions = false
     ) => {
         try {
-            debugger;
             setIsLoading(true);
             const posts = await getPosts(pageNumber, pageSize, showConfessions);
             setData((prevData) => [...prevData, ...posts]);
