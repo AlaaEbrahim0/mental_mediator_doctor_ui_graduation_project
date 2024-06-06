@@ -20,10 +20,10 @@ const Routes = () => {
     const { token } = useAuth();
 
     const routesForPublic = [
-        {
-            path: "/login",
-            element: <Login />,
-        },
+        // {
+        //     path: "/login",
+        //     element: <Login />,
+        // },
     ];
 
     const routesForAuthenticatedOnly = [
@@ -49,16 +49,17 @@ const Routes = () => {
     ];
 
     const routesForNotAuthenticatedOnly = [
-        // {
-        //     path: "/login",
-        //     element: <Login />,
-        // },
+        {
+            path: "/login",
+            element: <Login />,
+        },
     ];
 
     const router = createBrowserRouter([
         ...routesForPublic,
         ...(!token ? routesForNotAuthenticatedOnly : []),
         ...routesForAuthenticatedOnly,
+        { path: "*", element: <Navigate to="/" /> },
     ]);
 
     return <RouterProvider router={router} />;

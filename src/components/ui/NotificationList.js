@@ -15,17 +15,28 @@ export const NotificationsList = ({ notifications }) => {
                 </button>
             </div>
 
-            {loading ? (
-                <span className="loading loading-spinner"></span>
-            ) : (
-                <ul tabIndex={0} className="mt-4 overflow-y-auto max-h-96">
-                    {notifications.map((notification) => (
-                        <li className="mb-2" key={notification.id}>
-                            <Notification {...notification} />
-                        </li>
-                    ))}
-                </ul>
+            {loading && (
+                <div className="">
+                    <span className="loading loading-spinner"></span>
+                </div>
             )}
+
+            {!loading && !notifications.length && (
+                <div className="text-center text-info text-lg">
+                    No notifications yet
+                </div>
+            )}
+
+            <ul
+                tabIndex={0}
+                className="mt-4 overflow-y-auto max-h-96 divide-y-2"
+            >
+                {notifications.map((notification) => (
+                    <li key={notification.id}>
+                        <Notification {...notification} />
+                    </li>
+                ))}
+            </ul>
         </>
     );
 };

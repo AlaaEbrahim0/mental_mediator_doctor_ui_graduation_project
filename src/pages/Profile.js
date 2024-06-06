@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { useUpdateProfile } from "../api/updateProfile";
 import { useUserProfile } from "../context/profileContext";
 import toast from "react-hot-toast";
-
+import { motion } from "framer-motion";
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export function Profile() {
@@ -150,7 +150,7 @@ export function Profile() {
     };
 
     return (
-        <>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {isLoading ? (
                 <div className="flex justify-center items-center h-screen">
                     <span className="loading loading-spinner"></span>
@@ -354,6 +354,6 @@ export function Profile() {
                     </div>
                 </form>
             )}
-        </>
+        </motion.div>
     );
 }

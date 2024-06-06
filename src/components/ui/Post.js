@@ -14,6 +14,7 @@ import UpdatePostModal from "./UpdatePostModal"; // Import the UpdatePostModal c
 import { useDeletePost } from "../../api/comments/deletePost";
 import { CustomDeletionModal } from "./CustomDeletionModal";
 import { useUserProfile } from "../../context/profileContext";
+import { motion } from "framer-motion";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 console.log(imagesDir);
@@ -135,7 +136,11 @@ export const Post = ({
     };
 
     return (
-        <div className="flex flex-col mb-8 mt-4 p-4 w-full glass shadow-md rounded-lg">
+        <motion.div
+            animate={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            className="flex flex-col mb-8 p-4 mt w-full glass shadow-md rounded-lg"
+        >
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
                     <img
@@ -208,7 +213,7 @@ export const Post = ({
                 </div>
             </div>
             <Link
-                className="w-full hover:cursor-pointer hover:"
+                className="w-full hover:cursor-pointer pl-2"
                 to={`/forums/${id}`}
             >
                 <h1 className="text-sm sm:text-md md:text-2xl text-secondary font-semibold py-5 break-all">
@@ -253,56 +258,55 @@ export const Post = ({
                 </div>
             )}
 
-            <div className="mt-4">
-                <textarea
-                    type="text"
-                    value={commentText}
-                    onChange={handleCommentChange}
-                    rows={1}
-                    placeholder="Add a comment..."
-                    className="textarea textarea-bordered textarea-md md:textarea-lg w-full mb-2"
-                    disabled={isCreateLoading}
-                />
-                <div className="flex flex-row items-center justify-between mt-1">
-                    <button
-                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md max-w-52 relative"
-                        onClick={toggleComments}
-                        disabled={isCommentsLoading || commentCount === 0}
-                    >
-                        {isCommentsLoading && (
-                            <span className="loading loading-spinner"></span>
-                        )}
-                        {showComments ? (
-                            <>
-                                <BiHide className="text-2xl" />
-                                Hide Comments
-                            </>
-                        ) : (
-                            <>
-                                <BiShow className="text-2xl" />
-                                Show Comments
-                            </>
-                        )}
-                        {commentCount > 0 && (
-                            <div className="badge badge-sm text-white badge-primary absolute -top-2 -right-2">
-                                {commentCount}
-                            </div>
-                        )}
-                    </button>
-                    <button
-                        className="btn btn-xs md:btn-sm btn-primary btn-outline text-md max-w-52"
-                        onClick={handleAddComment}
-                        disabled={isCreateLoading || !commentText}
-                    >
-                        {isCreateLoading ? (
-                            <span className="loading loading-spinner"></span>
-                        ) : (
-                            <BiMessageAltAdd className="text-2xl" />
-                        )}
-                        Comment
-                    </button>
-                </div>
+            <div className="mt-4" />
+            <textarea
+                type="text"
+                value={commentText}
+                onChange={handleCommentChange}
+                placeholder="Add a comment..."
+                className="textarea textarea-bordered textarea-md md:textarea-lg w-full mb-2"
+                disabled={isCreateLoading}
+            />
+            <div className="flex flex-row items-center justify-between mt-1">
+                <button
+                    className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md max-w-52 relative"
+                    onClick={toggleComments}
+                    disabled={isCommentsLoading || commentCount === 0}
+                >
+                    {isCommentsLoading && (
+                        <span className="loading loading-spinner"></span>
+                    )}
+                    {showComments ? (
+                        <>
+                            <BiHide className="text-2xl" />
+                            Hide Comments
+                        </>
+                    ) : (
+                        <>
+                            <BiShow className="text-2xl" />
+                            Show Comments
+                        </>
+                    )}
+                    {commentCount > 0 && (
+                        <div className="badge badge-sm text-white badge-primary absolute -top-2 -right-2">
+                            {commentCount}
+                        </div>
+                    )}
+                </button>
+                <button
+                    className="btn btn-xs md:btn-sm btn-primary btn-outline text-md max-w-52"
+                    onClick={handleAddComment}
+                    disabled={isCreateLoading || !commentText}
+                >
+                    {isCreateLoading ? (
+                        <span className="loading loading-spinner"></span>
+                    ) : (
+                        <BiMessageAltAdd className="text-2xl" />
+                    )}
+                    Comment
+                </button>
             </div>
+
             <UpdatePostModal // Integrate the UpdatePostModal component
                 isVisible={isUpdateModalVisible}
                 onClose={() => setUpdateModalVisible(false)}
@@ -310,6 +314,6 @@ export const Post = ({
                 loading={isUpdatePostLoading} // Pass the loading state
                 initialData={{ id, title, content, postPhoto }}
             />
-        </div>
+        </motion.div>
     );
 };

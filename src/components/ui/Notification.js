@@ -1,6 +1,7 @@
 // src/ui/Notification.js
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../../context/notificationsContext";
+import { useState } from "react";
 
 export const Notification = ({
     id,
@@ -13,50 +14,62 @@ export const Notification = ({
     isRead,
 }) => {
     const { markAsRead } = useNotifications();
+    const navigate = useNavigate();
+    const [error, setError] = useState(null);
 
-    const handleMarkAsRead = async () => {
-        debugger;
-        if (isRead) return;
-        markAsRead(id);
+    const handleMarkAsRead = async (event) => {
+        event.preventDefault();
+        try {
+            await markAsRead(id);
+            navigate(`forums/${resources.postId}`);
+        } catch (err) {
+            console.error("Navigation error:", err);
+            setError(
+                "The page you're trying to navigate to was not found or deleted."
+            );
+        }
     };
+
     return (
-        <Link
-            key={resources.postId}
-            className="w-full"
-            to={`forums/${resources.postId}`}
-            onClick={handleMarkAsRead}
-        >
-            <div
-                className={`flex flex-col py-4 px-4 rounded-lg ${
-                    isRead ? "" : "bg-white glass"
-                }`}
-            >
-                <div className="flex flex-row gap-x-4">
-                    <img
-                        src={notifierPhotoUrl}
-                        className="w-12 h-12 rounded-full"
-                        alt={notifierUserName}
-                    />
-                    <div className="flex flex-col justify-center">
-                        <div className="text-md font-semibold">
-                            {notifierUserName} {message}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                            {dateCreated}
-                        </div>
-                    </div>
+        <>
+            {error && (
+                <div className="alert alert-error">
+                    <span>{error}</span>
                 </div>
-                {type === "appointmentRequest" && (
-                    <div className="flex flex-row gap-4">
-                        <button className="btn btn-sm btn-outline">
-                            Accept
-                        </button>
-                        <button className="btn btn-sm btn-outline btn-error">
-                            Reject
-                        </button>
+            )}
+            <div className="w-full" onClick={handleMarkAsRead}>
+                <div
+                    className={`flex flex-col py-4 px-4 rounded-lg ${
+                        isRead ? "" : "bg-white glass"
+                    }`}
+                >
+                    <div className="flex flex-row gap-x-4">
+                        <img
+                            src={notifierPhotoUrl}
+                            className="w-12 h-12 rounded-full"
+                            alt={notifierUserName}
+                        />
+                        <div className="flex flex-col justify-center">
+                            <div className="text-md font-semibold">
+                                {notifierUserName} {message}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                                {dateCreated}
+                            </div>
+                        </div>
                     </div>
-                )}
+                    {type === "appointmentRequest" && (
+                        <div className="flex flex-row gap-4">
+                            <button className="btn btn-sm btn-outline">
+                                Accept
+                            </button>
+                            <button className="btn btn-sm btn-outline btn-error">
+                                Reject
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </Link>
+        </>
     );
 };

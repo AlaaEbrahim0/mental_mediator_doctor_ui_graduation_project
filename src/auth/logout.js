@@ -3,14 +3,15 @@ import { useAuth } from "./authProvider";
 import { useNavigate } from "react-router-dom";
 
 export const Logout = () => {
-    const { setToken } = useAuth();
+    const { setToken, setUserId } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         setToken(null);
+        setUserId(null);
 
         navigate("/login");
-    }, [setToken, navigate]);
+    }, [setToken, navigate, setUserId]);
 
     return <div>Logging out...</div>;
 };

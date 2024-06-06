@@ -12,16 +12,29 @@ export const ForumsDetails = () => {
     const { userId } = useAuth();
 
     useEffect(() => {
-        execute(id);
+        const postId = Number(id);
+        if (!isNaN(postId)) {
+            execute(postId);
+        }
     }, [execute, id]);
 
-    console.log(post);
-    console.log(post.postedOn);
+    if (!id || isNaN(Number(id))) {
+        return (
+            <div className="alert alert-error text-white">
+                <span>Invalid post ID.</span>
+            </div>
+        );
+    }
 
     return (
-        <div className="row justify-center mx-auto max-w-3xl">
+        <div className="row justify-center mx-auto max-w-3xl mt-8">
             {isLoading && <PostSkeleton />}
-            {!isLoading && (
+            {!isLoading && error && (
+                <div className="alert alert-error text-white">
+                    <span>This page was deleted.</span>
+                </div>
+            )}
+            {!isLoading && !error && post && (
                 <Post
                     key={"post-" + post.id}
                     id={post.id}

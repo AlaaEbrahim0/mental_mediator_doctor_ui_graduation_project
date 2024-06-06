@@ -6,6 +6,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
 import { useUpdateReply } from "../../api/comments/putReply";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
@@ -70,7 +71,11 @@ export const Reply = ({
     };
 
     return (
-        <div className="flex flex-col shadow-md rounded-lg mt-3 w-full p-2 md:p-4 border-base-300 border-2">
+        <motion.div
+            animate={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            className="flex flex-col shadow-md rounded-lg mt-3 w-full p-2 md:p-4 border-base-100 border-2"
+        >
             <div className="info flex flex-col">
                 <div className="flex flex-row flex-grow">
                     <img
@@ -135,7 +140,7 @@ export const Reply = ({
                                 rows={2}
                                 value={tempReplyText}
                                 onChange={handleReplyChange}
-                                className="textarea textarea-xs md:textarea-lg textarea-bordered w-full"
+                                className="textarea textarea-sm md:textarea-lg textarea-bordered w-full"
                             />
                             <button onClick={handleSaveEdit}>
                                 <MdOutlineDoneOutline className="text-success" />
@@ -145,12 +150,12 @@ export const Reply = ({
                             </button>
                         </div>
                     ) : (
-                        <p className="text-sm md:text-lg w-full break-all">
+                        <p className="text-md md:text-lg w-full break-all">
                             {replyText}
                         </p>
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };

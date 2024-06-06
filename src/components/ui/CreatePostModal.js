@@ -57,7 +57,7 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
                     value={content}
                     onChange={handleContentChange}
                     placeholder="Content"
-                    className="textarea textarea-bordered bg-base-200 w-full mb-4 text-lg"
+                    className="textarea textarea-xs md:textarea-lg textarea-bordered bg-base-200 w-full mb-4 text-lg"
                     rows={6}
                 />
                 <label htmlFor="fileInput" className="block mb-4">

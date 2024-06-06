@@ -8,6 +8,7 @@ import { CreatePostModal } from "../components/ui/CreatePostModal";
 import { useCreatePost } from "../api/comments/createPost";
 import { Post } from "../components/ui/Post";
 import { useAuth } from "../auth/authProvider";
+import { motion } from "framer-motion";
 
 export const Forums = () => {
     const { isLoading, error, data, setData, page, hasMore, execute, reset } =
@@ -45,8 +46,12 @@ export const Forums = () => {
             return;
         }
         try {
+            debugger;
             const newPost = await createPostExecute(title, content, postPhoto);
-            setData([newPost, ...data]);
+            reset();
+            await execute();
+
+            // setData([newPost, ...data]);
             setModalVisible(false);
         } catch (e) {
             toast.error(e.errors[0].description, {
@@ -67,20 +72,16 @@ export const Forums = () => {
     }
 
     return (
-        <>
+        <motion.div>
             <InfiniteScroll
                 dataLength={data.length}
                 next={loadMore}
                 hasMore={!isLoading && hasMore}
-                loader={
-                    <div className="flex justify-center w-full">
-                        <PostSkeleton />
-                    </div>
-                }
+                loader={<PostSkeleton />}
             >
-                <div className="row">
+                <div className="block lg:flex ">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                        <div className="flex justify-between mx-2 my-2">
+                        <div className="flex flex-row justify-between my-2">
                             <button
                                 className="btn btn-sm md:btn ml-4 w-24 "
                                 onClick={handleAddPostClick}
@@ -99,6 +100,7 @@ export const Forums = () => {
                                 />
                             </div>
                         </div>
+                        <div className="flex justify-between mx-2 my-2"></div>
                         {data &&
                             data.map((post, index) => (
                                 <Post
@@ -120,11 +122,11 @@ export const Forums = () => {
                             ))}
 
                         {isLoading && page === 1 && (
-                            <>
+                            <div className="hidden lg:flex lg:flex-col lg:justify-center lg:w-full">
                                 <PostSkeleton />
                                 <PostSkeleton />
                                 <PostSkeleton />
-                            </>
+                            </div>
                         )}
                     </div>
                     <div className="hidden md:flex md:flex-col xl:col xl:col-4">
@@ -140,6 +142,6 @@ export const Forums = () => {
                     loading={isCreatePostLoading}
                 />
             </InfiniteScroll>
-        </>
+        </motion.div>
     );
 };
