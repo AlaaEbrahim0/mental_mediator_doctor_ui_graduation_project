@@ -6,14 +6,14 @@ import { Toaster } from "react-hot-toast";
 export const CustomToast = () => {
     return (
         <Toaster
-            position="top-right"
+            position="top-center"
             toastOptions={{
                 style: {
                     fontSize: "16px",
                     borderRadius: "8px",
                 },
                 success: {
-                    position: "top-right",
+                    position: "top-center",
                     duration: 3000,
                     icon: (
                         <div>

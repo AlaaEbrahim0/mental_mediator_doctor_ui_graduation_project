@@ -10,7 +10,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
     const { notifications, count } = useNotifications();
 
     return (
-        <div className="navbar bg-base-100 shadow-sm sticky p-3 z-10 top-0">
+        <div className="navbar bg-[#fdfdfd] shadow-sm sticky p-3 z-10 top-0">
             <button className="lg:hidden text-2xl" onClick={toggleSidebar}>
                 <FaBars />
             </button>
@@ -32,7 +32,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                 </label>
             </div>
             <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn m-1">
+                <div tabIndex={0} role="button" className="m-1">
                     <div className="indicator">
                         {count > 0 && (
                             <span className="indicator-item badge badge-secondary">

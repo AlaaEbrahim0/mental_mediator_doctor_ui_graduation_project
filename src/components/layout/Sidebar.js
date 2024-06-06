@@ -67,12 +67,25 @@ export function Sidebar({ isOpen, setIsOpen }) {
         setIsExpanded((prev) => !prev);
     };
 
+    useEffect(() => {
+        const handleResize = () => {
+            if (sidebarRef.current && !isExpanded) {
+                sidebarRef.current.style.height = "auto";
+            }
+        };
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, [isExpanded]);
+
     return (
         <div
             ref={sidebarRef}
             className={`animated-gradient fixed text-white lg:sticky top-0 left-0 h-screen z-40 overflow-y-auto transition-transform duration-300 ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
             } lg:translate-x-0 ${isExpanded ? "w-64" : "w-20"}`}
+            style={{ maxHeight: "100vh" }} // Set max height to viewport height
         >
             {isLoading ? (
                 <div className="doctor-info flex flex-col justify-center align-center py-4 px-8 w-full">

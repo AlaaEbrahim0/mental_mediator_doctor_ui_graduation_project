@@ -43,7 +43,7 @@ export const ForumsDetails = () => {
     };
 
     return (
-        <div className="row justify-center mx-auto max-w-3xl mt-8">
+        <div className="row justify-center mx-auto max-w-3xl mt-4">
             {isLoading && <PostSkeleton />}
             {!isLoading && error && (
                 <div className="alert alert-error text-white">
