@@ -4,6 +4,8 @@ import { useNotifications } from "../../context/notificationsContext";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
+const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
+
 export const Notification = ({
     id,
     message,
@@ -51,7 +53,9 @@ export const Notification = ({
                 >
                     <div className="flex flex-row gap-x-4">
                         <img
-                            src={notifierPhotoUrl}
+                            src={
+                                notifierPhotoUrl || imagesDir + "/profile.webp"
+                            }
                             className="w-12 h-12 rounded-full"
                             alt={notifierUserName}
                         />

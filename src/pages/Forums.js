@@ -72,7 +72,6 @@ export const Forums = () => {
             const newPost = await createPostExecute(title, content, postPhoto);
             reset();
             await execute();
-
             // setData([newPost, ...data]);
             setModalVisible(false);
         } catch (e) {
@@ -84,7 +83,6 @@ export const Forums = () => {
         }
     };
 
-    
     const toggleShowConfessions = () => {
         setShowConfessions((prevState) => !prevState);
         reset();
@@ -105,7 +103,7 @@ export const Forums = () => {
             >
                 <div className="block lg:flex ">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                        <div className="flex flex-row justify-between my-2 mx-2fo">
+                        <div className="flex flex-row justify-between my-2 mx-2">
                             <button
                                 className="btn btn-sm md:btn w-24 "
                                 onClick={handleAddPostClick}
