@@ -31,6 +31,8 @@ export const Post = ({
     commentCount: initialCommentCount,
     setData,
     currentUserId,
+    handleDelete,
+    postDeletionLoading,
 }) => {
     const [commentText, setCommentText] = useState("");
     const [showComments, setShowComments] = useState(false);
@@ -55,13 +57,6 @@ export const Post = ({
         error: createCommentError,
         execute: createCommentExecute,
     } = useCreateComment();
-
-    const {
-        isLoading: postDeletionLoading,
-        error: postDeletionError,
-        data: postDeletionData,
-        execute: deletePostExecute,
-    } = useDeletePost();
 
     const handleCommentChange = (e) => {
         setCommentText(e.target.value);
@@ -96,19 +91,6 @@ export const Post = ({
         setCommentCount(initialCommentCount);
     }, [initialCommentCount]);
 
-    const handleDeletePost = async (id) => {
-        try {
-            await deletePostExecute(id);
-            setData((prev) => prev.filter((post) => post.id !== id));
-        } catch (e) {
-            toast.error(e.errors[0].description, {
-                duration: 4000,
-                position: "top-center",
-                className: "text-lg text-primary",
-            });
-        }
-    };
-
     const handleUpdatePost = async (id, title, content, postPhoto) => {
         if (!title || !content) {
             return;
@@ -139,7 +121,7 @@ export const Post = ({
         <motion.div
             animate={{ opacity: 1 }}
             initial={{ opacity: 0 }}
-            className="flex flex-col mb-8 p-4 mt w-full glass shadow-md rounded-lg"
+            className="flex flex-col mb-8 p-6 mt w-full glass  shadow-md rounded-lg"
         >
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
@@ -199,7 +181,7 @@ export const Post = ({
                                 </li>
                                 <CustomDeletionModal
                                     id={"delete-post-modal-" + id}
-                                    handleConfirm={() => handleDeletePost(id)}
+                                    handleConfirm={async () => handleDelete(id)}
                                     loading={postDeletionLoading}
                                 />
                             </>
@@ -226,7 +208,7 @@ export const Post = ({
             {postPhoto && (
                 <img
                     src={postPhoto}
-                    className="w-full h-full object-cover  mt-5"
+                    className="w-full h-full object-cover rounded-lg mt-5"
                     alt="Post"
                 />
             )}

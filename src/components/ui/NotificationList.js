@@ -8,8 +8,8 @@ export const NotificationsList = ({ notifications }) => {
 
     return (
         <>
-            <div className="flex flex-row justify-between p-4">
-                <h1 className="text-xl text-left font-bold">Notifications</h1>
+            <div className="flex flex-row justify-between p-4 border-b-2 ">
+                <h1 className="text-xl text-left font-bold ">Notifications</h1>
                 <button onClick={markAllAsRead} className="text-sm text-info">
                     Mark All As Read
                 </button>
@@ -29,7 +29,7 @@ export const NotificationsList = ({ notifications }) => {
 
             <ul
                 tabIndex={0}
-                className="mt-4 overflow-y-auto max-h-96 divide-y-2"
+                className="mt-1 overflow-y-auto max-h-96 divide-y-2"
             >
                 {notifications.map((notification) => (
                     <li key={notification.id}>

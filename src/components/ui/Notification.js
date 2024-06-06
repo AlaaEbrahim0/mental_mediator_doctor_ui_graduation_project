@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../../context/notificationsContext";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export const Notification = ({
     id,
@@ -37,7 +38,12 @@ export const Notification = ({
                     <span>{error}</span>
                 </div>
             )}
-            <div className="w-full" onClick={handleMarkAsRead}>
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full"
+                onClick={handleMarkAsRead}
+            >
                 <div
                     className={`flex flex-col py-4 px-4 rounded-lg ${
                         isRead ? "" : "bg-white glass"
@@ -69,7 +75,7 @@ export const Notification = ({
                         </div>
                     )}
                 </div>
-            </div>
+            </motion.div>
         </>
     );
 };

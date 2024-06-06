@@ -19,6 +19,7 @@ export const useDeletePost = () => {
 
     const execute = async (id) => {
         try {
+            debugger;
             setIsLoading(true);
             const response = await DeletePost(id);
             setData(response);

@@ -4,10 +4,19 @@ import { PostSkeleton } from "../components/ui/PostSkeleton";
 import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
 import { Post } from "../components/ui/Post";
 import { useAuth } from "../auth/authProvider";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDeletePost } from "../api/comments/deletePost";
+import toast from "react-hot-toast";
 
 export const ForumsDetails = () => {
     const { isLoading, error, data: post, setData, execute } = useGetPostById();
+    const {
+        isLoadingDelete,
+        deleteError,
+        execute: executeDelete,
+    } = useDeletePost();
+    const navigate = useNavigate();
+
     const { id } = useParams();
     const { userId } = useAuth();
 
@@ -25,6 +34,13 @@ export const ForumsDetails = () => {
             </div>
         );
     }
+
+    const handleDelete = async (id) => {
+        debugger;
+        await executeDelete(id);
+        navigate("/forums", { replace: true });
+        toast.success("Post has been deleted successfully");
+    };
 
     return (
         <div className="row justify-center mx-auto max-w-3xl mt-8">
@@ -49,6 +65,8 @@ export const ForumsDetails = () => {
                     data={post}
                     setData={setData}
                     currentUserId={userId}
+                    handleDelete={handleDelete}
+                    postDeletionLoading={isLoadingDelete}
                 />
             )}
         </div>

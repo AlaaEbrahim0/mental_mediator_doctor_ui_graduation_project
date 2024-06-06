@@ -13,7 +13,7 @@ const useSignalR = (onReceiveNotification) => {
             .withUrl(`${url}/notification-hub`, {
                 accessTokenFactory: () => localStorage.getItem("token"),
             })
-            .withAutomaticReconnect()
+            // .withAutomaticReconnect()
             .build();
 
         setConnection(newConnection);

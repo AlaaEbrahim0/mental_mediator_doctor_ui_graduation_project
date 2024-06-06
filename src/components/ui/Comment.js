@@ -144,8 +144,8 @@ export const Comment = ({
     return (
         <>
             <motion.div
-                animate={{ opacity: 1 }}
-                initial={{ opacity: 0 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col shadow-md rounded-lg mt-3 w-full px-2 py-4 md:p-4 glass"
             >
                 <div className="info flex flex-col flex-1">

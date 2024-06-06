@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { PostSkeleton } from "../components/ui/PostSkeleton";
 import { CreatePostModal } from "../components/ui/CreatePostModal";
 import { useCreatePost } from "../api/comments/createPost";
+import { useDeletePost } from "../api/comments/deletePost";
+import { useNavigate } from "react-router-dom";
 import { Post } from "../components/ui/Post";
 import { useAuth } from "../auth/authProvider";
 import { motion } from "framer-motion";
@@ -13,6 +15,26 @@ import { motion } from "framer-motion";
 export const Forums = () => {
     const { isLoading, error, data, setData, page, hasMore, execute, reset } =
         useGetPosts();
+    const {
+        isLoadingDelete,
+        deleteError,
+        execute: executeDelete,
+    } = useDeletePost();
+    const navigate = useNavigate();
+
+    const handleDeletePost = async (id) => {
+        try {
+            debugger;
+            await executeDelete(id);
+            setData((prev) => prev.filter((post) => post.id !== id));
+        } catch (e) {
+            toast.error(e.errors[0].description, {
+                duration: 4000,
+                position: "top-center",
+                className: "text-lg text-primary",
+            });
+        }
+    };
 
     const { userId } = useAuth();
 
@@ -61,6 +83,8 @@ export const Forums = () => {
             });
         }
     };
+
+    
     const toggleShowConfessions = () => {
         setShowConfessions((prevState) => !prevState);
         reset();
@@ -81,9 +105,9 @@ export const Forums = () => {
             >
                 <div className="block lg:flex ">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                        <div className="flex flex-row justify-between my-2">
+                        <div className="flex flex-row justify-between my-2 mx-2fo">
                             <button
-                                className="btn btn-sm md:btn ml-4 w-24 "
+                                className="btn btn-sm md:btn w-24 "
                                 onClick={handleAddPostClick}
                             >
                                 Add Post
@@ -118,11 +142,13 @@ export const Forums = () => {
                                     commentCount={post.commentsCount}
                                     setData={setData}
                                     currentUserId={userId}
+                                    handleDelete={handleDeletePost}
+                                    postDeletionLoading={isLoadingDelete}
                                 />
                             ))}
 
                         {isLoading && page === 1 && (
-                            <div className="hidden lg:flex lg:flex-col lg:justify-center lg:w-full">
+                            <div className="lg:flex lg:flex-col lg:justify-center lg:w-full">
                                 <PostSkeleton />
                                 <PostSkeleton />
                                 <PostSkeleton />
