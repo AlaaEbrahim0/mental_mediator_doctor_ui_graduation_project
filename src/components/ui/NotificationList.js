@@ -16,7 +16,7 @@ export const NotificationsList = ({ notifications }) => {
             </div>
 
             {loading && (
-                <div className="">
+                <div className="text-center">
                     <span className="loading loading-spinner"></span>
                 </div>
             )}
