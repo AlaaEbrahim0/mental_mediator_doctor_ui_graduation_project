@@ -122,7 +122,7 @@ export const Post = ({
         <motion.div
             animate={{ opacity: 1 }}
             initial={{ opacity: 0 }}
-            className="flex flex-col mb-8 p-6 mt w-full glass  shadow-md rounded-lg"
+            className="flex flex-col mb-8 p-4 mt w-full glass  shadow-md rounded-lg"
         >
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
