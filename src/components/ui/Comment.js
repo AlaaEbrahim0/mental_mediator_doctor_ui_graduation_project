@@ -77,6 +77,7 @@ export const Comment = ({
             setRepliesCount((prevCount) => prevCount + 1);
             await getRepliesExecute(postId, id);
             setShowReplies(true);
+            toast.success("Reply has been added successfully", {});
         } catch (e) {
             toast.error(e.errors[0].description, {
                 duration: 4000,
@@ -108,6 +109,7 @@ export const Comment = ({
     };
 
     const handleDelete = async () => {
+        debugger;
         await deleteCommentExecute(postId, id);
         await handleDeleteComment();
         handleCommentDeletion();

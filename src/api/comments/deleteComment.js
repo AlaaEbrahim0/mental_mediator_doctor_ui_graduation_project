@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const url = process.env.REACT_APP_API_URL;
 
@@ -21,10 +22,12 @@ export const useDeleteComment = () => {
 
     const execute = async (postId, commentId) => {
         try {
+            debugger;
             setIsLoading(true);
             const comment = await deleteComment(postId, commentId);
             setData(comment);
             setIsLoading(false);
+            toast.success("Comment has been deleted successfully");
         } catch (e) {
             setError(e);
             setIsLoading(false);

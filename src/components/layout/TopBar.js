@@ -4,6 +4,7 @@ import { FaBars } from "react-icons/fa";
 import { MdOutlineNotificationsNone } from "react-icons/md";
 import { useNotifications } from "../../context/notificationsContext";
 import { NotificationsList } from "../ui/NotificationList";
+import { motion } from "framer-motion";
 
 export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
     const { notifications, count } = useNotifications();
@@ -13,9 +14,13 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
             <button className="lg:hidden text-2xl" onClick={toggleSidebar}>
                 <FaBars />
             </button>
-            <div className="flex-1">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex-1"
+            >
                 <h3 className="btn btn-ghost text-xl md:text-2xl">{title}</h3>
-            </div>
+            </motion.div>
             <div className="form-control">
                 <label className="input bg-neutral input-bordered flex items-center w-full">
                     <IoSearchSharp className="text-xl text-info mr-2" />

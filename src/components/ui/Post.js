@@ -71,6 +71,7 @@ export const Post = ({
             setCommentCount((prevCount) => prevCount + 1);
             await getCommentsExecute(id);
             setShowComments(true);
+            toast.success("Comment has been  added successfully", {});
         } catch (e) {
             console.log(e);
             toast.error(e.errors[0].description, {
