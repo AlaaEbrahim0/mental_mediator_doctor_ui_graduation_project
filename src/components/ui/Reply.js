@@ -74,7 +74,7 @@ export const Reply = ({
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col  shadow-lg border-2 border-zinc-500 rounded-lg mt-3 w-full p-2 md:p-4"
+            className="flex flex-col shadow-lg rounded-lg mt-3 w-full p-2 md:p-4"
         >
             <div className="info flex flex-col">
                 <div className="flex flex-row flex-grow">

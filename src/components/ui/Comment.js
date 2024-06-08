@@ -150,7 +150,7 @@ export const Comment = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col shadow-md rounded-lg mt-3 w-full px-2 py-4 md:p-4 border-2 border-zinc-500"
+            className="flex flex-col shadow-md rounded-lg mt-3 w-full px-2 py-4 md:p-4 glass"
         >
             <div className="info flex flex-col flex-1">
                 <div className="flex flex-row flex-grow">
