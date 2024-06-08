@@ -2,17 +2,10 @@ import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 const url = process.env.REACT_APP_API_URL;
 
-const token = localStorage.getItem("token");
-
 const getSchedule = async (doctorId) => {
     try {
         const response = await axios.get(
-            `${url}/api/doctors/${doctorId}/schedule`,
-            {
-                headers: {
-                    Authorization: "Bearer " + token,
-                },
-            }
+            `${url}/api/doctors/${doctorId}/schedule`
         );
         const data = await response.data;
         return data;
