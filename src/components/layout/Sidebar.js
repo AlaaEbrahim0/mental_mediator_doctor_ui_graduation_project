@@ -57,6 +57,7 @@ export function Sidebar({ isOpen, setIsOpen }) {
 
     const handleMenuItemClick = (index) => {
         setActive(index);
+        closeSidebar();
     };
 
     const closeSidebar = () => {

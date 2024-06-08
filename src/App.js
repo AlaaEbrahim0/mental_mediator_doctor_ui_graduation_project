@@ -9,7 +9,7 @@ function App() {
         <AuthProvider>
             <UserProfileProvider>
                 <NotificationsProvider>
-                    <Routes />
+                    <Routes />  
                 </NotificationsProvider>
             </UserProfileProvider>
         </AuthProvider>

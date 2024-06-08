@@ -7,13 +7,10 @@ import { useGetComments } from "../../api/comments/getComments";
 import { Link } from "react-router-dom";
 import { useCreateComment } from "../../api/comments/postComment";
 import toast from "react-hot-toast";
-import { useAuth } from "../../auth/authProvider";
 import { useUpdatePost } from "../../api/comments/updatePost";
-import { NavLink } from "react-router-dom";
 import UpdatePostModal from "./UpdatePostModal"; // Import the UpdatePostModal component
-import { useDeletePost } from "../../api/comments/deletePost";
 import { CustomDeletionModal } from "./CustomDeletionModal";
-import { useUserProfile } from "../../context/profileContext";
+import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
@@ -215,29 +212,30 @@ export const Post = ({
             )}
             {showComments && (
                 <div className="mt-4">
-                    {commentsData &&
-                        commentsData.map((comment) => (
-                            <Comment
-                                key={"comment-" + comment.id}
-                                id={comment.id}
-                                content={comment.content}
-                                authorName={comment.username || "Anonymous"}
-                                commentedAt={convertUtcToRelativeTime(
-                                    comment.commentedAt
-                                )}
-                                authorId={comment.appUserId}
-                                postId={id}
-                                handleDeleteComment={async () =>
-                                    await getCommentsExecute(id)
-                                }
-                                photoUrl={comment.photoUrl}
-                                handleCommentDeletion={() =>
-                                    setCommentCount(commentCount - 1)
-                                }
-                                currentUserId={currentUserId}
-                                repliesCount={comment.repliesCount}
-                            />
-                        ))}
+                        {commentsData &&
+                        
+                            commentsData.map((comment) => (
+                                <Comment
+                                    key={"comment-" + comment.id}
+                                    id={comment.id}
+                                    content={comment.content}
+                                    authorName={comment.username || "Anonymous"}
+                                    commentedAt={convertUtcToRelativeTime(
+                                        comment.commentedAt
+                                    )}
+                                    authorId={comment.appUserId}
+                                    postId={id}
+                                    handleDeleteComment={async () =>
+                                        await getCommentsExecute(id)
+                                    }
+                                    photoUrl={comment.photoUrl}
+                                    handleCommentDeletion={() =>
+                                        setCommentCount(commentCount - 1)
+                                    }
+                                    currentUserId={currentUserId}
+                                    repliesCount={comment.repliesCount}
+                                />
+                            ))}
                 </div>
             )}
 

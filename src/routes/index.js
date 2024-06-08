@@ -12,7 +12,7 @@ import { Login } from "../auth/login";
 import { Forums } from "../pages/Forums";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
 import { Logout } from "../auth/logout";
-import { Schedule } from "../pages/Home";
+import { Schedule } from "../pages/Schedule";
 import { ForumsDetails } from "../pages/ForumsDetails";
 import { Profile } from "../pages/Profile";
 

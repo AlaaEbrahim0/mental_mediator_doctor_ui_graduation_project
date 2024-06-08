@@ -10,34 +10,39 @@ import { useDeletePost } from "../api/comments/deletePost";
 import { useNavigate } from "react-router-dom";
 import { Post } from "../components/ui/Post";
 import { useAuth } from "../auth/authProvider";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+// Custom hook for intersection observer
+export const useInView = (options) => {
+    const [isIntersecting, setIntersecting] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => setIntersecting(entry.isIntersecting),
+            options
+        );
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => {
+            if (ref.current) {
+                observer.unobserve(ref.current);
+            }
+        };
+    }, [options]);
+
+    return [ref, isIntersecting];
+};
 
 export const Forums = () => {
     const { isLoading, error, data, setData, page, hasMore, execute, reset } =
         useGetPosts();
-    const {
-        isLoadingDelete,
-        deleteError,
-        execute: executeDelete,
-    } = useDeletePost();
+    const { isLoadingDelete, execute: executeDelete } = useDeletePost();
     const navigate = useNavigate();
-
-    const handleDeletePost = async (id) => {
-        try {
-            debugger;
-            await executeDelete(id);
-            setData((prev) => prev.filter((post) => post.id !== id));
-        } catch (e) {
-            toast.error(e.errors[0].description, {
-                duration: 4000,
-                position: "top-center",
-                className: "text-lg text-primary",
-            });
-        }
-    };
-
     const { userId } = useAuth();
-
     const [isModalVisible, setModalVisible] = useState(false);
     const [showConfessions, setShowConfessions] = useState(false);
     const initialFetchRef = useRef(false);
@@ -55,24 +60,32 @@ export const Forums = () => {
         }
     }, [execute, page, hasMore, isLoading, showConfessions]);
 
+    const handleDeletePost = async (id) => {
+        try {
+            await executeDelete(id);
+            setData((prev) => prev.filter((post) => post.id !== id));
+        } catch (e) {
+            toast.error(e.errors[0].description, {
+                duration: 4000,
+                position: "top-center",
+                className: "text-lg text-primary",
+            });
+        }
+    };
+
     const handleAddPostClick = () => setModalVisible(true);
     const handleCloseModal = () => setModalVisible(false);
 
-    const {
-        isLoading: isCreatePostLoading,
-        error: createPostError,
-        execute: createPostExecute,
-    } = useCreatePost();
+    const { isLoading: isCreatePostLoading, execute: createPostExecute } =
+        useCreatePost();
     const handleCreatePost = async (title, content, postPhoto) => {
         if (!title || !content) {
             return;
         }
         try {
-            debugger;
-            const newPost = await createPostExecute(title, content, postPhoto);
+            await createPostExecute(title, content, postPhoto);
             reset();
             await execute();
-            // setData([newPost, ...data]);
             setModalVisible(false);
         } catch (e) {
             toast.error(e.errors[0].description, {
@@ -101,16 +114,15 @@ export const Forums = () => {
                 hasMore={!isLoading && hasMore}
                 loader={<PostSkeleton />}
             >
-                <div className="block lg:flex ">
+                <div className="block lg:flex">
                     <div className="lg:flex lg:flex-col xl:col xl:col-8">
                         <div className="flex flex-row justify-between my-2 mx-2">
                             <button
-                                className="btn btn-sm md:btn w-24 "
+                                className="btn btn-sm md:btn w-24"
                                 onClick={handleAddPostClick}
                             >
                                 Add Post
                             </button>
-
                             <div className="flex items-center">
                                 <span className="mr-2 text-sm md:text-lg font-semibold">
                                     Show Confessions
@@ -123,28 +135,20 @@ export const Forums = () => {
                             </div>
                         </div>
                         <div className="flex justify-between mx-2 my-2"></div>
-                        {data &&
-                            data.map((post, index) => (
-                                <Post
-                                    key={"post-" + post.id + "-" + index}
-                                    id={post.id}
-                                    authorName={post.username}
-                                    authorId={post.appUserId}
-                                    title={post.title}
-                                    content={post.content}
-                                    date={convertUtcToRelativeTime(
-                                        post.postedOn
-                                    )}
-                                    image={post.photoUrl}
-                                    postPhoto={post.postPhotoUrl}
-                                    commentCount={post.commentsCount}
-                                    setData={setData}
-                                    currentUserId={userId}
-                                    handleDelete={handleDeletePost}
-                                    postDeletionLoading={isLoadingDelete}
-                                />
-                            ))}
-
+                        <AnimatePresence>
+                            {data &&
+                                data.map((post, index) => (
+                                    <AnimatedPost
+                                        key={"post-" + post.id + "-" + index}
+                                        post={post}
+                                        index={index}
+                                        handleDeletePost={handleDeletePost}
+                                        userId={userId}
+                                        isLoadingDelete={isLoadingDelete}
+                                        setData={setData}
+                                    />
+                                ))}
+                        </AnimatePresence>
                         {isLoading && page === 1 && (
                             <div className="lg:flex lg:flex-col lg:justify-center lg:w-full">
                                 <PostSkeleton />
@@ -166,6 +170,49 @@ export const Forums = () => {
                     loading={isCreatePostLoading}
                 />
             </InfiniteScroll>
+        </motion.div>
+    );
+};
+
+const AnimatedPost = ({
+    post,
+    index,
+    handleDeletePost,
+    userId,
+    isLoadingDelete,
+    setData,
+}) => {
+    const [ref, isIntersecting] = useInView({ threshold: 0.1 });
+
+    const variants = {
+        hidden: { scale: 0.9, opacity: 0 },
+        visible: { scale: 1, opacity: 1, transition: { duration: 0.5 } },
+        exit: { scale: 0.9, opacity: 0, transition: { duration: 0.5 } },
+    };
+
+    return (
+        <motion.div
+            ref={ref}
+            variants={variants}
+            initial="hidden"
+            animate={isIntersecting ? "visible" : "exit"}
+            exit="exit"
+        >
+            <Post
+                id={post.id}
+                authorName={post.username}
+                authorId={post.appUserId}
+                title={post.title}
+                content={post.content}
+                date={convertUtcToRelativeTime(post.postedOn)}
+                image={post.photoUrl}
+                postPhoto={post.postPhotoUrl}
+                commentCount={post.commentsCount}
+                setData={setData}
+                currentUserId={userId}
+                handleDelete={handleDeletePost}
+                postDeletionLoading={isLoadingDelete}
+            />
         </motion.div>
     );
 };

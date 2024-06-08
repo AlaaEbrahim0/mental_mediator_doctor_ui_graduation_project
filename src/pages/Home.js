@@ -6,7 +6,3 @@ export function Home() {
 export function Appointments() {
     return null;
 }
-
-export function Schedule() {
-    return null;
-}
