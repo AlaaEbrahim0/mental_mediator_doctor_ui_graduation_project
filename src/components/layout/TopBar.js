@@ -10,7 +10,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
     const { notifications, count } = useNotifications();
 
     return (
-        <div className="navbar bg-[#fdfdfd] shadow-sm sticky p-3 z-10 top-0">
+        <div className="navbar bg-base-100 shadow-sm sticky p-3 z-10 top-0">
             <button className="lg:hidden text-2xl" onClick={toggleSidebar}>
                 <FaBars />
             </button>

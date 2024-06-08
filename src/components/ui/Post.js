@@ -119,7 +119,7 @@ export const Post = ({
         <motion.div
             animate={{ opacity: 1 }}
             initial={{ opacity: 0 }}
-            className="flex flex-col mb-8 p-4 mt w-full glass  shadow-md rounded-lg"
+            className="flex flex-col mb-8 p-4 mt w-full border-2 border-zinc-500 shadow-md rounded-lg"
         >
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
@@ -212,30 +212,29 @@ export const Post = ({
             )}
             {showComments && (
                 <div className="mt-4">
-                        {commentsData &&
-                        
-                            commentsData.map((comment) => (
-                                <Comment
-                                    key={"comment-" + comment.id}
-                                    id={comment.id}
-                                    content={comment.content}
-                                    authorName={comment.username || "Anonymous"}
-                                    commentedAt={convertUtcToRelativeTime(
-                                        comment.commentedAt
-                                    )}
-                                    authorId={comment.appUserId}
-                                    postId={id}
-                                    handleDeleteComment={async () =>
-                                        await getCommentsExecute(id)
-                                    }
-                                    photoUrl={comment.photoUrl}
-                                    handleCommentDeletion={() =>
-                                        setCommentCount(commentCount - 1)
-                                    }
-                                    currentUserId={currentUserId}
-                                    repliesCount={comment.repliesCount}
-                                />
-                            ))}
+                    {commentsData &&
+                        commentsData.map((comment) => (
+                            <Comment
+                                key={"comment-" + comment.id}
+                                id={comment.id}
+                                content={comment.content}
+                                authorName={comment.username || "Anonymous"}
+                                commentedAt={convertUtcToRelativeTime(
+                                    comment.commentedAt
+                                )}
+                                authorId={comment.appUserId}
+                                postId={id}
+                                handleDeleteComment={async () =>
+                                    await getCommentsExecute(id)
+                                }
+                                photoUrl={comment.photoUrl}
+                                handleCommentDeletion={() =>
+                                    setCommentCount(commentCount - 1)
+                                }
+                                currentUserId={currentUserId}
+                                repliesCount={comment.repliesCount}
+                            />
+                        ))}
                 </div>
             )}
 

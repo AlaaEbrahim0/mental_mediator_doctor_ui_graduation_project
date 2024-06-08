@@ -34,7 +34,7 @@ const WeekdaySchedule = () => {
 
     console.log("Schedule:", schedule);
     return (
-        <div className="flex flex-col rounded-xl shadow-lg p-6 bg-slate-50 max-w-6xl mx-auto">
+        <div className="flex flex-col rounded-xl shadow-lg p-6  max-w-6xl mx-auto">
             <div className="flex flex-row justify-between">
                 <h1 className="text-xl text-center font-bold mb-2">
                     Weekly Schedule
@@ -95,7 +95,7 @@ const WeekdaySchedule = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 whileHover={{ scale: 1.05 }}
                                 key={index}
-                                className="p-8 bg-gray-50 hover:bg-white rounded-xl shadow-lg"
+                                className="p-8  hover:bg-base-200 rounded-xl shadow-lg"
                             >
                                 <div className="flex flex-row justify-between">
                                     <h2 className="text-xl text-center font-bold mb-2">
@@ -146,7 +146,7 @@ const WeekdaySchedule = () => {
                                                         "delete-day-modal-" +
                                                         index
                                                     }
-                                                handleConfirm={async (id) =>
+                                                    handleConfirm={async (id) =>
                                                         handleDelete(id)
                                                     }
                                                     // loading={
