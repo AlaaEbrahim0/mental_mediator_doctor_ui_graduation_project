@@ -5,7 +5,6 @@ import { HiOutlineMenu } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { useSchedule } from "../api/getWeeklySchedule";
 import { useAuth } from "../auth/authProvider";
-
 const WeekdaySchedule = () => {
     const {
         isLoading: isScheduleLoading,
@@ -117,9 +116,10 @@ const WeekdaySchedule = () => {
                                                 <li className="mb-1">
                                                     <button
                                                         className="btn btn-sm btn-secondary btn-outline text-md"
-                                                        // onClick={() =>
-                                                        //     setUpdateModalVisible(true)
-                                                        // } // Show update modal on click
+                                                        onClick={
+                                                            () => 5
+                                                            // setUpdateModalVisible(true)
+                                                        }
                                                     >
                                                         Edit
                                                     </button>
@@ -174,6 +174,10 @@ const WeekdaySchedule = () => {
                         ))}
                     </>
                 )}
+
+                {!isScheduleLoading && !schedule === 0 && (
+                    <div>Your schedule is empty</div>
+                )}
             </div>
         </div>
     );
@@ -212,5 +216,80 @@ export const Schedule = () => {
 
             <WeekdaySchedule />
         </div>
+    );
+};
+
+const EditScheduleForm = ({ initialValues, onSave, onCancel }) => {
+    const [formData, setFormData] = useState(initialValues);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="form-control">
+                <label htmlFor="dayOfWeek">Day of Week:</label>
+                <input
+                    type="text"
+                    id="dayOfWeek"
+                    name="dayOfWeek"
+                    value={formData.dayOfWeek}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+            <div className="form-control">
+                <label htmlFor="startTime">Start Time:</label>
+                <input
+                    type="text"
+                    id="startTime"
+                    name="startTime"
+                    value={formData.startTime}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+            <div className="form-control">
+                <label htmlFor="endTime">End Time:</label>
+                <input
+                    type="text"
+                    id="endTime"
+                    name="endTime"
+                    value={formData.endTime}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+            <div className="form-control">
+                <label htmlFor="sessionDuration">Session Duration:</label>
+                <input
+                    type="text"
+                    id="sessionDuration"
+                    name="sessionDuration"
+                    value={formData.sessionDuration}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
+            <div className="form-actions">
+                <button type="submit" className="btn btn-primary mr-2">
+                    Save
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={onCancel}
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
     );
 };

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../../context/notificationsContext";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -64,7 +65,7 @@ export const Notification = ({
                                 {notifierUserName} {message}
                             </div>
                             <div className="text-sm text-gray-500">
-                                {dateCreated}
+                                {convertUtcToRelativeTime(dateCreated)}
                             </div>
                         </div>
                     </div>

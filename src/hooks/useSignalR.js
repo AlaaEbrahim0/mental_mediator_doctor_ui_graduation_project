@@ -20,7 +20,7 @@ const useSignalR = (onReceiveNotification) => {
     }, []);
 
     useEffect(() => {
-        if (connection) {
+        if (connection && connection.isConnected) {
             connection
                 .start()
                 .then(() => {

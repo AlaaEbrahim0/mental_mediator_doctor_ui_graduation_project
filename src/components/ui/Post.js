@@ -124,7 +124,7 @@ export const Post = ({
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">
                     <img
-                        className="w-12 h-12 md:w-24 md:h-24 rounded-2xl shadow-md"
+                        className="w-12 h-12 md:w-24 md:h-24 rounded-2xl shadow-md object-cover"
                         src={image || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
@@ -132,7 +132,9 @@ export const Post = ({
                         <h1 className="text-xl text-secondary font-bold">
                             {authorName || "Anonymous"}
                         </h1>
-                        <p className="text-info">{date}</p>
+                        <p className="text-info">
+                            {convertUtcToRelativeTime(date)}
+                        </p>
                     </div>
                 </div>
 

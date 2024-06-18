@@ -27,7 +27,7 @@ export const useGetPosts = () => {
 
     const execute = async (
         pageNumber = 1,
-        pageSize = 20,
+        pageSize = 50,
         showConfessions = false
     ) => {
         try {

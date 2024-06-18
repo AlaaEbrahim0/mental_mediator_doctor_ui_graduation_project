@@ -8,6 +8,7 @@ import { MdOutlineDoneOutline } from "react-icons/md";
 import { useUpdateReply } from "../../api/comments/putReply";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -79,16 +80,16 @@ export const Reply = ({
             <div className="info flex flex-col">
                 <div className="flex flex-row flex-grow">
                     <img
-                        className="w-12 h-12 md:w-16 md:h-16 rounded-2xl shadow-lg"
+                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-2xl shadow-lg mr-4 "
                         src={image || imagesDir + "/profile.webp"}
                         alt="Author"
                     />
-                    <div className="ml-4 flex flex-col justify-center w-full">
+                    <div className=" flex flex-col justify-center w-full">
                         <h1 className="text-md md:text-xl text-secondary font-bold">
                             {username}
                         </h1>
-                        <p className="text-xs md:text-md text-info">
-                            {repliedAt}
+                        <p className="text-info">
+                            {convertUtcToRelativeTime(repliedAt)}
                         </p>
                     </div>
                     <div className="actions flex flex-row mt-2">

@@ -5,7 +5,7 @@ export const PostSkeleton = () => {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex flex-col mb-8 glass shadow-md rounded-lg w-full animate-pulse"
+            className="flex flex-col mb-8 glass shadow-md rounded-lg w-full animate-pulse p-4"
         >
             <div className="info flex flex-row justify-between w-full">
                 <div className="flex flex-row">

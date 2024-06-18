@@ -113,8 +113,8 @@ export function Sidebar({ isOpen, setIsOpen }) {
                                     }
                                     alt="Doctor"
                                 />
-                                <h3 className="text-center text-xl text-white uppercase mt-3">
-                                    {`DR. ${userProfileData.firstName || ""} ${
+                                <h3 className="text-center text-lg text-white mt-3">
+                                    {`Dr. ${userProfileData.firstName || ""} ${
                                         userProfileData.lastName || ""
                                     }`}
                                 </h3>

@@ -81,11 +81,11 @@ export const Comment = ({
             setShowReplies(true);
             toast.success("Reply has been added successfully", {});
         } catch (e) {
-            toast.error(e.errors[0].description, {
-                duration: 4000,
-                position: "top-center",
-                className: "text-lg text-primary",
-            });
+            // toast.error(e.errors[0].description, {
+            //     duration: 4000,
+            //     position: "top-center",
+            //     className: "text-lg text-primary",
+            // });
         }
     };
 
@@ -163,8 +163,8 @@ export const Comment = ({
                         <h1 className="text-md md:text-xl text-secondary font-bold">
                             {authorName}
                         </h1>
-                        <p className="text-xs md:text-md text-info">
-                            {commentedAt}
+                        <p className="text-info">
+                            {convertUtcToRelativeTime(commentedAt)}
                         </p>
                     </div>
                     <div className="actions flex">
