@@ -11,31 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { Post } from "../components/ui/Post";
 import { useAuth } from "../auth/authProvider";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Custom hook for intersection observer
-export const useInView = (options) => {
-    const [isIntersecting, setIntersecting] = useState(false);
-    const ref = useRef(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => setIntersecting(entry.isIntersecting),
-            options
-        );
-
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => {
-            if (ref.current) {
-                observer.unobserve(ref.current);
-            }
-        };
-    }, [options]);
-
-    return [ref, isIntersecting];
-};
+import { FiFilter } from "react-icons/fi";
+import { FilterationComponent } from "../components/ui/FilterationComponent";
 
 export const Forums = () => {
     const { isLoading, error, data, setData, page, hasMore, execute, reset } =
@@ -44,21 +21,27 @@ export const Forums = () => {
     const navigate = useNavigate();
     const { userId } = useAuth();
     const [isModalVisible, setModalVisible] = useState(false);
-    const [showConfessions, setShowConfessions] = useState(false);
-    const initialFetchRef = useRef(false);
+    const [isFilterVisible, setFilterVisible] = useState(false);
+    const [filters, setFilters] = useState({
+        fullname: "",
+        title: "",
+        content: "",
+        from: "",
+        to: "",
+        showConfessions: false,
+    });
 
     useEffect(() => {
-        if (!initialFetchRef.current) {
-            execute(1, 20, showConfessions);
-            initialFetchRef.current = true;
-        }
-    }, [execute, showConfessions]);
+        debugger;
+        execute(1, 50, filters);
+    }, [execute, filters]);
 
     const loadMore = useCallback(() => {
+        debugger;
         if (hasMore && !isLoading) {
-            execute(page + 1, 20, showConfessions);
+            execute(page + 1, 50, filters);
         }
-    }, [execute, page, hasMore, isLoading, showConfessions]);
+    }, [execute, page, hasMore, isLoading, filters]);
 
     const handleDeletePost = async (id) => {
         try {
@@ -73,6 +56,10 @@ export const Forums = () => {
         }
     };
 
+    const toggleShowFilters = () => {
+        setFilterVisible((prevState) => !prevState);
+    };
+
     const handleAddPostClick = () => setModalVisible(true);
     const handleCloseModal = () => setModalVisible(false);
 
@@ -83,9 +70,18 @@ export const Forums = () => {
             return;
         }
         try {
+            debugger;
             await createPostExecute(title, content, postPhoto);
             reset();
-            await execute();
+            setFilters({
+                fullname: "",
+                title: "",
+                content: "",
+                from: "",
+                to: "",
+                showConfessions: false,
+            });
+            await execute(1, 50, filters);
             setModalVisible(false);
         } catch (e) {
             toast.error(e.errors[0].description, {
@@ -96,10 +92,11 @@ export const Forums = () => {
         }
     };
 
-    const toggleShowConfessions = () => {
-        setShowConfessions((prevState) => !prevState);
+    const handleFilter = (appliedFilters) => {
+        debugger;
+        setFilters(appliedFilters);
         reset();
-        execute(1, 20, !showConfessions);
+        execute(1, 50, appliedFilters);
     };
 
     if (error) {
@@ -107,70 +104,92 @@ export const Forums = () => {
     }
 
     return (
-        <motion.div>
-            <InfiniteScroll
-                dataLength={data.length}
-                next={loadMore}
-                hasMore={!isLoading && hasMore}
-                loader={<PostSkeleton />}
-            >
-                <div className="block lg:flex">
-                    <div className="lg:flex lg:flex-col xl:col xl:col-8">
-                        <div className="flex flex-row justify-between my-2 mx-2">
-                            <button
-                                className="btn btn-sm md:btn w-24"
-                                onClick={handleAddPostClick}
-                            >
-                                Add Post
-                            </button>
-                            <div className="flex items-center">
-                                <span className="mr-2 text-sm md:text-lg font-semibold">
-                                    Show Confessions
-                                </span>
-                                <input
-                                    type="checkbox"
-                                    className="toggle toggle-md"
-                                    onChange={toggleShowConfessions}
-                                />
+        <>
+            <motion.div>
+                <InfiniteScroll
+                    dataLength={data.length}
+                    next={loadMore}
+                    hasMore={!isLoading && hasMore}
+                    loader={<PostSkeleton />}
+                >
+                    <div className="block lg:flex">
+                        <div className="lg:flex lg:flex-col xl:col xl:col-8">
+                            <div className="flex flex-row justify-between my-2 mx-2">
+                                <button
+                                    className="btn btn-sm md:btn w-24"
+                                    onClick={handleAddPostClick}
+                                >
+                                    Add Post
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-outline md:btn md:btn-outline"
+                                    onClick={toggleShowFilters}
+                                >
+                                    <FiFilter />
+                                    Filter
+                                </button>
                             </div>
-                        </div>
-                        <div className="flex justify-between mx-2 my-2"></div>
-                        <AnimatePresence>
-                            {data &&
-                                data.map((post, index) => (
-                                    <AnimatedPost
-                                        key={"post-" + post.id + "-" + index}
-                                        post={post}
-                                        index={index}
-                                        handleDeletePost={handleDeletePost}
-                                        userId={userId}
-                                        isLoadingDelete={isLoadingDelete}
-                                        setData={setData}
+                            {isFilterVisible && (
+                                <div className="fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-50">
+                                    <FilterationComponent
+                                        onClose={toggleShowFilters}
+                                        onFilter={handleFilter}
                                     />
-                                ))}
-                        </AnimatePresence>
-                        {isLoading && page === 1 && (
-                            <div className="lg:flex lg:flex-col lg:justify-center lg:w-full">
-                                <PostSkeleton />
-                                <PostSkeleton />
-                                <PostSkeleton />
-                            </div>
-                        )}
+                                </div>
+                            )}
+                            {!isLoading && data.length === 0 && (
+                                <div className="text-center text-3xl">
+                                    No Posts were found
+                                </div>
+                            )}
+                            {!isLoading && data.length > 0 && (
+                                <AnimatePresence>
+                                    {data &&
+                                        data.map((post, index) => (
+                                            <AnimatedPost
+                                                key={
+                                                    "post-" +
+                                                    post.id +
+                                                    "-" +
+                                                    index
+                                                }
+                                                post={post}
+                                                index={index}
+                                                handleDeletePost={
+                                                    handleDeletePost
+                                                }
+                                                userId={userId}
+                                                isLoadingDelete={
+                                                    isLoadingDelete
+                                                }
+                                                setData={setData}
+                                            />
+                                        ))}
+                                </AnimatePresence>
+                            )}
+                            {isLoading && page === 1 && (
+                                <div className="lg:flex lg:flex-col lg:justify-center lg:w-full">
+                                    <PostSkeleton />
+                                    <PostSkeleton />
+                                    <PostSkeleton />
+                                </div>
+                            )}
+                        </div>
+                        <div className="hidden md:flex md:flex-col xl:col xl:col-4">
+                            <PostSkeleton />
+                            <PostSkeleton />
+                            <PostSkeleton />
+                        </div>
                     </div>
-                    <div className="hidden md:flex md:flex-col xl:col xl:col-4">
-                        <PostSkeleton />
-                        <PostSkeleton />
-                        <PostSkeleton />
-                    </div>
-                </div>
-                <CreatePostModal
-                    isVisible={isModalVisible}
-                    onClose={handleCloseModal}
-                    onCreate={handleCreatePost}
-                    loading={isCreatePostLoading}
-                />
-            </InfiniteScroll>
-        </motion.div>
+                    <CreatePostModal
+                        isVisible={isModalVisible}
+                        onClose={handleCloseModal}
+                        onCreate={handleCreatePost}
+                        loading={isCreatePostLoading}
+                    />
+                </InfiniteScroll>
+            </motion.div>
+        </>
     );
 };
 
@@ -219,4 +238,28 @@ const AnimatedPost = ({
             />
         </motion.div>
     );
+};
+
+export const useInView = (options) => {
+    const [isIntersecting, setIntersecting] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => setIntersecting(entry.isIntersecting),
+            options
+        );
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => {
+            if (ref.current) {
+                observer.unobserve(ref.current);
+            }
+        };
+    }, [options]);
+
+    return [ref, isIntersecting];
 };

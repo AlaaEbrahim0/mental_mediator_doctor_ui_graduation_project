@@ -84,6 +84,9 @@ export function Profile() {
                       )
                     : true;
             }),
+        location: Yup.string().max(200),
+        city: Yup.string().max(100),
+        fees: Yup.number().min(0),
     });
 
     const [photoPreview, setPhotoPreview] = useState("");
@@ -104,6 +107,9 @@ export function Profile() {
             email: profileData?.email || "",
             specialization: profileData?.specialization || "",
             biography: profileData?.biography || "  ",
+            location: profileData?.location || "",
+            city: profileData?.city || "",
+            fees: profileData?.sessionFees,
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -257,6 +263,36 @@ export function Profile() {
                                 onBlur={formik.handleBlur}
                             />
                         </label>
+                        <label className="form-control col-span-2 w-full">
+                            <div className="label">
+                                <span className="label-text text-lg ">
+                                    City
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                name="city"
+                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                value={formik.values.city}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                        </label>
+                        <label className="form-control col-span-2 w-full">
+                            <div className="label">
+                                <span className="label-text text-lg ">
+                                    Location
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                name="location"
+                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                value={formik.values.location}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                        </label>
                         <label className="form-control w-full max-w-lg">
                             <div className="label">
                                 <span className="label-text text-lg ">
@@ -318,7 +354,7 @@ export function Profile() {
                                 </div>
                             ) : null}
                         </label>
-                        <label className="form-control col-span-2 w-full">
+                        <label className="form-control col-span-1 w-full">
                             <div className="label">
                                 <span className="label-text text-lg ">
                                     Specialization
@@ -343,6 +379,21 @@ export function Profile() {
                                     </option>
                                 ))}
                             </select>
+                        </label>
+                        <label className="form-control col-span-1 w-full">
+                            <div className="label">
+                                <span className="label-text text-lg ">
+                                    Session Fees
+                                </span>
+                            </div>
+                            <input
+                                type="number"
+                                name="fees"
+                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                value={formik.values.fees}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
                         </label>
                         <button
                             type="submit"

@@ -3,13 +3,18 @@ import axios from "axios";
 
 const url = process.env.REACT_APP_API_URL;
 
-const getPosts = async (pageNumber, pageSize, confessionsOnly) => {
+const getPosts = async (pageNumber, pageSize, filters) => {
     try {
         const response = await axios.get(`${url}/api/posts`, {
             params: {
-                pageNumber: pageNumber,
-                pageSize: pageSize,
-                confessionsOnly: confessionsOnly,
+                pageNumber,
+                pageSize,
+                title: filters.title,
+                content: filters.content,
+                username: filters.username,
+                startTime: filters.from || "0001-01-01",
+                endTime: filters.to || "0001-01-01",
+                confessionsOnly: filters.showConfessions,
             },
         });
         return response.data;
@@ -25,14 +30,11 @@ export const useGetPosts = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
-    const execute = async (
-        pageNumber = 1,
-        pageSize = 50,
-        showConfessions = false
-    ) => {
+    const execute = async (pageNumber = 1, pageSize = 50, filters) => {
         try {
+            debugger;
             setIsLoading(true);
-            const posts = await getPosts(pageNumber, pageSize, showConfessions);
+            const posts = await getPosts(pageNumber, pageSize, filters);
             setData((prevData) => [...prevData, ...posts]);
             setIsLoading(false);
             setPage(pageNumber);

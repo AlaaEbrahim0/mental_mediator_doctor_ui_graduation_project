@@ -13,6 +13,9 @@ const UpdateProfile = async (updateData) => {
         formData.append("Gender", updateData.gender);
         formData.append("Biography", updateData.biography);
         formData.append("Specialization", updateData.specialization);
+        formData.append("SessionFees", updateData.fees);
+        formData.append("Location", updateData.location);
+        formData.append("City", updateData.city);
         if (updateData.photo) {
             formData.append("Photo", updateData.photo);
         }
