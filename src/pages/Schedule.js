@@ -4,8 +4,87 @@ import { CustomDeletionModal } from "../components/ui/CustomDeletionModal";
 import { HiOutlineMenu } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { useSchedule } from "../api/getWeeklySchedule";
+import { useDeleteSchedule } from "../api/deleteWeeklySchedule";
+import { useDeleteScheduleDay } from "../api/deleteWeeklyScheduleDay";
 import { useAuth } from "../auth/authProvider";
-const WeekdaySchedule = () => {
+import { useEditScheduleDay } from "../api/editWeeklyScheduleDay";
+import { FaPlus } from "react-icons/fa";
+import { useCreateSchedule } from "../api/createWeeklySchedule";
+import { NewDayForm } from "../components/form/NewDayForm";
+
+const EditDayForm = ({ initialData, onCancel, onSubmit }) => {
+    const [editedData, setEditedData] = useState(initialData);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEditedData({
+            ...editedData,
+            [name]: value,
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit(editedData);
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="my-4 p-4 border border-gray-300 rounded-lg"
+        >
+            <form onSubmit={handleSubmit}>
+                <label className="block mb-2">
+                    Start Time
+                    <input
+                        type="time"
+                        name="startTime"
+                        value={editedData.startTime}
+                        onChange={handleChange}
+                        className="input input-bordered w-full mt-1"
+                    />
+                </label>
+                <label className="block mb-2">
+                    End Time
+                    <input
+                        type="time"
+                        name="endTime"
+                        value={editedData.endTime}
+                        onChange={handleChange}
+                        className="input input-bordered w-full mt-1"
+                    />
+                </label>
+                <label className="block mb-2">
+                    Session Duration (hh:mm:ss)
+                    <input
+                        type="text"
+                        name="sessionDuration"
+                        value={editedData.sessionDuration}
+                        onChange={handleChange}
+                        className="input input-bordered w-full mt-1"
+                        placeholder="hh:mm:ss"
+                    />
+                </label>
+                <div className="flex justify-between">
+                    <button type="submit" className="btn btn-sm btn-primary">
+                        Save
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-secondary"
+                        onClick={onCancel}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </motion.div>
+    );
+};
+
+export const Schedule = () => {
     const {
         isLoading: isScheduleLoading,
         data: schedule,
@@ -14,185 +93,103 @@ const WeekdaySchedule = () => {
         execute: getSchedule,
     } = useSchedule();
 
+    const {
+        isLoading: isDeleteScheduleLoading,
+        error: scheduleDeletionError,
+        execute: deleteSchedule,
+    } = useDeleteSchedule();
+
+    const {
+        isLoading: isDeleteScheduleDayLoading,
+        error: scheduleDayDeletionError,
+        execute: deleteScheduleDay,
+    } = useDeleteScheduleDay();
+
     const { userId } = useAuth();
+    const { execute: editScheduleDay, isLoading: editScheduleDayLoading } =
+        useEditScheduleDay();
+    const { execute: createSchedule, isLoading: createScheduleLoading } =
+        useCreateSchedule();
+
+    const [editDayIndex, setEditDayIndex] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isNewDayFormVisible, setIsNewDayFormVisible] = useState(false);
 
     useEffect(() => {
-        debugger;
         getSchedule(userId);
     }, [userId, getSchedule]);
 
-    useEffect(() => {
-        if (schedule) {
-            console.log("Fetched schedule:", schedule);
-        }
-    }, [schedule]);
-
-    const handleDelete = (id) => {
-        console.log("Delete:", id);
+    const handleDelete = async (id) => {
+        await deleteSchedule(id);
+        setSchedule(null);
     };
 
-    console.log("Schedule:", schedule);
-    return (
-        <div className="flex flex-col rounded-xl shadow-lg p-6  max-w-6xl mx-auto">
-            <div className="flex flex-row justify-between">
-                <h1 className="text-xl text-center font-bold mb-2">
-                    Weekly Schedule
-                </h1>
-                <div className="dropdown dropdown-end">
-                    <div tabIndex={0} role="button" className="m-1">
-                        <HiOutlineMenu className="text-md md:text-xl" />
-                    </div>
-                    <ul
-                        tabIndex={0}
-                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
-                    >
-                        <>
-                            <li className="mb-1">
-                                <button
-                                    className="btn btn-sm btn-secondary btn-outline text-md"
-                                    // onClick={() =>
-                                    //     setUpdateModalVisible(true)
-                                    // } // Show update modal on click
-                                >
-                                    Edit
-                                </button>
-                            </li>
-                            <li className="mb-1">
-                                <>
-                                    <button
-                                        className="btn btn-sm btn-error btn-outline text-md"
-                                        onClick={() =>
-                                            document
-                                                .getElementById(
-                                                    "delete-schedule-modal"
-                                                )
-                                                .showModal()
-                                        }
-                                    >
-                                        Delete
-                                    </button>
-                                </>
-                            </li>
-                            <CustomDeletionModal
-                                id={"delete-schedule-modal"}
-                                // handleConfirm={async () => handleDelete(id)}
-                                // loading={postDeletionLoading}
-                            />
-                        </>
-                    </ul>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                {isScheduleLoading && (
-                    <span className="loading loading-spinner"></span>
-                )}
-                {!isScheduleLoading && schedule && (
-                    <>
-                        {schedule.weekDays.map((day, index) => (
-                            <motion.div
-                                initial={{ y: -10, opacity: 0 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                whileHover={{ scale: 1.05 }}
-                                key={index}
-                                className="p-8  hover:bg-base-200 rounded-xl shadow-lg"
-                            >
-                                <div className="flex flex-row justify-between">
-                                    <h2 className="text-xl text-center font-bold mb-2">
-                                        {day.dayOfWeek}
-                                    </h2>
-                                    <div className="dropdown dropdown-end">
-                                        <div
-                                            tabIndex={0}
-                                            role="button"
-                                            className="m-1"
-                                        >
-                                            <HiOutlineMenu className="text-md md:text-xl" />
-                                        </div>
-                                        <ul
-                                            tabIndex={0}
-                                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
-                                        >
-                                            <>
-                                                <li className="mb-1">
-                                                    <button
-                                                        className="btn btn-sm btn-secondary btn-outline text-md"
-                                                        onClick={
-                                                            () => 5
-                                                            // setUpdateModalVisible(true)
-                                                        }
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                </li>
-                                                <li className="mb-1">
-                                                    <>
-                                                        <button
-                                                            className="btn btn-sm btn-error btn-outline text-md"
-                                                            onClick={() =>
-                                                                document
-                                                                    .getElementById(
-                                                                        "delete-day-modal-" +
-                                                                            index
-                                                                    )
-                                                                    .showModal()
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </>
-                                                </li>
-                                                <CustomDeletionModal
-                                                    id={
-                                                        "delete-day-modal-" +
-                                                        index
-                                                    }
-                                                    handleConfirm={async (id) =>
-                                                        handleDelete(id)
-                                                    }
-                                                    // loading={
-                                                    //     postDeletionLoading
-                                                    // }
-                                                />
-                                            </>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <p>
-                                        <strong>Start Time:</strong>{" "}
-                                        {day.startTime}
-                                    </p>
-                                    <p>
-                                        <strong>End Time:</strong> {day.endTime}
-                                    </p>
-                                    <p>
-                                        <strong>Session Duration:</strong>{" "}
-                                        {day.sessionDuration}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </>
-                )}
+    const handleDayDelete = async (day) => {
+        debugger;
+        await deleteScheduleDay(userId, day);
+        await getSchedule(userId);
+    };
 
-                {!isScheduleLoading && !schedule === 0 && (
-                    <div>Your schedule is empty</div>
-                )}
-            </div>
-        </div>
-    );
-};
+    const handleEditDay = (dayIndex) => {
+        setEditDayIndex(dayIndex);
+    };
 
-export const Schedule = () => {
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const handleCancelEdit = () => {
+        setEditDayIndex(null);
+    };
+
+    const formatTime = (time) => {
+        const [hours, minutes] = time.split(":");
+        return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`;
+    };
+
+    const handleSubmitEdit = async (editedDay) => {
+        try {
+            const editedData = {
+                startTime: formatTime(editedDay.startTime),
+                endTime: formatTime(editedDay.endTime),
+                sessionDuration: editedDay.sessionDuration,
+            };
+            await editScheduleDay(
+                userId,
+                schedule.weekDays[editDayIndex].dayOfWeek,
+                editedData
+            );
+            setEditDayIndex(null);
+            getSchedule(userId);
+        } catch (error) {
+            console.error("Error editing day:", error);
+        }
+    };
+
+    const handleAddNewDay = async (newDayData) => {
+        try {
+            const formattedData = {
+                startTime: formatTime(newDayData.startTime),
+                endTime: formatTime(newDayData.endTime),
+                sessionDuration: newDayData.sessionDuration,
+                dayOfWeek: newDayData.dayOfWeek,
+            };
+            await createSchedule(userId, newDayData.dayOfWeek, formattedData);
+            setIsNewDayFormVisible(false);
+            getSchedule(userId);
+        } catch (error) {
+            console.error("Error adding new day:", error);
+        }
+    };
 
     return (
         <div className="container mx-auto md:px-4">
-            <div className="flex justify-center items-center mb-4 mt-2">
-                <button className="btn" onClick={() => setIsModalVisible(true)}>
-                    Create Schedule
-                </button>
-            </div>
+            {(!schedule || schedule.weekDays.length === 0) && (
+                <div className="flex justify-center items-center mb-4 mt-2">
+                    <button
+                        className="btn"
+                        onClick={() => setIsModalVisible(true)}
+                    >
+                        Create Schedule
+                    </button>
+                </div>
+            )}
             {isModalVisible && (
                 <div className="modal modal-open">
                     <div className="modal-box w-11/12 max-w-2xl">
@@ -201,6 +198,7 @@ export const Schedule = () => {
                         </h3>
                         <ScheduleForm
                             onClose={() => setIsModalVisible(false)}
+                            onCreate={() => getSchedule(userId)}
                         />
                         <div className="modal-action">
                             <button
@@ -214,82 +212,185 @@ export const Schedule = () => {
                 </div>
             )}
 
-            <WeekdaySchedule />
+            <div className="flex flex-col rounded-xl shadow-lg p-6 max-w-6xl mx-auto">
+                <div className="flex flex-row justify-between">
+                    <h1 className="text-xl text-center font-bold mb-2">
+                        Weekly Schedule
+                    </h1>
+                    <div className="dropdown dropdown-end">
+                        <div tabIndex={0} role="button" className="m-1">
+                            <HiOutlineMenu className="text-md md:text-xl" />
+                        </div>
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
+                        >
+                            <>
+                                <li className="mb-1">
+                                    <button className="btn btn-sm btn-secondary btn-outline text-md">
+                                        Edit
+                                    </button>
+                                </li>
+                                <li className="mb-1">
+                                    <>
+                                        <button
+                                            className="btn btn-sm btn-error btn-outline text-md"
+                                            onClick={() =>
+                                                document
+                                                    .getElementById(
+                                                        "delete-schedule-modal"
+                                                    )
+                                                    .showModal()
+                                            }
+                                            disabled={isDeleteScheduleLoading}
+                                        >
+                                            {isDeleteScheduleLoading && (
+                                                <span className="loading loading-spinner"></span>
+                                            )}{" "}
+                                            Delete
+                                        </button>
+                                    </>
+                                </li>
+                                <CustomDeletionModal
+                                    id="delete-schedule-modal"
+                                    handleConfirm={async () => {
+                                        await handleDelete(schedule.doctorId);
+                                    }}
+                                    loading={isDeleteScheduleLoading}
+                                />
+                            </>
+                        </ul>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                    {isScheduleLoading && (
+                        <span className="loading loading-spinner"></span>
+                    )}
+                    {!isScheduleLoading && schedule && (
+                        <>
+                            {schedule.weekDays.map((day, index) => (
+                                <motion.div
+                                    initial={{ y: -10, opacity: 0 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    key={index}
+                                    className="p-8 hover:bg-base-200 rounded-xl shadow-lg"
+                                >
+                                    <div className="flex flex-row justify-between">
+                                        <h2 className="text-xl text-center font-bold mb-2">
+                                            {day.dayOfWeek}
+                                        </h2>
+                                        <div className="dropdown dropdown-end">
+                                            <div
+                                                tabIndex={0}
+                                                role="button"
+                                                className="m-1"
+                                            >
+                                                <HiOutlineMenu className="text-md md:text-xl" />
+                                            </div>
+                                            <ul
+                                                tabIndex={0}
+                                                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
+                                            >
+                                                <>
+                                                    <li className="mb-1">
+                                                        <button
+                                                            className="btn btn-sm btn-secondary btn-outline text-md"
+                                                            onClick={() =>
+                                                                handleEditDay(
+                                                                    index
+                                                                )
+                                                            }
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    </li>
+                                                    <li className="mb-1">
+                                                        <>
+                                                            <button
+                                                                className="btn btn-sm btn-error btn-outline text-md"
+                                                                onClick={() =>
+                                                                    document
+                                                                        .getElementById(
+                                                                            "delete-day-modal-" +
+                                                                                index
+                                                                        )
+                                                                        .showModal()
+                                                                }
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </>
+                                                    </li>
+                                                    <CustomDeletionModal
+                                                        id={
+                                                            "delete-day-modal-" +
+                                                            index
+                                                        }
+                                                        handleConfirm={async () =>
+                                                            handleDayDelete(
+                                                                schedule
+                                                                    .weekDays[
+                                                                    index
+                                                                ].dayOfWeek
+                                                            )
+                                                        }
+                                                    />
+                                                </>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p>
+                                            <strong>Start Time:</strong>{" "}
+                                            {day.startTime}
+                                        </p>
+                                        <p>
+                                            <strong>End Time:</strong>{" "}
+                                            {day.endTime}
+                                        </p>
+                                        <p>
+                                            <strong>Session Duration:</strong>{" "}
+                                            {day.sessionDuration}
+                                        </p>
+                                    </div>
+                                    {editDayIndex === index && (
+                                        <EditDayForm
+                                            initialData={{
+                                                startTime: day.startTime,
+                                                endTime: day.endTime,
+                                                sessionDuration:
+                                                    day.sessionDuration,
+                                            }}
+                                            onCancel={handleCancelEdit}
+                                            onSubmit={handleSubmitEdit}
+                                        />
+                                    )}
+                                </motion.div>
+                            ))}
+                            <button
+                                className="btn btn-secondary btn-outline h-full"
+                                onClick={() => setIsNewDayFormVisible(true)}
+                            >
+                                <FaPlus />
+                            </button>
+                            {isNewDayFormVisible && (
+                                <NewDayForm
+                                    onSubmit={handleAddNewDay}
+                                    onCancel={() =>
+                                        setIsNewDayFormVisible(false)
+                                    }
+                                />
+                            )}
+                        </>
+                    )}
+                </div>
+                {!isScheduleLoading && !schedule && (
+                    <div className="text-2xl text-center py-5">
+                        Your schedule is empty
+                    </div>
+                )}
+            </div>
         </div>
-    );
-};
-
-const EditScheduleForm = ({ initialValues, onSave, onCancel }) => {
-    const [formData, setFormData] = useState(initialValues);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave(formData);
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="form-control">
-                <label htmlFor="dayOfWeek">Day of Week:</label>
-                <input
-                    type="text"
-                    id="dayOfWeek"
-                    name="dayOfWeek"
-                    value={formData.dayOfWeek}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div className="form-control">
-                <label htmlFor="startTime">Start Time:</label>
-                <input
-                    type="text"
-                    id="startTime"
-                    name="startTime"
-                    value={formData.startTime}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div className="form-control">
-                <label htmlFor="endTime">End Time:</label>
-                <input
-                    type="text"
-                    id="endTime"
-                    name="endTime"
-                    value={formData.endTime}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div className="form-control">
-                <label htmlFor="sessionDuration">Session Duration:</label>
-                <input
-                    type="text"
-                    id="sessionDuration"
-                    name="sessionDuration"
-                    value={formData.sessionDuration}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-            <div className="form-actions">
-                <button type="submit" className="btn btn-primary mr-2">
-                    Save
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={onCancel}
-                >
-                    Cancel
-                </button>
-            </div>
-        </form>
     );
 };

@@ -5,17 +5,7 @@ import { useAuth } from "../auth/authProvider";
 const url = process.env.REACT_APP_API_URL;
 const GetProfile = async (token) => {
     try {
-        let response;
-        if (!token) {
-            response = await axios.get(`${url}/api/doctors/me`);
-        } else {
-            response = await axios.get(`${url}/api/doctors/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-        }
-
+        let response = await axios.get(`${url}/api/doctors/me`);
         return response.data;
     } catch (error) {
         console.log(error);
@@ -26,17 +16,19 @@ const GetProfile = async (token) => {
 export const useGetProfile = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const { token } = useAuth();
 
-    const execute = useCallback(async (token) => {
+    const execute = useCallback(async () => {
+        if (!token) return;
         try {
             setIsLoading(true);
+            debugger;
             const data = await GetProfile(token);
             setIsLoading(false);
             return data;
         } catch (e) {
             setError(e);
             setIsLoading(false);
-            throw e;
         }
     }, []);
 

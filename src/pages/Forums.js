@@ -32,12 +32,10 @@ export const Forums = () => {
     });
 
     useEffect(() => {
-        debugger;
         execute(1, 50, filters);
     }, [execute, filters]);
 
     const loadMore = useCallback(() => {
-        debugger;
         if (hasMore && !isLoading) {
             execute(page + 1, 50, filters);
         }
@@ -70,7 +68,6 @@ export const Forums = () => {
             return;
         }
         try {
-            debugger;
             await createPostExecute(title, content, postPhoto);
             reset();
             setFilters({
@@ -93,7 +90,6 @@ export const Forums = () => {
     };
 
     const handleFilter = (appliedFilters) => {
-        debugger;
         setFilters(appliedFilters);
         reset();
         execute(1, 50, appliedFilters);

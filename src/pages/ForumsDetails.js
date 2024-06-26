@@ -36,7 +36,6 @@ export const ForumsDetails = () => {
     }
 
     const handleDelete = async (id) => {
-        debugger;
         await executeDelete(id);
         navigate("/forums", { replace: true });
         toast.success("Post has been deleted successfully");

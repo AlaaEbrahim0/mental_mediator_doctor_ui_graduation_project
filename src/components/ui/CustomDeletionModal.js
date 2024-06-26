@@ -13,7 +13,10 @@ export const CustomDeletionModal = ({ id, handleConfirm, loading }) => {
                     </button>
                     <button
                         className="btn btn-sm btn-error"
-                        onClick={handleConfirm}
+                        onClick={() => {
+                            handleConfirm();
+                            document.getElementById(id).close();
+                        }}
                         disabled={loading}
                     >
                         {loading && (

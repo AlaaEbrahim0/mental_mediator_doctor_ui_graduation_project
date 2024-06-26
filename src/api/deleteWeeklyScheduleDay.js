@@ -1,43 +1,42 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
+
 const url = process.env.REACT_APP_API_URL;
 
-const deleteSchedule = async (doctorId) => {
+const deleteScheduleDay = async (doctorId, day) => {
     try {
         const response = await axios.delete(
-            `${url}/api/doctors/${doctorId}/schedule`
+            `${url}/api/doctors/${doctorId}/schedule/days/${day}`
         );
-        const data = await response.data;
-        return data;
+        return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-export const useDeleteSchedule = () => {
+export const useDeleteScheduleDay = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    const execute = async (userId) => {
+    const execute = useCallback(async (doctorId, day) => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
-            const response = await deleteSchedule(userId);
-            setData(response);
+            const data = await deleteScheduleDay(doctorId, day);
+            setData(data);
             setIsLoading(false);
-            return response;
+            return data;
         } catch (e) {
             setError(e);
             setIsLoading(false);
-            console.log(e);
         }
-    };
+    }, []);
 
     return {
         isLoading,
         data,
         setData,
         error,
-        execute: useCallback(execute, []),
+        execute,
     };
 };

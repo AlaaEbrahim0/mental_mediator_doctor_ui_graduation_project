@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Formik, Field, Form, FieldArray } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
+import { useCreateSchedule } from "../../api/createWeeklySchedule";
+import { useAuth } from "../../auth/authProvider";
+
 import { AnimatePresence, motion } from "framer-motion";
 
 const ScheduleValidationSchema = Yup.object().shape({
@@ -52,31 +54,42 @@ const ScheduleValidationSchema = Yup.object().shape({
         ),
 });
 
-export const ScheduleForm = ({ onClose }) => {
+const formatTime = (time) => {
+    const [hours, minutes] = time.split(":");
+    return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`;
+};
+
+export const ScheduleForm = ({ onClose, onCreate }) => {
+    const { userId } = useAuth();
+    const { execute: createSchedule, isLoading } = useCreateSchedule();
+
     return (
         <Formik
             initialValues={{
                 weekDays: [],
             }}
             validationSchema={ScheduleValidationSchema}
-            onSubmit={(values, { setSubmitting }) => {
-                axios
-                    .post("/api/schedules", values)
-                    .then((response) => {
-                        console.log(
-                            "Schedule created successfully:",
-                            response.data
-                        );
-                        setSubmitting(false);
-                        onClose();
-                    })
-                    .catch((error) => {
-                        console.error(
-                            "There was an error creating the schedule:",
-                            error
-                        );
-                        setSubmitting(false);
-                    });
+            onSubmit={async (values, { setSubmitting }) => {
+                const formattedValues = {
+                    weekDays: values.weekDays.map((day) => ({
+                        ...day,
+                        startTime: formatTime(day.startTime),
+                        endTime: formatTime(day.endTime),
+                    })),
+                };
+
+                try {
+                    await createSchedule(userId, formattedValues);
+                    setSubmitting(false);
+                    onClose();
+                    onCreate();
+                } catch (error) {
+                    console.error(
+                        "There was an error creating the schedule:",
+                        error
+                    );
+                    setSubmitting(false);
+                }
             }}
         >
             {({ values, errors, touched, isSubmitting }) => (
@@ -103,6 +116,9 @@ export const ScheduleForm = ({ onClose }) => {
                                                     <option value="">
                                                         Select Day
                                                     </option>
+                                                    <option value="0">
+                                                        Sunday
+                                                    </option>
                                                     <option value="1">
                                                         Monday
                                                     </option>
@@ -120,9 +136,6 @@ export const ScheduleForm = ({ onClose }) => {
                                                     </option>
                                                     <option value="6">
                                                         Saturday
-                                                    </option>
-                                                    <option value="7">
-                                                        Sunday
                                                     </option>
                                                 </Field>
                                                 {touched.weekDays?.[index]
@@ -232,8 +245,11 @@ export const ScheduleForm = ({ onClose }) => {
                     <button
                         type="submit"
                         className="btn btn-sm btn-success mt-4"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isLoading}
                     >
+                        {isLoading && (
+                            <span className="loading loading-spinner"></span>
+                        )}
                         Submit
                     </button>
                     <button

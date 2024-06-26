@@ -12,6 +12,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
 import { useAuth } from "../../auth/authProvider";
+import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 import { AnimatePresence } from "framer-motion";
 
 import toast from "react-hot-toast";
@@ -111,7 +112,6 @@ export const Comment = ({
     };
 
     const handleDelete = async () => {
-        debugger;
         await deleteCommentExecute(postId, id);
         await handleDeleteComment();
         handleCommentDeletion();
@@ -228,9 +228,9 @@ export const Comment = ({
                             </div>
                         </div>
                     ) : (
-                        <p className="text-md md:text-lg break-all">
+                        <ReactMarkdown className="text-md md:text-lg break-all">
                             {commentText}
-                        </p>
+                        </ReactMarkdown>
                     )}
                 </div>
 

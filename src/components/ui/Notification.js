@@ -4,6 +4,8 @@ import { useNotifications } from "../../context/notificationsContext";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
+import toast from "react-hot-toast";
+import { CustomToast } from "./CustomToast";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -24,23 +26,25 @@ export const Notification = ({
     const handleMarkAsRead = async (event) => {
         event.preventDefault();
         try {
+            debugger;
             await markAsRead(id);
-            navigate(`forums/${resources.postId}`);
+            if (resources["postId"]) {
+                navigate(`forums/${resources.postId}`);
+            }
+            if (resources["appointmentId"]) {
+                navigate(`appointments`);
+            }
         } catch (err) {
             console.error("Navigation error:", err);
             setError(
                 "The page you're trying to navigate to was not found or deleted."
             );
+            toast.error(error);
         }
     };
 
     return (
         <>
-            {error && (
-                <div className="alert alert-error">
-                    <span>{error}</span>
-                </div>
-            )}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}

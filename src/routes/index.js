@@ -7,7 +7,7 @@ import {
 import { useAuth } from "../auth/authProvider";
 import { MainLayout } from "../components/layout/MainLayout";
 import { Home } from "../pages/Home";
-import { Appointments } from "../pages/Home";
+import { Appointments } from "../pages/Appointment";
 import { Login } from "../auth/login";
 import { Forums } from "../pages/Forums";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
@@ -39,7 +39,7 @@ const Routes = () => {
                         { path: "appointments", element: <Appointments /> },
                         { path: "schedule", element: <Schedule /> },
                         { path: "profile", element: <Profile /> },
-                        { path: "forums", element: <Forums /> },
+                        { path: "Community", element: <Forums /> },
                         { path: "forums/:id", element: <ForumsDetails /> },
                         { path: "logout", element: <Logout /> },
                     ],

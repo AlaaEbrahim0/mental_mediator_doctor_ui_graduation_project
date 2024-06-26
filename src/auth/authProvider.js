@@ -11,7 +11,7 @@ const AuthProvider = ({ children }) => {
         if (token) {
             localStorage.setItem("token", token);
             localStorage.setItem("userId", userId);
-            axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+            axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         } else {
             delete axios.defaults.headers.common["Authorization"];
             localStorage.removeItem("token");
@@ -29,7 +29,6 @@ const AuthProvider = ({ children }) => {
         [token, userId]
     );
 
-    // Provide the authentication context to the children components
     return (
         <AuthContext.Provider value={contextValue}>
             {children}
@@ -37,8 +36,6 @@ const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
 export default AuthProvider;

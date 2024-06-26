@@ -32,7 +32,6 @@ export const useGetPosts = () => {
 
     const execute = async (pageNumber = 1, pageSize = 50, filters) => {
         try {
-            debugger;
             setIsLoading(true);
             const posts = await getPosts(pageNumber, pageSize, filters);
             setData((prevData) => [...prevData, ...posts]);

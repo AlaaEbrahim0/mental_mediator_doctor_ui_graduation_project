@@ -3,30 +3,32 @@ import axios from "axios";
 
 const url = process.env.REACT_APP_API_URL;
 
-const getPostById = async (id) => {
+const getAppointments = async (filters) => {
     try {
-        const response = await axios.get(`${url}/api/posts/${id}`);
+        const response = await axios.get(`${url}/api/appointments/doctors/me`, {
+            params: filters,
+        });
         return response.data;
     } catch (error) {
         throw error.response.data;
     }
 };
 
-export const useGetPostById = () => {
+export const useGetAppointments = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [data, setData] = useState([]);
 
-    const execute = async (id) => {
+    const execute = async (filters) => {
         try {
             setIsLoading(true);
-            const post = await getPostById(id);
-            setData(post);
+            const replies = await getAppointments(filters);
+            setData(replies);
             setIsLoading(false);
-            return post;
         } catch (e) {
             setError(e);
             setIsLoading(false);
+            throw e;
         }
     };
 
@@ -34,7 +36,6 @@ export const useGetPostById = () => {
         isLoading,
         error,
         data,
-        setData,
         execute: useCallback(execute, []),
     };
 };

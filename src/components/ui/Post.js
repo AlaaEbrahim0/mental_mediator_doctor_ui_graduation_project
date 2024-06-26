@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 import { HiOutlineMenu } from "react-icons/hi";
 import { BiHide, BiShow, BiMessageAltAdd } from "react-icons/bi";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
@@ -201,9 +202,9 @@ export const Post = ({
                 <h1 className="text-sm sm:text-md md:text-2xl text-secondary font-semibold py-5 break-all">
                     {title}
                 </h1>
-                <p className="text-sm md:text-xl text-info-content break-all">
+                <ReactMarkdown className="text-sm md:text-xl text-info-content break-all">
                     {content}
-                </p>
+                </ReactMarkdown>
             </Link>
             {postPhoto && (
                 <img

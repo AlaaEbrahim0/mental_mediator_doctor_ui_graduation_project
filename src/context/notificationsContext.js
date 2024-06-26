@@ -1,6 +1,7 @@
 // src/context/notificationsContext.js
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { useAuth } from "../auth/authProvider";
 import useSignalR from "../hooks/useSignalR";
 
 const url = process.env.REACT_APP_API_URL;
@@ -10,16 +11,20 @@ export const NotificationsProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
     const [count, setCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const { token } = useAuth();
     const [error, setError] = useState(null);
 
     const fetchNotifications = async (pageNumber = 1, pageSize = 20) => {
+        if (!token) return;
         try {
-            debugger;
             setLoading(true);
             const response = await axios.get(
                 `${url}/api/notifications/users/me`,
                 {
-                    params: { pageNumber, pageSize: 20 },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    params: { pageNumber, pageSize },
                 }
             );
             const notificationsData = response.data;
@@ -32,6 +37,10 @@ export const NotificationsProvider = ({ children }) => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchNotifications();
+    }, [token]);
 
     const markAllAsRead = async () => {
         try {
@@ -63,10 +72,6 @@ export const NotificationsProvider = ({ children }) => {
             console.log(err);
         }
     };
-
-    useEffect(() => {
-        fetchNotifications();
-    }, []);
 
     const handleNewNotification = (notification) => {
         setNotifications((prevNotifications) => [

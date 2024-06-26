@@ -37,9 +37,9 @@ export function Sidebar({ isOpen, setIsOpen }) {
                 link: "/schedule",
             },
             {
-                name: "Forums",
+                name: "Community",
                 icon: <BiMessageSquareDetail className={iconStyles} />,
-                link: "/forums",
+                link: "/community",
             },
             {
                 name: "Profile",

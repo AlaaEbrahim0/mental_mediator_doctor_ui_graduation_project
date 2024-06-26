@@ -22,7 +22,6 @@ export const useDeleteComment = () => {
 
     const execute = async (postId, commentId) => {
         try {
-            debugger;
             setIsLoading(true);
             const comment = await deleteComment(postId, commentId);
             setData(comment);

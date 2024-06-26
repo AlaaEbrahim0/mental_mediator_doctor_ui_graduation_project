@@ -3,11 +3,11 @@ import axios from "axios";
 
 const url = process.env.REACT_APP_API_URL;
 
-const getSchedule = async (doctorId) => {
+const editScheduleDay = async (doctorId, day, data) => {
     try {
-        const response = await axios.get(
-            
-            `${url}/api/doctors/${doctorId}/schedule`
+        const response = await axios.put(
+            `${url}/api/doctors/${doctorId}/schedule/days/${day}`,
+            data
         );
         return response.data;
     } catch (error) {
@@ -15,15 +15,16 @@ const getSchedule = async (doctorId) => {
     }
 };
 
-export const useSchedule = () => {
+
+export const useEditScheduleDay = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    const execute = useCallback(async (doctorId) => {
+    const execute = useCallback(async (doctorId, day, newDay) => {
         setIsLoading(true);
         try {
-            const data = await getSchedule(doctorId);
+            const data = await editScheduleDay(doctorId, day, newDay);
             setData(data);
             setIsLoading(false);
             return data;
