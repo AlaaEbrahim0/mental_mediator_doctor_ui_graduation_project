@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 const url = process.env.REACT_APP_API_URL;
 
-const createSchedule = async (doctorId, day, dayData) => {
+const createSchedule = async (doctorId, dayData) => {
     try {
         const response = await axios.post(
-            `${url}/api/doctors/${doctorId}/schedule/days/${day}`,
+            `${url}/api/doctors/${doctorId}/schedule/days`,
             dayData
         );
         const data = await response.data;
@@ -20,10 +20,10 @@ export const useCreateScheduleDay = () => {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    const execute = async (doctorId, day, dayData) => {
+    const execute = async (doctorId, dayData) => {
         try {
             setIsLoading(true);
-            const response = await createSchedule(doctorId, day, dayData);
+            const response = await createSchedule(doctorId, dayData);
             setData(response);
             setIsLoading(false);
             return response;

@@ -126,7 +126,7 @@ export const Forums = () => {
                                 </button>
                             </div>
                             {isFilterVisible && (
-                                <div className="fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-50">
+                                <div className="fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-50">
                                     <FilterationComponent
                                         onClose={toggleShowFilters}
                                         onFilter={handleFilter}

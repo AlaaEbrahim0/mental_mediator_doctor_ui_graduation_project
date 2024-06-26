@@ -3,12 +3,23 @@ import { useGetAppointments } from "../api/getAppoinments";
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { GrFormPrevious } from "react-icons/gr";
 import { motion } from "framer-motion";
+import { FiFilter } from "react-icons/fi";
 
 export function Appointments() {
     const { isLoading, error, data, totalPages, execute } =
         useGetAppointments();
     const [pageNumber, setPageNumber] = useState(1);
     const pageSize = 7;
+
+    const [isFilterVisible, setFilterVisible] = useState(false);
+    const [filters, setFilters] = useState({
+        fullname: "",
+        title: "",
+        content: "",
+        from: "",
+        to: "",
+        showConfessions: false,
+    });
 
     useEffect(() => {
         execute({ PageSize: pageSize, PageNumber: pageNumber });
@@ -56,7 +67,6 @@ export function Appointments() {
     if (isLoading) {
         return (
             <div className="flex flex-col justify-center items-center mt-52">
-                {/* Example spinner */}
                 <span className="loading loading-spinner"></span>
             </div>
         );
@@ -72,18 +82,21 @@ export function Appointments() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
+            <div className="flex flex-row justify-end mx-2">
+                <button
+                    className="btn btn-sm btn-outline md:btn md:btn-outline"
+                    onClick={() => setFilterVisible(!isFilterVisible)}
+                >
+                    <FiFilter />
+                    Filter
+                </button>
+                {isFilterVisible && <div>ABC</div>}
+            </div>
             <div className="overflow-x-auto w-full">
                 <table className="table">
                     <thead className="uppercase font-bold text-secondary">
                         <tr>
-                            <th>
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        className="checkbox"
-                                    />
-                                </label>
-                            </th>
+                            <th>Id</th>
                             <th>Client</th>
                             <th>Date Time</th>
                             <th>Duration</th>
@@ -101,14 +114,7 @@ export function Appointments() {
                                 }}
                                 key={appointment.id}
                             >
-                                <th>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            className="checkbox"
-                                        />
-                                    </label>
-                                </th>
+                                <th>{appointment.id}</th>
                                 <td>
                                     <div className="flex items-center gap-3">
                                         <div className="avatar">

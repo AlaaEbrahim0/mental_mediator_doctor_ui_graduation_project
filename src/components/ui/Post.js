@@ -59,6 +59,7 @@ export const Post = ({
     const handleCommentChange = (e) => {
         setCommentText(e.target.value);
     };
+    
     const handleAddComment = async () => {
         if (!commentText) {
             return;

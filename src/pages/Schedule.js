@@ -11,23 +11,44 @@ import { useEditScheduleDay } from "../api/editWeeklyScheduleDay";
 import { FaPlus } from "react-icons/fa";
 import { useCreateSchedule } from "../api/createWeeklySchedule";
 import { NewDayForm } from "../components/form/NewDayForm";
+import { useCreateScheduleDay } from "../api/createWeeklyScheduleDay";
+import toast from "react-hot-toast";
+import { Formik, Form, Field, ErrorMessage, validateYupSchema } from "formik";
+import * as Yup from "yup";
+
+const ScheduleValidationSchema = Yup.object().shape({
+    startTime: Yup.string().required("Start time is required"),
+    endTime: Yup.string()
+        .required("End time is required")
+        .test(
+            "is-greater",
+            "End time must be greater than start time",
+            function (value) {
+                const { startTime } = this.parent;
+                return value > startTime;
+            }
+        ),
+    sessionDuration: Yup.string()
+        .required("Session duration is required")
+        .matches(
+            /^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/,
+            "Invalid duration format (hh:mm:ss)"
+        )
+        .test(
+            "is-valid-duration",
+            "Session duration must not exceed 1 hour",
+            function (value) {
+                const [hours, minutes, seconds] = value.split(":");
+                const totalSeconds =
+                    parseInt(hours) * 3600 +
+                    parseInt(minutes) * 60 +
+                    parseInt(seconds);
+                return totalSeconds <= 3600;
+            }
+        ),
+});
 
 const EditDayForm = ({ initialData, onCancel, onSubmit }) => {
-    const [editedData, setEditedData] = useState(initialData);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setEditedData({
-            ...editedData,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit(editedData);
-    };
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -35,51 +56,75 @@ const EditDayForm = ({ initialData, onCancel, onSubmit }) => {
             exit={{ opacity: 0, y: -20 }}
             className="my-4 p-4 border border-gray-300 rounded-lg"
         >
-            <form onSubmit={handleSubmit}>
-                <label className="block mb-2">
-                    Start Time
-                    <input
-                        type="time"
-                        name="startTime"
-                        value={editedData.startTime}
-                        onChange={handleChange}
-                        className="input input-bordered w-full mt-1"
-                    />
-                </label>
-                <label className="block mb-2">
-                    End Time
-                    <input
-                        type="time"
-                        name="endTime"
-                        value={editedData.endTime}
-                        onChange={handleChange}
-                        className="input input-bordered w-full mt-1"
-                    />
-                </label>
-                <label className="block mb-2">
-                    Session Duration (hh:mm:ss)
-                    <input
-                        type="text"
-                        name="sessionDuration"
-                        value={editedData.sessionDuration}
-                        onChange={handleChange}
-                        className="input input-bordered w-full mt-1"
-                        placeholder="hh:mm:ss"
-                    />
-                </label>
-                <div className="flex justify-between">
-                    <button type="submit" className="btn btn-sm btn-primary">
-                        Save
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-sm btn-secondary"
-                        onClick={onCancel}
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </form>
+            <Formik
+                initialValues={initialData}
+                validationSchema={ScheduleValidationSchema}
+                onSubmit={(values) => {
+                    onSubmit(values);
+                }}
+            >
+                {({ handleSubmit }) => (
+                    <Form onSubmit={handleSubmit}>
+                        <div className="mb-2">
+                            <label className="block mb-1">Start Time</label>
+                            <Field
+                                type="time"
+                                name="startTime"
+                                className="input input-bordered w-full"
+                            />
+                            <ErrorMessage
+                                name="startTime"
+                                component="div"
+                                className="text-red-500 text-sm mt-1"
+                            />
+                        </div>
+                        <div className="mb-2">
+                            <label className="block mb-1">End Time</label>
+                            <Field
+                                type="time"
+                                name="endTime"
+                                className="input input-bordered w-full"
+                            />
+                            <ErrorMessage
+                                name="endTime"
+                                component="div"
+                                className="text-red-500 text-sm mt-1"
+                            />
+                        </div>
+                        <div className="mb-2">
+                            <label className="block mb-1">
+                                Session Duration (hh:mm:ss)
+                            </label>
+                            <Field
+                                type="text"
+                                name="sessionDuration"
+                                className="input input-bordered w-full"
+                                placeholder="hh:mm:ss"
+                            />
+                            <ErrorMessage
+                                name="sessionDuration"
+                                component="div"
+                                className="text-red-500 text-sm mt-1"
+                            />
+                        </div>
+                        <div className="flex justify-between mt-4">
+                            <button
+                                type="submit"
+                                className="btn btn-sm btn-primary"
+                            >
+                                Save
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-secondary"
+                                onClick={onCancel}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </Form>
+                )}
+            </Formik>
         </motion.div>
     );
 };
@@ -92,6 +137,13 @@ export const Schedule = () => {
         error: scheduleError,
         execute: getSchedule,
     } = useSchedule();
+
+    const {
+        isLoading: isCreatingScheduleDayLoading,
+        setData: setScheduleDay,
+        error: CreatingScheduleDayError,
+        execute: createScheduleDay,
+    } = useCreateScheduleDay();
 
     const {
         isLoading: isDeleteScheduleLoading,
@@ -164,17 +216,19 @@ export const Schedule = () => {
 
     const handleAddNewDay = async (newDayData) => {
         try {
+            debugger;
             const formattedData = {
                 startTime: formatTime(newDayData.startTime),
                 endTime: formatTime(newDayData.endTime),
                 sessionDuration: newDayData.sessionDuration,
                 dayOfWeek: newDayData.dayOfWeek,
             };
-            await createSchedule(userId, newDayData.dayOfWeek, formattedData);
+            await createScheduleDay(userId, formattedData);
             setIsNewDayFormVisible(false);
             getSchedule(userId);
         } catch (error) {
             console.error("Error adding new day:", error);
+            toast.error("Cannot add duplicate days");
         }
     };
 
@@ -226,11 +280,6 @@ export const Schedule = () => {
                             className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
                         >
                             <>
-                                <li className="mb-1">
-                                    <button className="btn btn-sm btn-secondary btn-outline text-md">
-                                        Edit
-                                    </button>
-                                </li>
                                 <li className="mb-1">
                                     <>
                                         <button
@@ -374,20 +423,21 @@ export const Schedule = () => {
                             >
                                 <FaPlus />
                             </button>
-                            {isNewDayFormVisible && (
-                                <NewDayForm
-                                    onSubmit={handleAddNewDay}
-                                    onCancel={() =>
-                                        setIsNewDayFormVisible(false)
-                                    }
-                                />
-                            )}
                         </>
                     )}
                 </div>
+
                 {!isScheduleLoading && !schedule && (
                     <div className="text-2xl text-center py-5">
                         Your schedule is empty
+                    </div>
+                )}
+                {isNewDayFormVisible && (
+                    <div className="fixed inset-0 z-20 flex items-center bg-black justify-center bg-opacity-50">
+                        <NewDayForm
+                            onSubmit={handleAddNewDay}
+                            onCancel={() => setIsNewDayFormVisible(false)}
+                        />
                     </div>
                 )}
             </div>

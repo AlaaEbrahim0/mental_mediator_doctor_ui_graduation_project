@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useGetPostById } from "../api/posts/getPostById";
 import { PostSkeleton } from "../components/ui/PostSkeleton";
 import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
@@ -16,9 +16,23 @@ export const ForumsDetails = () => {
         execute: executeDelete,
     } = useDeletePost();
     const navigate = useNavigate();
+    const postRef = useRef(null); // Ref for the post element
 
     const { id } = useParams();
     const { userId } = useAuth();
+
+    useEffect(() => {
+        // Scroll to the comment/reply if anchor exists in the URL
+        debugger;
+        const hash = window.location.hash;
+        if (hash && hash.startsWith("#comment-")) {
+            const commentId = hash.substring("#comment-".length);
+            const commentElement = document.getElementById(`${commentId}`);
+            if (commentElement) {
+                commentElement.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const postId = Number(id);
@@ -42,7 +56,10 @@ export const ForumsDetails = () => {
     };
 
     return (
-        <div className="row justify-center mx-auto max-w-3xl mt-4">
+        <div
+            className="row justify-center mx-auto max-w-3xl mt-4"
+            ref={postRef}
+        >
             {isLoading && <PostSkeleton />}
             {!isLoading && error && (
                 <div className="alert alert-error text-white">

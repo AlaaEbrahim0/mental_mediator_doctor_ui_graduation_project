@@ -42,7 +42,7 @@ export const NewDayForm = ({ onSubmit, onCancel }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="my-4 p-4 border border-gray-300 rounded-lg"
+            className="my-4 p-4 border border-gray-300 bg-base-100 shadow-md rounded-lg"
         >
             <Formik
                 initialValues={{
@@ -123,7 +123,7 @@ export const NewDayForm = ({ onSubmit, onCancel }) => {
                                 className="text-red-600 mt-1"
                             />
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between mt-4">
                             <button
                                 type="submit"
                                 className="btn btn-sm btn-primary"

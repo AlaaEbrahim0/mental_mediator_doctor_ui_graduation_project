@@ -1,11 +1,9 @@
-// src/ui/Notification.js
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../../context/notificationsContext";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 import toast from "react-hot-toast";
-import { CustomToast } from "./CustomToast";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -26,10 +24,11 @@ export const Notification = ({
     const handleMarkAsRead = async (event) => {
         event.preventDefault();
         try {
-            debugger;
             await markAsRead(id);
             if (resources["postId"]) {
-                navigate(`forums/${resources.postId}`);
+                navigate(
+                    `forums/${resources.postId}#comment-${resources.commentId}`
+                );
             }
             if (resources["appointmentId"]) {
                 navigate(`appointments`);
