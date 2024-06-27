@@ -22,13 +22,12 @@ export const useGetAppointments = () => {
     const execute = async (filters) => {
         try {
             setIsLoading(true);
-            const replies = await getAppointments(filters);
-            setData(replies);
+            const appointments = await getAppointments(filters);
+            setData(appointments);
             setIsLoading(false);
         } catch (e) {
             setError(e);
             setIsLoading(false);
-            throw e;
         }
     };
 

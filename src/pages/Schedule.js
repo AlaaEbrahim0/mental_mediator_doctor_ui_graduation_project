@@ -252,7 +252,7 @@ export const Schedule = () => {
                         </h3>
                         <ScheduleForm
                             onClose={() => setIsModalVisible(false)}
-                            onCreate={() => getSchedule(userId)}
+                            onCreate={async () => await getSchedule(userId)}
                         />
                         <div className="modal-action">
                             <button
@@ -427,11 +427,6 @@ export const Schedule = () => {
                     )}
                 </div>
 
-                {!isScheduleLoading && !schedule && (
-                    <div className="text-2xl text-center py-5">
-                        Your schedule is empty
-                    </div>
-                )}
                 {isNewDayFormVisible && (
                     <div className="fixed inset-0 z-20 flex items-center bg-black justify-center bg-opacity-50">
                         <NewDayForm

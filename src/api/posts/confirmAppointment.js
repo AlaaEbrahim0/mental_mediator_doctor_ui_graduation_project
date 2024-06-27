@@ -1,39 +1,41 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import { useAuth } from "../auth/authProvider";
 
 const url = process.env.REACT_APP_API_URL;
-const GetProfile = async (token) => {
+
+const confirmAppointment = async (appointmentId) => {
     try {
-        let response = await axios.get(`${url}/api/doctors/me`);
+        const response = await axios.put(
+            `${url}/api/appointments/${appointmentId}/confirm`  
+        );
         return response.data;
     } catch (error) {
-        console.log(error);
-        // throw error.response.data;
+        throw error;
     }
 };
 
-export const useGetProfile = () => {
+export const useConfirmAppointment = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [data, setData] = useState(null);
     const [error, setError] = useState(null);
-    const { token } = useAuth();
 
-    const execute = useCallback(async () => {
-        if (!token) return;
+    const execute = useCallback(async (appointmentId) => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
-            debugger;
-            const data = await GetProfile(token);
+            const data = await confirmAppointment(appointmentId);
+            setData(data);
             setIsLoading(false);
             return data;
         } catch (e) {
             setError(e);
             setIsLoading(false);
         }
-    }, [token]);
+    }, []);
 
     return {
         isLoading,
+        data,
+        setData,
         error,
         execute,
     };

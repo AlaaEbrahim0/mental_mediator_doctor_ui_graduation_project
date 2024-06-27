@@ -4,14 +4,37 @@ import { MdOutlineNavigateNext } from "react-icons/md";
 import { GrFormPrevious } from "react-icons/gr";
 import { motion } from "framer-motion";
 import { FiFilter } from "react-icons/fi";
+import toast from "react-hot-toast";
+import {
+    CustomConfirmationModal,
+    CustomDeletionModal,
+} from "../components/ui/CustomDeletionModal";
+import { useConfirmAppointment } from "../api/posts/confirmAppointment";
+import { useRejectAppointment } from "../api/posts/rejectAppointment";
 
 export function Appointments() {
     const { isLoading, error, data, totalPages, execute } =
         useGetAppointments();
+    const {
+        isLoading: confirmIsLoading,
+        error: confirmError,
+        execute: confirmExecute,
+    } = useConfirmAppointment();
+    const {
+        isLoading: rejectIsLoading,
+        error: rejectError,
+        execute: rejectExecute,
+    } = useRejectAppointment();
+
     const [pageNumber, setPageNumber] = useState(1);
     const pageSize = 7;
 
+    const [currentAppointment, setCurrentAppointment] = useState(null);
     const [isFilterVisible, setFilterVisible] = useState(false);
+    const [isConfirmationModalVisible, setConfirmationModalVisible] =
+        useState(false);
+    const [isRejectionModalVisible, setIsRejectionModalVisible] =
+        useState(false);
     const [filters, setFilters] = useState({
         fullname: "",
         title: "",
@@ -20,6 +43,7 @@ export function Appointments() {
         to: "",
         showConfessions: false,
     });
+    const [rejectionReason, setRejectionReason] = useState("");
 
     useEffect(() => {
         execute({ PageSize: pageSize, PageNumber: pageNumber });
@@ -62,6 +86,19 @@ export function Appointments() {
         if (data.length >= pageSize) {
             setPageNumber(pageNumber + 1);
         }
+    };
+
+    const handleConfirm = async (appointmentId) => {
+        await confirmExecute(appointmentId);
+        setConfirmationModalVisible(false);
+        await execute({ PageSize: pageSize, PageNumber: pageNumber });
+    };
+
+    const handleReject = async (appointmentId) => {
+        debugger;
+        await rejectExecute(appointmentId, rejectionReason);
+        setIsRejectionModalVisible(false);
+        await execute({ PageSize: pageSize, PageNumber: pageNumber });
     };
 
     if (isLoading) {
@@ -168,10 +205,30 @@ export function Appointments() {
                                 <td>
                                     {appointment.status === "Pending" && (
                                         <div className="flex gap-2">
-                                            <button className="btn btn-sm btn-success btn-outline">
+                                            <button
+                                                className="btn btn-sm btn-success btn-outline"
+                                                onClick={() => {
+                                                    setCurrentAppointment(
+                                                        appointment
+                                                    );
+                                                    setConfirmationModalVisible(
+                                                        true
+                                                    );
+                                                }}
+                                            >
                                                 Confirm
                                             </button>
-                                            <button className="btn btn-sm text-white btn-error">
+                                            <button
+                                                className="btn btn-sm text-white btn-error"
+                                                onClick={() => {
+                                                    setCurrentAppointment(
+                                                        appointment
+                                                    );
+                                                    setIsRejectionModalVisible(
+                                                        true
+                                                    );
+                                                }}
+                                            >
                                                 Reject
                                             </button>
                                         </div>
@@ -181,6 +238,193 @@ export function Appointments() {
                         ))}
                     </tbody>
                 </table>
+                {isConfirmationModalVisible && currentAppointment && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        id={`confirmation-modal-${currentAppointment.id}`}
+                        className="fixed inset-0 flex items-center justify-center bg-secondary bg-opacity-20 overflow-auto z-50"
+                    >
+                        <div className="bg-base-100  p-6 rounded-lg w-full shadow-lg z-50 max-w-xl mx-4 relative">
+                            <h3 className="font-bold mb-4 text-secondary text-xl text-center">
+                                Confirm Appointment
+                            </h3>
+                            <div className="flex flox-row">
+                                <div className="flex flex-row client-info">
+                                    <img
+                                        src={currentAppointment.clientPhotoUrl}
+                                        className="w-16 h-16"
+                                        alt=""
+                                    />
+                                    <div className="ml-4 flex flex-col justify-center">
+                                        <div className="h-6 font-bold">
+                                            {currentAppointment.clientName}
+                                        </div>
+                                        <div className="h-4 text-info">
+                                            {currentAppointment.clientEmail}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="properties flex flex-col gap-y-4 my-8 divide-y-2">
+                                <div className="flex flex-row justify-between items-center mx-4">
+                                    <div className="text-md font-bold text-secondary">
+                                        Date/Time
+                                    </div>
+                                    <div className="text-md font-bold  text-secondary">
+                                        {formatDateTime(
+                                            currentAppointment.startTime
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex flex-row justify-between items-center mx-4">
+                                    <div className="text-md font-bold text-secondary">
+                                        Location
+                                    </div>
+                                    <div className="text-md font-bold  text-secondary">
+                                        {currentAppointment.location}
+                                    </div>
+                                </div>
+                                <div className="flex flex-row justify-between items-center mx-4">
+                                    <div className="text-md font-bold text-secondary">
+                                        Fees
+                                    </div>
+                                    <div className="text-md font-bold  text-secondary">
+                                        {currentAppointment.fees} EGP
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flow-row justify-between mt-4">
+                                <button
+                                    disabled={confirmIsLoading}
+                                    className="btn btn-sm btn-success btn-outline"
+                                    onClick={async () => {
+                                        await handleConfirm(
+                                            currentAppointment.id
+                                        );
+                                        toast.success("Appointment Confirmed");
+                                    }}
+                                >
+                                    {confirmIsLoading && (
+                                        <span className="loading loading-spinner"></span>
+                                    )}
+                                    Confirm
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-ghost btn-outline"
+                                    onClick={() =>
+                                        setConfirmationModalVisible(false)
+                                    }
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
+                {isRejectionModalVisible && currentAppointment && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        id={`confirmation-modal-${currentAppointment.id}`}
+                        className="fixed inset-0 flex items-center justify-center bg-secondary bg-opacity-20 overflow-auto z-50"
+                    >
+                        <div className="bg-base-100  p-6 rounded-lg w-full shadow-lg z-50 max-w-xl mx-4 relative">
+                            <h3 className="font-bold mb-4 text-secondary text-xl text-center">
+                                Reject Appointment
+                            </h3>
+                            <div className="flex flox-row">
+                                <div className="flex flex-row client-info">
+                                    <img
+                                        src={currentAppointment.clientPhotoUrl}
+                                        className="w-16 h-16"
+                                        alt=""
+                                    />
+                                    <div className="ml-4 flex flex-col justify-center">
+                                        <div className="h-6 font-bold">
+                                            {currentAppointment.clientName}
+                                        </div>
+                                        <div className="h-4 text-info">
+                                            {currentAppointment.clientEmail}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="properties flex flex-col gap-y-4 mt-4 divide-y">
+                                <div className="flex flex-row justify-between items-center mx-4">
+                                    <div className="text-md font-bold text-secondary">
+                                        Date/Time
+                                    </div>
+                                    <div className="text-md font-bold  text-secondary">
+                                        {formatDateTime(
+                                            currentAppointment.startTime
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex flex-row justify-between items-center mx-4">
+                                    <div className="text-md font-bold text-secondary">
+                                        Location
+                                    </div>
+                                    <div className="text-md font-bold  text-secondary">
+                                        {currentAppointment.location}
+                                    </div>
+                                </div>
+                                <div className="flex flex-row justify-between items-center mx-4">
+                                    <div className="text-md font-bold text-secondary">
+                                        Fees
+                                    </div>
+                                    <div className="text-md font-bold  text-secondary">
+                                        {currentAppointment.fees} EGP
+                                    </div>
+                                </div>
+                                <label className="form-control w-full">
+                                    <div className="label">
+                                        <span className="label-text text-secondary text-lg">
+                                            Rejection Reason
+                                        </span>
+                                    </div>
+                                    <textarea
+                                        name="reason"
+                                        type="text"
+                                        placeholder="This is optional"
+                                        className="textarea textarea-bordered textarea-sm w-full"
+                                        onChange={(e) => {
+                                            setRejectionReason(e.target.value);
+                                        }}
+                                    />
+                                </label>
+                            </div>
+
+                            <div className="flex flow-row justify-between mt-4">
+                                <button
+                                    disabled={rejectIsLoading}
+                                    className="btn btn-sm btn-error btn-outline"
+                                    onClick={async () => {
+                                        await handleReject(
+                                            currentAppointment.id
+                                        );
+                                        toast.success("Appointment Rejected");
+                                    }}
+                                >
+                                    {rejectIsLoading && (
+                                        <span className="loading loading-spinner"></span>
+                                    )}
+                                    Reject
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-ghost btn-outline"
+                                    onClick={() =>
+                                        setIsRejectionModalVisible(false)
+                                    }
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
                 {/* Pagination Controls */}
             </div>
             <div className="flex justify-between items-center mt-1 px-8">
