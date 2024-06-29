@@ -35,14 +35,14 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                 <div tabIndex={0} role="button" className="m-1">
                     <div className="indicator">
                         {count > 0 && (
-                            <span className="indicator-item badge badge-secondary">
+                            <span className="indicator-item badge badge-error ">
                                 {count}
                             </span>
                         )}
                         <MdOutlineNotificationsNone className="text-3xl text-secondary" />
                     </div>
                 </div>
-                <div className="dropdown-content mt-4 z-[1] menu p-1 shadow-lg bg-base-100  rounded-box w-96">
+                <div className="dropdown-content mt-4 z-[1] menu p-1 shadow-lg bg-white rounded-box w-96">
                     <NotificationsList notifications={notifications} />
                 </div>
             </div>

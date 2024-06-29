@@ -23,7 +23,6 @@ export const ForumsDetails = () => {
 
     useEffect(() => {
         // Scroll to the comment/reply if anchor exists in the URL
-        debugger;
         const hash = window.location.hash;
         if (hash && hash.startsWith("#comment-")) {
             const commentId = hash.substring("#comment-".length);
@@ -51,7 +50,7 @@ export const ForumsDetails = () => {
 
     const handleDelete = async (id) => {
         await executeDelete(id);
-        navigate("/forums", { replace: true });
+        navigate("/community", { replace: true });
         toast.success("Post has been deleted successfully");
     };
 
@@ -79,7 +78,9 @@ export const ForumsDetails = () => {
                     postPhoto={post.postPhotoUrl}
                     commentCount={post.commentsCount}
                     data={post}
-                    setData={setData}
+                    setData={async () => {
+                        setData(await execute(post.id));
+                    }}
                     currentUserId={userId}
                     handleDelete={handleDelete}
                     postDeletionLoading={isLoadingDelete}

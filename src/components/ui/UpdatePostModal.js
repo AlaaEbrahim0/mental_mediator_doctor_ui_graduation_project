@@ -88,7 +88,10 @@ export const UpdatePostModal = ({
                             />
                             <div
                                 className="absolute top-2 right-2 p-1 rounded-full cursor-pointer"
-                                onClick={() => setPreviewUrl(null)}
+                                onClick={() => {
+                                    setPreviewUrl(null);
+                                    setPostPhoto(null);
+                                }}
                             >
                                 <IoClose />
                             </div>

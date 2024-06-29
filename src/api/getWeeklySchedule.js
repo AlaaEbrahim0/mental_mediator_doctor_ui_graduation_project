@@ -6,7 +6,6 @@ const url = process.env.REACT_APP_API_URL;
 const getSchedule = async (doctorId) => {
     try {
         const response = await axios.get(
-            
             `${url}/api/doctors/${doctorId}/schedule`
         );
         return response.data;
@@ -26,7 +25,7 @@ export const useSchedule = () => {
             const data = await getSchedule(doctorId);
             setData(data);
             setIsLoading(false);
-            return data;
+            return data.sort((a) => a.weekDay);
         } catch (e) {
             setError(e);
             setIsLoading(false);

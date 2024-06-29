@@ -158,7 +158,14 @@ export const Forums = () => {
                                                 isLoadingDelete={
                                                     isLoadingDelete
                                                 }
-                                                setData={setData}
+                                                setData={async () => {
+                                                    reset();
+                                                    await execute(
+                                                        1,
+                                                        50,
+                                                        filters
+                                                    );
+                                                }}
                                             />
                                         ))}
                                 </AnimatePresence>

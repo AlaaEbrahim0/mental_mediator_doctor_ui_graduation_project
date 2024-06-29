@@ -12,7 +12,7 @@ export const CustomDeletionModal = ({ id, handleConfirm, loading }) => {
                         Cancel
                     </button>
                     <button
-                        className="btn btn-sm btn-error"
+                        className="btn btn-sm btn-error text-white"
                         onClick={() => {
                             handleConfirm();
                             document.getElementById(id).close();

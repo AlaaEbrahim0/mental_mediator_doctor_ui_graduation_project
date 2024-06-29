@@ -54,7 +54,7 @@ const EditDayForm = ({ initialData, onCancel, onSubmit }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="my-4 p-4 border border-gray-300 rounded-lg"
+            className="my-4 p-4 border  border-gray-300 rounded-lg"
         >
             <Formik
                 initialValues={initialData}
@@ -177,7 +177,6 @@ export const Schedule = () => {
     };
 
     const handleDayDelete = async (day) => {
-        debugger;
         await deleteScheduleDay(userId, day);
         await getSchedule(userId);
     };
@@ -216,7 +215,6 @@ export const Schedule = () => {
 
     const handleAddNewDay = async (newDayData) => {
         try {
-            debugger;
             const formattedData = {
                 startTime: formatTime(newDayData.startTime),
                 endTime: formatTime(newDayData.endTime),
@@ -233,7 +231,7 @@ export const Schedule = () => {
     };
 
     return (
-        <div className="container mx-auto md:px-4">
+        <div className="container mx-auto md:px-4 text-secondary">
             {(!schedule || schedule.weekDays.length === 0) && (
                 <div className="flex justify-center items-center mb-4 mt-2">
                     <button
@@ -266,9 +264,9 @@ export const Schedule = () => {
                 </div>
             )}
 
-            <div className="flex flex-col rounded-xl shadow-lg p-6 max-w-6xl mx-auto">
+            <div className=" flex flex-col rounded-xl bg-white bg-opacity-50  shadow-lg p-6 max-w-6xl mx-auto">
                 <div className="flex flex-row justify-between">
-                    <h1 className="text-xl text-center font-bold mb-2">
+                    <h1 className="text-xl text-center font-bold mb-2"> 
                         Weekly Schedule
                     </h1>
                     <div className="dropdown dropdown-end">
@@ -277,7 +275,7 @@ export const Schedule = () => {
                         </div>
                         <ul
                             tabIndex={0}
-                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
+                            className="dropdown-content z-[1] menu p-2 shadow rounded-box w-32"
                         >
                             <>
                                 <li className="mb-1">
@@ -321,7 +319,7 @@ export const Schedule = () => {
                                 <motion.div
                                     initial={{ y: -10, opacity: 0 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    whileHover={{ scale: 1.05 }}
+                                    whileHover={{ scale: 1.02 }}
                                     key={index}
                                     className="p-8 hover:bg-base-200 rounded-xl shadow-lg"
                                 >

@@ -5,6 +5,7 @@ const url = process.env.REACT_APP_API_URL;
 
 const getAppointments = async (filters) => {
     try {
+        debugger;
         const response = await axios.get(`${url}/api/appointments/doctors/me`, {
             params: filters,
         });

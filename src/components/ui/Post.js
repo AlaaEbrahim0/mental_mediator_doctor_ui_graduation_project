@@ -59,7 +59,7 @@ export const Post = ({
     const handleCommentChange = (e) => {
         setCommentText(e.target.value);
     };
-    
+
     const handleAddComment = async () => {
         if (!commentText) {
             return;
@@ -103,9 +103,7 @@ export const Post = ({
                 postPhoto
             );
 
-            setData((prev) =>
-                prev.map((post) => (post.id === id ? updatedPost : post))
-            );
+            await setData();
 
             setUpdateModalVisible(false);
         } catch (e) {
@@ -121,7 +119,7 @@ export const Post = ({
         <motion.div
             animate={{ opacity: 1 }}
             initial={{ opacity: 0 }}
-            className="flex flex-col mb-8 p-4 mt w-full glass shadow-md rounded-lg"
+            className="flex flex-col mb-8 p-4 mt w-full bg-white bg-opacity-50 shadow-md rounded-lg"
         >
             <div className="info flex flex-row justify-between">
                 <div className="flex flex-row">

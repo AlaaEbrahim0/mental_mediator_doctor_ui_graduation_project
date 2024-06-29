@@ -1,11 +1,16 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
 import { useAuth } from "../auth/authProvider";
-
-const url = process.env.REACT_APP_API_URL;
-const GetProfile = async (token) => {
+const getNews = async () => {
     try {
-        let response = await axios.get(`${url}/api/doctors/me`);
+        let response = await axios.get("https://newsapi.org/v2/everything", {
+            params: {
+                q: "psychology OR Neuroscience OR Therapy OR Mental health OR Medical research OR Clinical psychology",
+                sortBy: "relevancy",
+                apiKey: "ca9c5ed021cb495cab719bfba0455567",
+                pageSize: 5,
+            },
+        });
         return response.data;
     } catch (error) {
         console.log(error);
@@ -13,8 +18,9 @@ const GetProfile = async (token) => {
     }
 };
 
-export const useGetProfile = () => {
+export const useGetNews = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [news, setNews] = useState([]);
     const [error, setError] = useState(null);
     const { token } = useAuth();
 
@@ -22,7 +28,8 @@ export const useGetProfile = () => {
         if (!token) return;
         try {
             setIsLoading(true);
-            const data = await GetProfile(token);
+            const data = await getNews(token);
+            setNews(data);
             setIsLoading(false);
             return data;
         } catch (e) {
@@ -34,6 +41,7 @@ export const useGetProfile = () => {
     return {
         isLoading,
         error,
+        news,
         execute,
     };
 };
