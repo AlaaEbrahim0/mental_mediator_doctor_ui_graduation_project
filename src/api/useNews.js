@@ -2,16 +2,10 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useAuth } from "../auth/authProvider";
 
+const url = process.env.REACT_APP_API_URL;
 const getNews = async () => {
     try {
-        let response = await axios.get("https://newsapi.org/v2/everything", {
-            params: {
-                q: "psychology OR Neuroscience OR Therapy OR Mental health OR Medical research OR Clinical psychology",
-                sortBy: "relevancy",
-                apiKey: "ca9c5ed021cb495cab719bfba0455567",
-                pageSize: 20,
-            },
-        });
+        let response = await axios.get(`${url}/api/articles`, {});
         return response.data;
     } catch (error) {
         console.error(error);

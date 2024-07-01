@@ -34,7 +34,11 @@ export const Forums = () => {
     });
 
     useEffect(() => {
-        execute(1, 20, filters);
+        const initialLoad = async () => {
+            await execute(1, 20, filters);
+        };
+        debugger;
+        initialLoad();
     }, [execute, filters]);
 
     const loadMore = useCallback(() => {
@@ -80,6 +84,7 @@ export const Forums = () => {
                 to: "",
                 showConfessions: false,
             });
+            reset();
             await execute(1, 20, filters);
             setModalVisible(false);
         } catch (e) {
@@ -109,7 +114,7 @@ export const Forums = () => {
                     next={loadMore}
                     hasMore={!isLoading && hasMore}
                     loader={<PostSkeleton />}
-                    scrollThreshold={0.8} // Adjust the scroll threshold
+                    scrollThreshold={0.9} // Adjust the scroll threshold
                     scrollableTarget="scrollableDiv" // Ensure proper target for scrollable container
                 >
                     <div className="block lg:flex">

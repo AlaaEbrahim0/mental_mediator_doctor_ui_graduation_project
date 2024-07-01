@@ -228,7 +228,19 @@ export const Comment = ({
                             </div>
                         </div>
                     ) : (
-                        <ReactMarkdown className="text-md md:text-lg break-all">
+                        <ReactMarkdown
+                            allowedElements={[
+                                "p",
+                                "a",
+                                "h1",
+                                "h2",
+                                "h3",
+                                "ul",
+                                "li",
+                            ]}
+                            className="text-md md:text-lg break-all whitespace-pre-line"
+                            style={{ lineHeight: "1.2" }}
+                        >
                             {commentText}
                         </ReactMarkdown>
                     )}

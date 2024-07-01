@@ -30,11 +30,13 @@ export const useGetPosts = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
-    const execute = async (pageNumber = 1, pageSize = 50, filters) => {
+    const execute = async (pageNumber = 1, pageSize = 20, filters = {}) => {
         try {
             setIsLoading(true);
             const posts = await getPosts(pageNumber, pageSize, filters);
-            setData((prevData) => [...prevData, ...posts]);
+            setData((prevData) =>
+                pageNumber === 1 ? posts : [...prevData, ...posts]
+            );
             setIsLoading(false);
             setPage(pageNumber);
             setHasMore(posts.length === pageSize);

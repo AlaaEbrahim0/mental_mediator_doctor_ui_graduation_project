@@ -8,6 +8,7 @@ import { MdOutlineDoneOutline } from "react-icons/md";
 import { useUpdateReply } from "../../api/comments/putReply";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
@@ -151,9 +152,9 @@ export const Reply = ({
                             </button>
                         </div>
                     ) : (
-                        <p className="text-md md:text-lg w-full break-all">
+                        <ReactMarkdown className="text-md md:text-lg break-all whitespace-pre-line">
                             {replyText}
-                        </p>
+                        </ReactMarkdown>
                     )}
                 </div>
             </div>

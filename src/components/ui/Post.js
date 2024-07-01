@@ -201,7 +201,7 @@ export const Post = ({
                 <h1 className="text-sm sm:text-md md:text-2xl text-secondary font-semibold py-5 break-all">
                     {title}
                 </h1>
-                <ReactMarkdown className="text-sm md:text-xl text-info-content break-all">
+                <ReactMarkdown className="text-sm md:text-xl text-info-content break-all whitespace-pre-line">
                     {content}
                 </ReactMarkdown>
             </Link>

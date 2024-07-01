@@ -270,11 +270,11 @@ export function NewsSection() {
 
     if (!newsLoading && !newsError && news) {
         return (
-            <div className="bg-white bg-opacity-50 shadow-lg p-4 rounded-2xl">
+            <div className="bg-white bg-opacity-50 shadow-lg p-8 rounded-2xl">
+                <h3 className="text-2xl text-center text-secondary font-bold mb-4">
+                    Latest in Psychology, Neurology and more...
+                </h3>
                 <div className="flex flex-col gap-y-8">
-                    <h3 className="text-2xl text-center text-secondary font-bold mb-4">
-                        Latest in Orientation, Neurology and more...
-                    </h3>
                     {news.articles?.map((article) => (
                         <NewsArticle key={article.url} article={article} />
                     ))}

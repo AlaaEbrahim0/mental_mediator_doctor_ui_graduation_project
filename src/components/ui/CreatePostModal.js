@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { BiImageAdd } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
 import { useCreatePost } from "../../api/comments/createPost";
+
 export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -46,7 +47,7 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-base-100 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4 "
+                className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4 "
             >
                 <h2 className="text-2xl font-bold mb-4">Create a New Post</h2>
                 <input
@@ -64,6 +65,7 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
                     placeholder="Content"
                     className="textarea textarea-xs md:textarea-lg textarea-bordered bg-base-200 w-full mb-4 text-lg"
                     rows={6}
+                    style={{ whiteSpace: "pre-wrap" }} // Ensures white-space handling
                 />
                 <label htmlFor="fileInput" className="block mb-4">
                     <input
