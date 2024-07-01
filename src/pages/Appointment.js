@@ -151,7 +151,10 @@ export function Appointments({ pageSize = 7 }) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
             >
-                <div className="flex flex-row justify-end mx-2 ">
+                <div className="flex flex-row items-center justify-between mx-2 ">
+                    <h3 className="text-2xl text-secondary font-bold">
+                        Appointments
+                    </h3>
                     <button
                         className="btn btn-sm btn-outline md:btn md:btn-outline"
                         onClick={() => setFilterVisible(true)}
@@ -159,7 +162,6 @@ export function Appointments({ pageSize = 7 }) {
                         <FiFilter />
                         Filter
                     </button>
-                    {isFilterVisible && <div>ABC</div>}
                 </div>
                 <div className="overflow-x-auto w-full my-4">
                     <table className="table">

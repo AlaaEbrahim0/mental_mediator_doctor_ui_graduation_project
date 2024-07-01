@@ -2,8 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useAuth } from "../auth/authProvider";
-import useSignalR from "../hooks/useSignalR";
-
+import { useSignalR } from "../hooks/useSignalR";
 const url = process.env.REACT_APP_API_URL;
 const NotificationsContext = createContext();
 
@@ -75,13 +74,12 @@ export const NotificationsProvider = ({ children }) => {
 
     const handleNewNotification = (notification) => {
         setNotifications((prevNotifications) => [
-            {
-                ...notification,
-            },
+            notification,
             ...prevNotifications,
         ]);
         setCount((prevCount) => prevCount + 1);
     };
+
     useSignalR(handleNewNotification);
 
     return (

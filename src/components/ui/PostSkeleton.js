@@ -1,12 +1,6 @@
-import { motion } from "framer-motion";
-
 export const PostSkeleton = () => {
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col mb-8 glass shadow-md rounded-lg w-full animate-pulse p-4"
-        >
+        <div className="flex flex-col mb-8 glass shadow-md rounded-lg w-full animate-pulse p-4">
             <div className="info flex flex-row justify-between w-full">
                 <div className="flex flex-row">
                     <div className="w-24 h-24 bg-gray-300 rounded-2xl shadow-md"></div>
@@ -27,6 +21,6 @@ export const PostSkeleton = () => {
             <div className="mt-4">
                 <div className="w-full h-48 bg-gray-300 rounded-lg"></div>
             </div>
-        </motion.div>
+        </div>
     );
 };

@@ -266,7 +266,7 @@ export const Schedule = () => {
 
             <div className=" flex flex-col rounded-xl bg-white bg-opacity-50  shadow-lg p-6 max-w-6xl mx-auto">
                 <div className="flex flex-row justify-between">
-                    <h1 className="text-xl text-center font-bold mb-2"> 
+                    <h1 className="text-xl text-center font-bold mb-2">
                         Weekly Schedule
                     </h1>
                     <div className="dropdown dropdown-end">
@@ -321,7 +321,7 @@ export const Schedule = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     whileHover={{ scale: 1.02 }}
                                     key={index}
-                                    className="p-8 hover:bg-base-200 rounded-xl shadow-lg"
+                                    className="p-8 rounded-xl shadow-lg"
                                 >
                                     <div className="flex flex-row justify-between">
                                         <h2 className="text-xl text-center font-bold mb-2">

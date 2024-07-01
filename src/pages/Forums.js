@@ -13,6 +13,8 @@ import { useAuth } from "../auth/authProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiFilter } from "react-icons/fi";
 import { FilterationComponent } from "../components/ui/FilterationComponent";
+import { Articles } from "./Home";
+import { NewsSection } from "./Home";
 
 export const Forums = () => {
     const { isLoading, error, data, setData, page, hasMore, execute, reset } =
@@ -32,12 +34,12 @@ export const Forums = () => {
     });
 
     useEffect(() => {
-        execute(1, 50, filters);
+        execute(1, 20, filters);
     }, [execute, filters]);
 
     const loadMore = useCallback(() => {
         if (hasMore && !isLoading) {
-            execute(page + 1, 50, filters);
+            execute(page + 1, 20, filters);
         }
     }, [execute, page, hasMore, isLoading, filters]);
 
@@ -78,7 +80,7 @@ export const Forums = () => {
                 to: "",
                 showConfessions: false,
             });
-            await execute(1, 50, filters);
+            await execute(1, 20, filters);
             setModalVisible(false);
         } catch (e) {
             toast.error(e.errors[0].description, {
@@ -107,12 +109,14 @@ export const Forums = () => {
                     next={loadMore}
                     hasMore={!isLoading && hasMore}
                     loader={<PostSkeleton />}
+                    scrollThreshold={0.8} // Adjust the scroll threshold
+                    scrollableTarget="scrollableDiv" // Ensure proper target for scrollable container
                 >
                     <div className="block lg:flex">
                         <div className="lg:flex lg:flex-col xl:col xl:col-8">
                             <div className="flex flex-row justify-between my-2 mx-2">
                                 <button
-                                    className="btn btn-sm md:btn w-24"
+                                    className="btn btn-sm md:btn-secondary md:btn-outline md:btn w-24"
                                     onClick={handleAddPostClick}
                                 >
                                     Add Post
@@ -179,9 +183,10 @@ export const Forums = () => {
                             )}
                         </div>
                         <div className="hidden md:flex md:flex-col xl:col xl:col-4">
+                            {/* <PostSkeleton />
                             <PostSkeleton />
-                            <PostSkeleton />
-                            <PostSkeleton />
+                            <PostSkeleton /> */}
+                            <NewsSection />
                         </div>
                     </div>
                     <CreatePostModal
@@ -211,9 +216,8 @@ const AnimatedPost = ({
         visible: {
             scale: 1,
             opacity: 1,
-            transition: { duration: 0.3 },
         },
-        exit: { scale: 0.9, opacity: 0, transition: { duration: 0.3 } },
+        exit: { scale: 0.9, opacity: 0 },
     };
 
     return (

@@ -3,8 +3,8 @@ import { IoSearchSharp } from "react-icons/io5";
 import { FaBars } from "react-icons/fa";
 import { MdOutlineNotificationsNone } from "react-icons/md";
 import { useNotifications } from "../../context/notificationsContext";
-import { NotificationsList } from "../ui/NotificationList";
 import { motion } from "framer-motion";
+import { NotificationsList } from "../ui/NotificationList";
 
 export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
     const { notifications, count } = useNotifications();
@@ -35,7 +35,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                 <div tabIndex={0} role="button" className="m-1">
                     <div className="indicator">
                         {count > 0 && (
-                            <span className="indicator-item badge badge-error ">
+                            <span className="indicator-item badge badge-error text-white ">
                                 {count}
                             </span>
                         )}

@@ -8,7 +8,7 @@ const getNews = async () => {
                 q: "psychology OR Neuroscience OR Therapy OR Mental health OR Medical research OR Clinical psychology",
                 sortBy: "relevancy",
                 apiKey: "ca9c5ed021cb495cab719bfba0455567",
-                pageSize: 5,
+                pageSize: 20,
             },
         });
         return response.data;

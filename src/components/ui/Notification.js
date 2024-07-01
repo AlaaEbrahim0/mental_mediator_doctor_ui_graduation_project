@@ -52,7 +52,7 @@ export const Notification = ({
             >
                 <div
                     className={`flex flex-col py-4 px-4 rounded-lg ${
-                        isRead ? "" : "bg-white glass"
+                        isRead ? "" : "bg-base-100 glass"
                     }`}
                 >
                     <div className="flex flex-row gap-x-4">

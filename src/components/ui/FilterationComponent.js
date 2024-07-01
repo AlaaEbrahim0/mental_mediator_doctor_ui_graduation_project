@@ -29,7 +29,7 @@ export function FilterationComponent({ onClose, onFilter }) {
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-base-100 shadow-lg glass p-4 rounded-xl z-10"
+            className="bg-white shadow-lg glass p-4 rounded-xl z-10"
         >
             <div className="flex items-center">
                 <h3 className="text-xl font-semibold">Filters</h3>
@@ -133,7 +133,7 @@ export function AppointmentsFilterationComponent({ onClose, onFilter }) {
         <motion.div
             initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-base-100 shadow-lg glass p-4 rounded-xl z-10"
+            className="bg-white shadow-lg glass p-4 rounded-xl z-10"
         >
             <div className="flex items-center">
                 <h3 className="text-xl font-semibold">Filters</h3>

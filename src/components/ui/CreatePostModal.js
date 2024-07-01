@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { BiImageAdd } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
 import { useCreatePost } from "../../api/comments/createPost";
@@ -41,8 +42,12 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center mt-8 justify-center bg-secondary bg-opacity-20 overflow-auto z-50">
-            <div className="bg-base-100 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4 ">
+        <div className="fixed inset-0 flex items-center justify-center bg-secondary bg-opacity-20 overflow-auto z-50">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-base-100 p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4 "
+            >
                 <h2 className="text-2xl font-bold mb-4">Create a New Post</h2>
                 <input
                     type="text"
@@ -50,7 +55,7 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
                     onChange={handleTitleChange}
                     placeholder="Title"
                     disabled={loading}
-                    className="input input-bordered bg-base-200 w-full mb-4 font-medium text-lg"
+                    className="input input-bordered input-white bg-base-200 w-full mb-4 font-medium text-lg"
                 />
                 <textarea
                     disabled={loading}
@@ -109,7 +114,7 @@ export const CreatePostModal = ({ isVisible, onClose, onCreate, loading }) => {
                         Create
                     </button>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };

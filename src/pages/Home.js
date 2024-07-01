@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, registerables, defaults } from "chart.js";
 import { motion } from "framer-motion";
 import { BsJournalMedical } from "react-icons/bs";
 import { Appointments } from "./Appointment";
+import { useGetAppointments } from "../api/getAppoinments";
 import { useGetNews } from "../api/useNews";
+import { useEffect, useState } from "react";
+import { PostSkeleton } from "../components/ui/PostSkeleton";
 
 // Register components
 ChartJS.register(...registerables);
@@ -48,18 +50,6 @@ const data = {
 };
 
 export function Home() {
-    const {
-        loading: newsLoading,
-        error: newsError,
-        execute: executeGetNews,
-        news,
-    } = useGetNews();
-
-    useEffect(() => {
-        debugger;
-        executeGetNews();
-    }, [executeGetNews]);
-
     return (
         <div className="flex flex-col p-4 gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -252,45 +242,68 @@ export function Home() {
                 <div className="col-span-2">
                     <Appointments pageSize={4} />
                 </div>
-                <div className="col-span-1 bg-white bg-opacity-50  shadow-lg p-8 rounded-2xl">
-                    {news.loading && <div>Loading...</div>}
-
-                    <div className="flex flex-col gap-y-8">
-                        <h3 className="text-2xl text-secondary font-bold mb-4">
-                            Latest in Psychology, Neuroscience and more...
-                        </h3>
-                        {!news.newsLoading &&
-                            news.articles?.map((article) => {
-                                return (
-                                    <div className="card card-compact bg-white bg-opacity-50 w-full shadow-xl">
-                                        <figure>
-                                            <img
-                                                src={article.urlToImage}
-                                                alt="Shoes"
-                                            />
-                                        </figure>
-                                        <div className="card-body p-4">
-                                            <h2 className="card-title text-secondary">
-                                                {article.title}
-                                            </h2>
-                                            <p className="text-info">
-                                                {article.description}
-                                            </p>
-                                            <div className="card-actions justify-start">
-                                                <a
-                                                    href={article.url}
-                                                    className="btn btn-primary btn-outline"
-                                                >
-                                                    Read Now
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                    </div>
-                </div>
+                <div className="col-span-1">I don't know</div>
             </div>
         </div>
+    );
+}
+export function NewsSection() {
+    const {
+        loading: newsLoading,
+        error: newsError,
+        execute: executeGetNews,
+        news,
+    } = useGetNews();
+
+    useEffect(() => {
+        executeGetNews();
+    }, [executeGetNews]);
+
+    return (
+        <div className="bg-white bg-opacity-50 shadow-lg p-8 rounded-2xl">
+            {newsLoading && <PostSkeleton />}
+            {newsError && <div>Error loading news: {newsError.message}</div>}
+            <div className="flex flex-col gap-y-8">
+                <h3 className="text-2xl text-center text-secondary font-bold mb-4">
+                    Latest in Psychology, Neuroscience and more...
+                </h3>
+                {!newsLoading &&
+                    news.articles?.map((article) => (
+                        <NewsArticle key={article.url} article={article} />
+                    ))}
+            </div>
+        </div>
+    );
+}
+function NewsArticle({ article }) {
+    return (
+        <motion.div
+            initial={{ y: -20 }}
+            animate={{ y: 0 }}
+            className="card card-compact bg-white bg-opacity-50 w-full shadow-xl"
+        >
+            <figure>
+                <img src={article.urlToImage} alt={article.title} />
+            </figure>
+            <div className="card-body p-4">
+                <h2 className="card-title text-secondary">
+                    {article.title} - {article.author}
+                </h2>
+                <span className="text-info text-xs">
+                    {new Date(article.publishedAt).toDateString()}
+                </span>
+                <p className="text-info">{article.description}</p>
+                <div className="card-actions justify-end">
+                    <a
+                        href={article.url}
+                        className="btn btn-primary btn-outline "
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Read More
+                    </a>
+                </div>
+            </div>
+        </motion.div>
     );
 }

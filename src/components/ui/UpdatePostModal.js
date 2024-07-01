@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { BiImageAdd } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
-
+import { motion } from "framer-motion";
 export const UpdatePostModal = ({
     isVisible,
     onClose,
@@ -46,8 +46,12 @@ export const UpdatePostModal = ({
     if (!isVisible) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 flex items-center mt-8 justify-center bg-secondary bg-opacity-20 overflow-auto z-50">
-            <div className="bg-base-100  p-6 rounded-lg w-full shadow-lg z-50 max-w-2xl mx-4 relative">
+        <div className="fixed inset-0 flex items-center justify-center bg-secondary bg-opacity-20 overflow-auto z-50">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-base-100  p-6 rounded-lg w-full shadow-lg z-50 max-w-2xl mx-4 relative"
+            >
                 <h2 className="text-2xl font-bold mb-4">Update Post</h2>
                 <input
                     type="text"
@@ -117,7 +121,7 @@ export const UpdatePostModal = ({
                         Update
                     </button>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 
