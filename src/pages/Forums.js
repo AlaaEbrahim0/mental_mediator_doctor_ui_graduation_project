@@ -113,7 +113,7 @@ export const Forums = () => {
                     scrollableTarget="scrollableDiv" // Ensure proper target for scrollable container
                 >
                     <div className="block lg:flex">
-                        <div className="lg:flex lg:flex-col xl:col xl:col-8">
+                        <div className="md:flex md:flex-col lg:col lg:col-6 xl:col xl:col-8">
                             <div className="flex flex-row justify-between my-2 mx-2">
                                 <button
                                     className="btn btn-sm md:btn-secondary md:btn-outline md:btn w-24"
@@ -182,7 +182,7 @@ export const Forums = () => {
                                 </div>
                             )}
                         </div>
-                        <div className="hidden md:flex md:flex-col xl:col xl:col-4">
+                        <div className="hidden md:flex md:flex-col lg:col lg:col-6 xl:col xl:col-4">
                             {/* <PostSkeleton />
                             <PostSkeleton />
                             <PostSkeleton /> */}

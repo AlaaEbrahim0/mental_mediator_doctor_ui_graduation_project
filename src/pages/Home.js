@@ -260,7 +260,7 @@ export function NewsSection() {
     }, [executeGetNews]);
 
     return (
-        <div className="bg-white bg-opacity-50 shadow-lg p-8 rounded-2xl">
+        <div className="bg-white bg-opacity-50 shadow-lg p-4 rounded-2xl">
             {newsLoading && <PostSkeleton />}
             {newsError && <div>Error loading news: {newsError.message}</div>}
             <div className="flex flex-col gap-y-8">
