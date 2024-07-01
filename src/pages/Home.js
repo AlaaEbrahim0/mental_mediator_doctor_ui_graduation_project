@@ -247,9 +247,10 @@ export function Home() {
         </div>
     );
 }
+
 export function NewsSection() {
     const {
-        loading: newsLoading,
+        isLoading: newsLoading,
         error: newsError,
         execute: executeGetNews,
         news,
@@ -259,22 +260,32 @@ export function NewsSection() {
         executeGetNews();
     }, [executeGetNews]);
 
-    return (
-        <div className="bg-white bg-opacity-50 shadow-lg p-4 rounded-2xl">
-            {newsLoading && <PostSkeleton />}
-            {newsError && <div>Error loading news: {newsError.message}</div>}
-            <div className="flex flex-col gap-y-8">
-                <h3 className="text-2xl text-center text-secondary font-bold mb-4">
-                    Latest in Psychology, Neuroscience and more...
-                </h3>
-                {!newsLoading &&
-                    news.articles?.map((article) => (
+    if (newsLoading) {
+        return <PostSkeleton />;
+    }
+
+    if (newsError) {
+        return <div>Error loading news: {newsError.message}</div>;
+    }
+
+    if (!newsLoading && !newsError && news) {
+        return (
+            <div className="bg-white bg-opacity-50 shadow-lg p-4 rounded-2xl">
+                <div className="flex flex-col gap-y-8">
+                    <h3 className="text-2xl text-center text-secondary font-bold mb-4">
+                        Latest in Orientation, Neurology and more...
+                    </h3>
+                    {news.articles?.map((article) => (
                         <NewsArticle key={article.url} article={article} />
                     ))}
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
+
+    return null;
 }
+
 function NewsArticle({ article }) {
     return (
         <motion.div
