@@ -40,3 +40,4 @@ export const NotificationsList = ({ notifications }) => {
         </>
     );
 };
+    

@@ -19,9 +19,9 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                 animate={{ opacity: 1 }}
                 className="flex-1"
             >
-                <h3 className="btn btn-ghost text-xl md:text-2xl">{title}</h3>
+                <h3 className="btn btn-ghost text-xl md:text-2xl">Nexus</h3>
             </motion.div>
-            <div className="form-control">
+            {/* <div className="form-control">
                 <label className="input bg-neutral input-bordered flex items-center w-full">
                     <IoSearchSharp className="text-xl text-info mr-2" />
                     <input
@@ -30,7 +30,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                         placeholder="Search "
                     />
                 </label>
-            </div>
+            </div> */}
             <div className="dropdown dropdown-end">
                 <div tabIndex={0} role="button" className="m-1">
                     <div className="indicator">

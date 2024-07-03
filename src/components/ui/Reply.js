@@ -69,6 +69,7 @@ export const Reply = ({
 
     const handleDelete = async () => {
         await deleteReplyExecute(postId, commentId, id);
+        
         await handleDeleteReply();
     };
 

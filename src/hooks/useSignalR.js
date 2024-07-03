@@ -43,9 +43,7 @@ export const useSignalR = (onReceiveNotification) => {
                         console.log("Notification received:", notification);
                         if (onReceiveNotification) {
                             onReceiveNotification(notification);
-                            toast.custom(
-                                <Notification message={notification.message} />
-                            );
+                            toast.success("Notification received");
                         }
                     });
 

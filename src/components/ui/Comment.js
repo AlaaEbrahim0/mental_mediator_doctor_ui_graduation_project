@@ -297,9 +297,12 @@ export const Comment = ({
                                 )}
                                 commentId={id}
                                 postId={postId}
-                                handleDeleteReply={async () =>
-                                    await getRepliesExecute(postId, id)
-                                }
+                                handleDeleteReply={async () => {
+                                    await getRepliesExecute(postId, id);
+                                    setRepliesCount(
+                                        (prevCount) => prevCount - 1
+                                    );
+                                }}
                                 image={reply.photoUrl}
                                 currentUserId={currentUserId}
                             />

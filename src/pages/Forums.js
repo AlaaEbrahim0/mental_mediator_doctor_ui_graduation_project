@@ -13,7 +13,6 @@ import { useAuth } from "../auth/authProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiFilter } from "react-icons/fi";
 import { FilterationComponent } from "../components/ui/FilterationComponent";
-import { Articles } from "./Home";
 import { NewsSection } from "./Home";
 
 export const Forums = () => {
@@ -35,15 +34,24 @@ export const Forums = () => {
 
     useEffect(() => {
         const initialLoad = async () => {
-            await execute(1, 20, filters);
+            try {
+                await execute(1, 20, filters);
+            } catch (error) {
+                console.error("Failed to load initial posts:", error);
+                toast.error("Failed to load posts. Please try again.");
+            }
         };
-        debugger;
         initialLoad();
     }, [execute, filters]);
 
-    const loadMore = useCallback(() => {
+    const loadMore = useCallback(async () => {
         if (hasMore && !isLoading) {
-            execute(page + 1, 20, filters);
+            try {
+                await execute(page + 1, 20, filters);
+            } catch (error) {
+                console.error("Failed to load more posts:", error);
+                toast.error("Failed to load more posts. Please try again.");
+            }
         }
     }, [execute, page, hasMore, isLoading, filters]);
 
@@ -51,6 +59,7 @@ export const Forums = () => {
         try {
             await executeDelete(id);
             setData((prev) => prev.filter((post) => post.id !== id));
+            toast.success("Post deleted successfully");
         } catch (e) {
             toast.error(e.errors[0].description, {
                 duration: 4000,
@@ -71,6 +80,7 @@ export const Forums = () => {
         useCreatePost();
     const handleCreatePost = async (title, content, postPhoto) => {
         if (!title || !content) {
+            toast.error("Title and content are required");
             return;
         }
         try {
@@ -84,9 +94,9 @@ export const Forums = () => {
                 to: "",
                 showConfessions: false,
             });
-            reset();
             await execute(1, 20, filters);
             setModalVisible(false);
+            toast.success("Post created successfully");
         } catch (e) {
             toast.error(e.errors[0].description, {
                 duration: 4000,
@@ -99,11 +109,11 @@ export const Forums = () => {
     const handleFilter = (appliedFilters) => {
         setFilters(appliedFilters);
         reset();
-        execute(1, 50, appliedFilters);
+        execute(1, 20, appliedFilters);
     };
 
     if (error) {
-        return <div>Error loading posts</div>;
+        return <div>Error loading posts: {error.message}</div>;
     }
 
     return (
@@ -113,11 +123,15 @@ export const Forums = () => {
                     dataLength={data.length}
                     next={loadMore}
                     hasMore={!isLoading && hasMore}
-                    loader={<PostSkeleton />}
-                    scrollThreshold={0.9} // Adjust the scroll threshold
-                    scrollableTarget="scrollableDiv" // Ensure proper target for scrollable container
+                    loader={
+                        <div className="my-4">
+                            <PostSkeleton />
+                        </div>
+                    }
+                    scrollThreshold={0.7}
+                    scrollableTarget="scrollableDiv"
                 >
-                    <div className="block lg:flex">
+                    <div className="block lg:flex overflow-x-hidden">
                         <div className="md:flex md:flex-col lg:col lg:col-6 xl:col xl:col-8">
                             <div className="flex flex-row justify-between my-2 mx-2">
                                 <button
@@ -135,7 +149,7 @@ export const Forums = () => {
                                 </button>
                             </div>
                             {isFilterVisible && (
-                                <div className="fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-50">
+                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                                     <FilterationComponent
                                         onClose={toggleShowFilters}
                                         onFilter={handleFilter}
@@ -147,17 +161,13 @@ export const Forums = () => {
                                     No Posts were found
                                 </div>
                             )}
-                            {!isLoading && data.length > 0 && (
+                            {data.length > 0 && (
                                 <AnimatePresence>
-                                    {data &&
-                                        data.map((post, index) => (
+                                    {data.map((post, index) => (
+                                        <React.Fragment
+                                            key={`post-${post.id}-${index}`}
+                                        >
                                             <AnimatedPost
-                                                key={
-                                                    "post-" +
-                                                    post.id +
-                                                    "-" +
-                                                    index
-                                                }
                                                 post={post}
                                                 index={index}
                                                 handleDeletePost={
@@ -176,7 +186,12 @@ export const Forums = () => {
                                                     );
                                                 }}
                                             />
-                                        ))}
+                                            {isLoading &&
+                                                index === data.length - 1 && (
+                                                    <PostSkeleton />
+                                                )}
+                                        </React.Fragment>
+                                    ))}
                                 </AnimatePresence>
                             )}
                             {isLoading && page === 1 && (
@@ -186,11 +201,18 @@ export const Forums = () => {
                                     <PostSkeleton />
                                 </div>
                             )}
+                            {!isLoading && hasMore && (
+                                <div className="text-center my-4">
+                                    <button
+                                        className="btn btn-primary btn-outline"
+                                        onClick={loadMore}
+                                    >
+                                        Load More
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div className="hidden md:flex md:flex-col lg:col lg:col-6 xl:col xl:col-4">
-                            {/* <PostSkeleton />
-                            <PostSkeleton />
-                            <PostSkeleton /> */}
                             <NewsSection />
                         </div>
                     </div>
