@@ -6,6 +6,8 @@ import { useNotifications } from "../../context/notificationsContext";
 import { motion } from "framer-motion";
 import { NotificationsList } from "../ui/NotificationList";
 
+const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
+
 export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
     const { notifications, count } = useNotifications();
 
@@ -19,7 +21,12 @@ export const TopBar = ({ title = "Nexus", toggleSidebar }) => {
                 animate={{ opacity: 1 }}
                 className="flex-1"
             >
-                <h3 className="btn btn-ghost text-xl md:text-2xl">Nexus</h3>
+                <img
+                    src={`${imagesDir}/logooo.png`}
+                    alt=""
+                    className="w-20 ml-4"
+                />
+                {/* <h3 className="btn btn-ghost text-xl md:text-2xl"></h3> */}
             </motion.div>
             {/* <div className="form-control">
                 <label className="input bg-neutral input-bordered flex items-center w-full">
