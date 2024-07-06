@@ -29,7 +29,7 @@ export const useGetProfile = () => {
             setError(e);
             setIsLoading(false);
         }
-    }, []);
+    }, [token]);
 
     return {
         isLoading,

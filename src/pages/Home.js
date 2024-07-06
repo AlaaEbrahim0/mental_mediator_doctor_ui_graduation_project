@@ -7,6 +7,8 @@ import { useGetDoctorReport } from "../api/getDoctorReports";
 import { MdOutlinePendingActions } from "react-icons/md";
 import { TbReportMoney } from "react-icons/tb";
 import { GiConfirmed } from "react-icons/gi";
+import { useGetNews } from "../api/useNews";
+import { PostSkeleton } from "../components/ui/PostSkeleton";
 
 // Register components
 ChartJS.register(...registerables);
@@ -254,6 +256,73 @@ export function Home() {
 
     return null;
 }
-export function NewsSection() {}
+export function NewsSection() {
+    const {
+        isLoading: newsLoading,
+        error: newsError,
+        execute: executeGetNews,
+        news,
+    } = useGetNews();
 
-function NewsArticle({ article }) {}
+    useEffect(() => {
+        executeGetNews();
+    }, [executeGetNews]);
+
+    if (newsLoading) {
+        return <PostSkeleton />;
+    }
+
+    if (newsError) {
+        return <div>Error loading news: {newsError.message}</div>;
+    }
+
+    if (!newsLoading && !newsError && news) {
+        return (
+            <div className="bg-white bg-opacity-50 shadow-lg p-8 rounded-2xl">
+                <h3 className="text-2xl text-center text-secondary font-bold mb-4">
+                    Latest in Psychology, Neurology and more...
+                </h3>
+                <div className="flex flex-col gap-y-8">
+                    {news.articles?.map((article) => (
+                        <NewsArticle key={article.url} article={article} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    return null;
+}
+
+function NewsArticle({ article }) {
+    return (
+        <motion.div
+            initial={{ y: -20 }}
+            animate={{ y: 0 }}
+            className="card card-compact bg-white bg-opacity-50 w-full shadow-xl"
+        >
+            <figure>
+                <img src={article.urlToImage} alt={article.title} />
+            </figure>
+            <div className="card-body p-4">
+                <h2 className="card-title text-secondary">
+                    {article.title} - {article.author}
+                </h2>
+                <span className="text-info text-xs">
+                    {new Date(article.publishedAt).toDateString()}
+                </span>
+                <p className="text-info">{article.description}</p>
+                <div className="card-actions justify-end">
+                    <a
+                        href={article.url}
+                        className="btn btn-primary btn-outline "
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Read More
+                    </a>
+                </div>
+            </div>
+        </motion.div>
+    );
+}
