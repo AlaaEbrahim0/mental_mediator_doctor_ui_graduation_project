@@ -69,39 +69,7 @@ export const UpdatePostModal = ({
                     className="textarea textarea-bordered bg-base-200 w-full mb-4 text-lg"
                     rows={6}
                 />
-                <label htmlFor="fileInput" className="block mb-4">
-                    <input
-                        type="file"
-                        id="fileInput"
-                        onChange={handlePostPhotoChange}
-                        accept="image/*"
-                        className="hidden"
-                    />
-                    {!previewUrl && (
-                        <div className="flex items-center cursor-pointer">
-                            <BiImageAdd className="text-3xl mr-2" />
-                            <span className="text-lg">Upload Photo</span>
-                        </div>
-                    )}
-                    {previewUrl && (
-                        <div className="relative">
-                            <img
-                                src={previewUrl}
-                                alt="Preview"
-                                className="w-full h-auto max-h-40 object-contain rounded-lg"
-                            />
-                            <div
-                                className="absolute top-2 right-2 p-1 rounded-full cursor-pointer"
-                                onClick={() => {
-                                    setPreviewUrl(null);
-                                    setPostPhoto(null);
-                                }}
-                            >
-                                <IoClose />
-                            </div>
-                        </div>
-                    )}
-                </label>
+
                 <div className="flex justify-end">
                     <button
                         className="btn btn-secondary mr-2"

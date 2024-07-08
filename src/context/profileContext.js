@@ -39,8 +39,8 @@ export const UserProfileProvider = ({ children }) => {
         setUserProfileData(null);
     };
 
-    const initializeUserProfile = async (token) => {
-        const data = await getProfile(token);
+    const initializeUserProfile = async () => {
+        const data = await getProfile();
         setUserProfileData(data);
     };
 

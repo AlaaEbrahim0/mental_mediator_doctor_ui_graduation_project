@@ -29,8 +29,6 @@ export function Profile() {
         updateLoading,
     } = useUserProfile();
 
-    console.log(profileData);
-
     const specializationsOptions = [
         { label: "Clinical Psychology", value: "ClinicalPsychology" },
         { label: "Counseling Psychology", value: "CounselingPsychology" },
