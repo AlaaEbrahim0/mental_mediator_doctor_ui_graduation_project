@@ -65,7 +65,7 @@ export const Notification = ({
                         />
                         <div className="flex flex-col justify-center">
                             <div className="text-md font-semibold">
-                                {notifierUserName} {message}
+                                {message}
                             </div>
                             <div className="text-sm text-gray-500">
                                 {convertUtcToRelativeTime(dateCreated)}
