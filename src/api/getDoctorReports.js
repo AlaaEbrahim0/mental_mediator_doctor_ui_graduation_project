@@ -8,8 +8,8 @@ const GetReport = async () => {
         let response = await axios.get(`${url}/api/doctors/me/report`);
         return response.data;
     } catch (error) {
-        console.log(error);
-        // throw error.response.data;
+        // console.log(error);
+        throw error.response.data;
     }
 };
 

@@ -186,11 +186,6 @@ export const Post = ({
                                 />
                             </>
                         )}
-                        <li>
-                            <button className="btn btn-sm btn-error text-md">
-                                Report
-                            </button>
-                        </li>
                     </ul>
                 </div>
             </div>

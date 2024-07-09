@@ -16,13 +16,12 @@ export const ForumsDetails = () => {
         execute: executeDelete,
     } = useDeletePost();
     const navigate = useNavigate();
-    const postRef = useRef(null); // Ref for the post element
+    const postRef = useRef(null);
 
     const { id } = useParams();
     const { userId } = useAuth();
 
     useEffect(() => {
-        // Scroll to the comment/reply if anchor exists in the URL
         const hash = window.location.hash;
         if (hash && hash.startsWith("#comment-")) {
             const commentId = hash.substring("#comment-".length);
