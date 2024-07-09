@@ -39,7 +39,7 @@ export const useSignIn = () => {
                         {
                             code: "Unauthorized",
                             description:
-                                "You cannot be authenticated unless you are a doctor",
+                                "The provided email or password is invalid",
                         },
                     ],
                 };

@@ -138,15 +138,15 @@ export const Post = ({
                     </div>
                 </div>
 
-                <div className="dropdown dropdown-end">
-                    <div tabIndex={0} role="button" className="md:btn m-1">
-                        <HiOutlineMenu className="text-md md:text-2xl" />
-                    </div>
-                    <ul
-                        tabIndex={0}
-                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
-                    >
-                        {authorId === currentUserId && (
+                {authorId === currentUserId && (
+                    <div className="dropdown dropdown-end">
+                        <div tabIndex={0} role="button" className="md:btn m-1">
+                            <HiOutlineMenu className="text-md md:text-2xl" />
+                        </div>
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
+                        >
                             <>
                                 <li className="mb-1">
                                     <button
@@ -185,9 +185,14 @@ export const Post = ({
                                     loading={postDeletionLoading}
                                 />
                             </>
-                        )}
-                    </ul>
-                </div>
+                            {/* <li>
+                                <button className="btn btn-sm btn-error text-md">
+                                    Report
+                                </button>
+                            </li> */}
+                        </ul>
+                    </div>
+                )}
             </div>
             <Link
                 className="w-full hover:cursor-pointer pl-2"
