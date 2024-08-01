@@ -47,9 +47,15 @@ export function Appointments({ pageSize = 7 }) {
     });
 
     useEffect(() => {
-        debugger;
-
-        execute(filterData);
+        const initialLoad = async () => {
+            try {
+                await execute(filterData);
+            } catch (error) {
+                console.error("Failed to load initial posts:", error);
+                toast.error("Failed to load posts. Please try again.");
+            }
+        };
+        initialLoad();
     }, [execute, filterData]);
 
     // Function to format the date and time
