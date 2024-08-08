@@ -27,6 +27,8 @@ export function Home() {
     } = useGetDoctorReport();
 
     useEffect(() => {
+        debugger;
+        
         executeGetReport();
     }, [executeGetReport]);
 

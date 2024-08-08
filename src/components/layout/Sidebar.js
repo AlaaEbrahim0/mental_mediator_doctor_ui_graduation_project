@@ -8,6 +8,7 @@ import { NavLink } from "react-router-dom";
 import { IoIosClose, IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { useUserProfile } from "../../context/profileContext";
 import { motion } from "framer-motion";
+import { useAuth } from "../../auth/authProvider";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 

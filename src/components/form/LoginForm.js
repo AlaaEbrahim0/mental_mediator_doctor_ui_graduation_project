@@ -132,7 +132,8 @@ export const LoginForm = () => {
             const data = await execute(values);
             setToken(data.token);
             setUserId(data.userId);
-            initializeUserProfile(data.token);
+            debugger;
+            await initializeUserProfile();
             navigate("/", { replace: true });
         } catch (error) {
             console.error(error);
