@@ -26,18 +26,27 @@ export const useSchedule = () => {
     const [error, setError] = useState(null);
     const { token } = useAuth();
 
-    const execute = useCallback(async (doctorId) => {
-        setIsLoading(true);
-        try {
-            const data = await getSchedule(doctorId, token);
-            setData(data);
-            setIsLoading(false);
-            return data.sort((a) => a.weekDay);
-        } catch (e) {
-            setError(e);
-            setIsLoading(false);
-        }
-    }, []);
+    const execute = useCallback(
+        async (doctorId) => {
+            if (!token) {
+                setError(new Error("No authentication token available"));
+                return;
+            }
+            try {
+                setIsLoading(true);
+                const data = await getSchedule(doctorId, token);
+                setData(data);
+                setIsLoading(false);
+                return data.sort((a) => a.weekDay);
+            } catch (e) {
+                setError(e);
+                throw e;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [token]
+    );
 
     return {
         isLoading,
