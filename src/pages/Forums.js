@@ -135,7 +135,7 @@ export const Forums = () => {
                         <div className="md:flex md:flex-col lg:col lg:col-6 xl:col xl:col-8">
                             <div className="flex flex-row justify-between my-2 mx-2">
                                 <button
-                                    className="btn btn-sm md:btn-secondary md:btn-outline md:btn w-24"
+                                    className="btn btn-sm btn-primary hover:text-white md:btn-outline md:btn w-24"
                                     onClick={handleAddPostClick}
                                 >
                                     Add Post

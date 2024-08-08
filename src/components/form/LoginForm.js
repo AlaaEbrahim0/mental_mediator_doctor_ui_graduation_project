@@ -69,6 +69,7 @@ const FormField = ({
 );
 
 const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
+    const [message, setMessage] = useState("");
     return (
         <ForgetPasswordCustomModal isOpen={isOpen} onClose={onRequestClose}>
             <h2 className="text-lg font-semibold mb-4">Forget Password</h2>
@@ -107,6 +108,7 @@ const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
                                 "Send"
                             )}
                         </button>
+                        <p className="text-success">{message}</p>
                     </Form>
                 )}
             </Formik>
@@ -146,7 +148,8 @@ export const LoginForm = () => {
         try {
             await executeForgetPassword(values.email);
             toast.success("Password reset link sent to your email");
-            setIsForgetPasswordOpen(false);
+
+            // setIsForgetPasswordOpen(false);
         } catch (error) {
             console.error(error);
             toast.error("Failed to send password reset link");
@@ -189,7 +192,7 @@ export const LoginForm = () => {
                             isPasswordVisible={isPasswordVisible}
                         />
                         <div className="actions flex justify-end w-full my-3 px-3">
-                            <a
+                            <button
                                 className="text-primary font-semibold text-sm"
                                 href="#"
                                 onClick={(e) => {
@@ -197,8 +200,8 @@ export const LoginForm = () => {
                                     setIsForgetPasswordOpen(true);
                                 }}
                             >
-                                Forget Your Password
-                            </a>
+                                Forgot your password?
+                            </button>
                         </div>
                         <button
                             type="submit"

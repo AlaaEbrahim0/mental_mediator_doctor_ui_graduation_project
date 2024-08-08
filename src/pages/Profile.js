@@ -107,14 +107,12 @@ export function Profile() {
             biography: profileData?.biography || "  ",
             location: profileData?.location || "",
             city: profileData?.city || "",
-            fees: profileData?.sessionFees,
+            fees: profileData?.sessionFees || 0,
         },
         validationSchema,
         onSubmit: async (values) => {
             try {
                 await updateProfile(values);
-                toast.success("Profile updated successfully!");
-                console.log("Profile updated successfully!");
             } catch (error) {
                 console.error("Error updating profile:", error);
             }

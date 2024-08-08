@@ -27,7 +27,6 @@ export const useGetProfile = () => {
             setError(new Error("No authentication token available"));
             return;
         }
-
         try {
             setIsLoading(true);
             const data = await GetProfile(token);
