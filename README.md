@@ -1,70 +1,37 @@
-# Getting Started with Create React App
+# Nexus Doctor UI Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to the Doctor UI Frontend repository! This project is part of the Nexus platform, which was developed as a final year project in Computer Science. Nexus is designed to support individuals dealing with mental health challenges, offering a space to share thoughts and receive advice both anonymously and openly. The frontend of Nexus is built using modern technologies to provide a responsive and interactive user experience.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Community Interaction:** Users can view and interact with posts, either publicly or anonymously.
+- **Appointment Management:** Interface for booking, viewing, and managing appointments with doctors.
+- **Real-Time Notifications:** Receive updates and notifications about appointments and other activities.
+- **Data Visualization:** Visualize key metrics and insights through charts and graphs.
+- **Form Handling:** Intuitive forms for user registration, login, and appointment booking.
 
-### `npm start`
+## Technologies Used
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **React:** A JavaScript library for building user interfaces.
+- **TailwindCSS:** A utility-first CSS framework for styling.
+- **DaisyUI:** A component library for TailwindCSS that provides a set of pre-designed components.
+- **Framer Motion:** A library for animations and transitions.
+- **Formik:** A library for handling form state and validation.
+- **Chart.js:** A library for creating interactive charts and graphs.
+- **React Toastify:** A library for providing easy-to-use and customizable toast notifications.
+- **Vercel:** For deploying and hosting the frontend application.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Usage
 
-### `npm test`
+- **User Interface:** Navigate through the application using the sidebar and top navigation bar.
+- **Forms:** Use the built-in forms to register, log in, and book appointments.
+- **Charts:** View various metrics and insights on the dashboard.
+- **Notifications:** Toast notifications provide feedback and alerts throughout the application.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Contact
 
-### `npm run build`
+For any inquiries or feedback, please contact me at [alaaebrahim387@gmail.com].
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## License
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
