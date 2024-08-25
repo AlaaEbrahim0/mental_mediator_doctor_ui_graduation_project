@@ -15,15 +15,13 @@ import { Logout } from "../auth/logout";
 import { Schedule } from "../pages/Schedule";
 import { ForumsDetails } from "../pages/ForumsDetails";
 import { Profile } from "../pages/Profile";
+import { ResetPassword } from "../auth/forgetPassword";
 
 const Routes = () => {
     const { token } = useAuth();
 
     const routesForPublic = [
-        // {
-        //     path: "/login",
-        //     element: <Login />,
-        // },
+        { path: "forgetPassword", element: <ResetPassword /> },
     ];
 
     const routesForAuthenticatedOnly = [
