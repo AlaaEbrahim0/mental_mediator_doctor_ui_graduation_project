@@ -1,15 +1,18 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/authProvider";
+import { getRoles, getToken } from "../auth/session";
 
 export const ProtectedRoute = () => {
     const { token, roles } = useAuth();
+    const location = useLocation();
 
-    // Fallback to localStorage to prevent race conditions during immediate navigation
-    const activeToken = token || localStorage.getItem("token");
-    const activeRoles = roles?.length > 0 ? roles : JSON.parse(localStorage.getItem("roles") || "[]");
+    // Fall back to the persisted session so a navigation that happens right
+    // after sign-in is not rejected while React state is still settling.
+    const activeToken = token || getToken();
+    const activeRoles = roles?.length > 0 ? roles : getRoles();
 
     if (!activeToken) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 
     const isDoctor = activeRoles.some(
@@ -17,7 +20,7 @@ export const ProtectedRoute = () => {
     );
 
     if (!isDoctor) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" replace state={{ from: location.pathname }} />;
     }
 
     return <Outlet />;

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import apiClient from "./client";
+import apiClient, { getApiErrorMessages } from "./client";
 
 export const signIn = async ({ email, password }) => {
     const { data } = await apiClient.post("/api/auth/signin", { email, password });
@@ -38,25 +38,33 @@ export const updateDoctorProfile = async (updateData) => {
 export function useSignIn() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [errorMessages, setErrorMessages] = useState([]);
     const execute = useCallback(async (credentials) => {
         setIsLoading(true);
         setError(null);
+        setErrorMessages([]);
         try {
             const response = await signIn(credentials);
             if (!response?.roles?.includes("Doctor")) {
-                const authError = new Error("The provided email or password is invalid");
+                const authError = new Error("This account is not registered as a doctor. Use a doctor account to sign in.");
                 authError.errors = [{ code: "Unauthorized", description: authError.message }];
                 throw authError;
             }
             return response;
         } catch (requestError) {
             setError(requestError);
+            // The API answers failed sign-ins with RFC 7807 problem details.
+            // Surface those messages instead of a generic network error.
+            const messages = getApiErrorMessages(requestError);
+            setErrorMessages(
+                messages.length ? messages : [requestError?.message || "Unable to sign in. Please try again."]
+            );
             throw requestError;
         } finally {
             setIsLoading(false);
         }
     }, []);
-    return { isLoading, error, execute };
+    return { isLoading, error, errorMessages, execute };
 }
 
 export function useForgetPassword() {

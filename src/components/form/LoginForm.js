@@ -120,7 +120,7 @@ const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
 export const LoginForm = () => {
     const { setToken, setUserId, setRoles, setExpiresOn } = useAuth();
     const navigate = useNavigate();
-    const { isLoading, error, execute } = useSignIn();
+    const { isLoading, errorMessages, execute } = useSignIn();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isForgetPasswordOpen, setIsForgetPasswordOpen] = useState(false);
     const { execute: executeForgetPassword } = useForgetPassword();
@@ -132,9 +132,9 @@ export const LoginForm = () => {
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
             const data = await execute(values);
-            // API requests and the SignalR token factory read from localStorage.
-            // Persist before profile loading so the first request cannot race
-            // the auth context's persistence effect.
+            // API requests and the SignalR token factory read from the shared
+            // session helpers, so persist before navigating to make sure the
+            // first request after login already carries the token.
             localStorage.setItem("token", data.token);
             localStorage.setItem("userId", data.userId);
             localStorage.setItem("roles", JSON.stringify(data.roles || []));
@@ -147,8 +147,8 @@ export const LoginForm = () => {
             // changes. Let it own that request so login doesn't issue a second
             // /doctors/me call before the auth state has propagated.
             navigate("/", { replace: true });
-        } catch (error) {
-            console.error("Sign-in failed:", error);
+        } catch (requestError) {
+            console.error("Sign-in failed:", requestError);
         } finally {
             setSubmitting(false);
         }
@@ -248,11 +248,22 @@ export const LoginForm = () => {
                                 "Login"
                             )}
                         </button>
-                        <ul className="space-y-1 text-sm font-medium text-red-700" role="alert">
-                            {error?.errors?.map((error) => (
-                                <li key={error.code}>{error.description}</li>
-                            ))}
-                        </ul>
+                        {errorMessages.length > 0 && (
+                            <div
+                                role="alert"
+                                aria-live="polite"
+                                className="rounded-xl border border-error/30 bg-error/5 px-3.5 py-3"
+                            >
+                                <p className="text-sm font-semibold text-red-800">
+                                    We could not sign you in
+                                </p>
+                                <ul className="mt-1 space-y-1 text-sm font-medium text-red-700">
+                                    {errorMessages.map((message, index) => (
+                                        <li key={`${message}-${index}`}>{message}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </Form>
                 )}
             </Formik>

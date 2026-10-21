@@ -2,10 +2,12 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 import * as signalR from "@microsoft/signalr";
 import { useAuth } from "../auth/authProvider";
+import { getToken } from "../auth/session";
+import { API_BASE_URL } from "../api/client";
 import toast from "react-hot-toast";
 import { getUserNotifications, markAllNotificationsRead, markNotificationRead } from "../api/notifications.api";
 
-const url = process.env.REACT_APP_API_URL;
+const url = API_BASE_URL;
 const NotificationsContext = createContext();
 
 export const NotificationsProvider = ({ children }) => {
@@ -96,9 +98,14 @@ export const NotificationsProvider = ({ children }) => {
             return undefined;
         }
 
+        // Read the token from the persisted session: SignalR reconnects on its
+        // own and the token factory may be called long after the React state
+        // that created the connection was unmounted.
+        const accessTokenFactory = () => getToken() || token;
+
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${url}/notification-hub`, {
-                accessTokenFactory: () => token,
+                accessTokenFactory,
             })
             .withAutomaticReconnect()
             .build();

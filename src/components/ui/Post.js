@@ -110,14 +110,52 @@ export const Post = ({
     useEffect(() => { setLikesCount(initialLikesCount); setIsLiked(initialLiked); }, [initialLikesCount, initialLiked]);
 
     const toggleLike = async () => {
+        if (likeLoading) return;
+
+        // Optimistic update: flip the UI straight away so the button reacts
+        // immediately, then reconcile with the server response. If the request
+        // fails we roll back to the previous state.
+        const previousLiked = isLiked;
+        const previousCount = likesCount;
+        const nextLiked = !isLiked;
+
         setLikeLoading(true);
+        setIsLiked(nextLiked);
+        setLikesCount((prev) => Math.max(0, prev + (nextLiked ? 1 : -1)));
+
         try {
-            const result = await setPostLike(id, !isLiked);
-            setLikesCount(result.likesCount ?? 0);
-            setIsLiked(Boolean(result.isLikedByCurrentUser));
+            const result = await setPostLike(id, nextLiked);
+            const serverCount = result?.likesCount;
+            const serverLiked = result?.isLikedByCurrentUser;
+
+            // The API is the source of truth for the counter.
+            if (typeof serverCount === "number") setLikesCount(serverCount);
+            if (typeof serverLiked === "boolean") setIsLiked(serverLiked);
+
+            // Keep the list in sync so the state survives a re-render or a
+            // re-fetch of the feed.
+            if (typeof setData === "function") {
+                setData((prev) =>
+                    (prev || []).map((post) =>
+                        post.id === id
+                            ? {
+                                ...post,
+                                likesCount: typeof serverCount === "number" ? serverCount : post.likesCount,
+                                isLikedByCurrentUser:
+                                    typeof serverLiked === "boolean" ? serverLiked : post.isLikedByCurrentUser,
+                            }
+                            : post
+                    )
+                );
+            }
         } catch (error) {
+            // Roll back the optimistic update.
+            setIsLiked(previousLiked);
+            setLikesCount(previousCount);
             toast.error(getApiErrorMessage(error, "Could not update your like. Please try again."));
-        } finally { setLikeLoading(false); }
+        } finally {
+            setLikeLoading(false);
+        }
     };
 
     const handleUpdatePost = async (id, title, content, postPhoto) => {

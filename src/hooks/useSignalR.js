@@ -2,19 +2,25 @@
 import * as signalR from "@microsoft/signalr";
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/authProvider";
+import { getToken } from "../auth/session";
+import { API_BASE_URL } from "../api/client";
 import toast from "react-hot-toast";
-import { Notification } from "../components/ui/Notification";
 
-const url = process.env.REACT_APP_API_URL;
+const url = API_BASE_URL;
 
 export const useSignalR = (onReceiveNotification) => {
     const [connection, setConnection] = useState(null);
     const { token } = useAuth();
 
     useEffect(() => {
+        // Read the token from the persisted session: SignalR reconnects on its
+        // own and the token factory may be called long after the React state
+        // that created the connection was unmounted.
+        const accessTokenFactory = () => getToken() || token;
+
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${url}/notification-hub`, {
-                accessTokenFactory: () => token,
+                accessTokenFactory,
             })
             .withAutomaticReconnect()
             .build();
