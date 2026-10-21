@@ -1,9 +1,9 @@
 // src/context/notificationsContext.js
-import React, { createContext, useState, useEffect, useContext } from "react";
-import axios from "axios";
+import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 import * as signalR from "@microsoft/signalr";
 import { useAuth } from "../auth/authProvider";
 import toast from "react-hot-toast";
+import { getUserNotifications, markAllNotificationsRead, markNotificationRead } from "../api/notifications.api";
 
 const url = process.env.REACT_APP_API_URL;
 const NotificationsContext = createContext();
@@ -16,20 +16,18 @@ export const NotificationsProvider = ({ children }) => {
     const { token } = useAuth();
     const [connection, setConnection] = useState(null);
 
-    const fetchNotifications = async (pageNumber = 1, pageSize = 20) => {
-        if (!token) return;
+    const fetchNotifications = useCallback(async (pageNumber = 1, pageSize = 20) => {
+        if (!token) {
+            setNotifications([]);
+            setCount(0);
+            setError(null);
+            setLoading(false);
+            return;
+        }
         try {
             setLoading(true);
-            const response = await axios.get(
-                `${url}/api/notifications/users/me`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    params: { pageNumber, pageSize },
-                }
-            );
-            const notificationsData = response.data;
+            setError(null);
+            const notificationsData = await getUserNotifications(pageNumber, pageSize);
             setNotifications(notificationsData);
             setCount(notificationsData.filter((x) => !x.isRead).length);
             setLoading(false);
@@ -38,15 +36,24 @@ export const NotificationsProvider = ({ children }) => {
             setError(err);
             setLoading(false);
         }
-    };
+    }, [token]);
 
     useEffect(() => {
         fetchNotifications();
+    }, [fetchNotifications]);
+
+    useEffect(() => {
+        if (!token) {
+            setNotifications([]);
+            setCount(0);
+            setError(null);
+            setLoading(false);
+        }
     }, [token]);
 
     const markAllAsRead = async () => {
         try {
-            await axios.put(`${url}/api/notifications/users/me/read`);
+            await markAllNotificationsRead();
             setNotifications((prevNotifications) =>
                 prevNotifications.map((notification) => ({
                     ...notification,
@@ -68,7 +75,7 @@ export const NotificationsProvider = ({ children }) => {
                         : notification
                 )
             );
-            await axios.put(`${url}/api/notifications/${id}/read`);
+            await markNotificationRead(id);
             setCount((prev) => prev - 1);
         } catch (err) {
             console.log(err);
@@ -84,6 +91,11 @@ export const NotificationsProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        if (!token) {
+            setConnection(null);
+            return undefined;
+        }
+
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${url}/notification-hub`, {
                 accessTokenFactory: () => token,

@@ -18,37 +18,39 @@ export const UserProfileProvider = ({ children }) => {
     } = useUpdateProfile();
 
     useEffect(() => {
+        let cancelled = false;
+
         const fetchUserProfile = async () => {
-            if (token) {
-                try {
-                    setIsLoading(true);
-                    const data = await getProfile();
-                    setUserProfileData(data);
-                } catch (err) {
+            if (!token) {
+                setUserProfileData(null);
+                setError(null);
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                setError(null);
+                const data = await getProfile();
+                if (!cancelled) setUserProfileData(data);
+            } catch (err) {
+                if (!cancelled) {
                     setError(err);
-                    toast.error("Failed to load profile");
-                } finally {
-                    setIsLoading(false);
+                    toast.error(err.response?.status === 403
+                        ? "This account is not authorized as a doctor. Sign in with a Doctor account."
+                        : "Failed to load doctor profile");
                 }
+            } finally {
+                if (!cancelled) setIsLoading(false);
             }
         };
 
         fetchUserProfile();
+        return () => { cancelled = true; };
     }, [token, getProfile]);
 
     const reset = () => {
         setUserProfileData(null);
-    };
-
-    const initializeUserProfile = async () => {
-        try {
-            debugger;
-            const data = await getProfile();
-            setUserProfileData(data);
-        } catch (err) {
-            setError(err);
-            toast.error("Failed to initialize profile");
-        }
     };
 
     const updateUserProfile = async (profileUpdates) => {
@@ -71,7 +73,6 @@ export const UserProfileProvider = ({ children }) => {
                 updateUserProfile,
                 updateLoading: updateIsLoading,
                 reset,
-                initializeUserProfile,
             }}
         >
             {children}

@@ -1,89 +1,60 @@
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "../../context/notificationsContext";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { FiActivity, FiCalendar, FiMessageCircle } from "react-icons/fi";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
-import toast from "react-hot-toast";
 
-const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
+const notificationKind = (type = "", resources = {}) => {
+    const normalizedType = type.toLowerCase();
+    if (resources.appointmentId || normalizedType.includes("appointment")) {
+        return { label: "Appointment reminder", Icon: FiCalendar };
+    }
+    if (resources.postId || normalizedType.includes("comment")) {
+        return { label: "Community update", Icon: FiMessageCircle };
+    }
+    return { label: "System alert", Icon: FiActivity };
+};
 
 export const Notification = ({
     id,
     message,
     notifierUserName,
-    notifierPhotoUrl,
     dateCreated,
-    resources,
+    resources = {},
     type,
     isRead,
 }) => {
+    const notificationResources = resources || {};
     const { markAsRead } = useNotifications();
     const navigate = useNavigate();
-    const [error, setError] = useState(null);
+    const { label, Icon } = notificationKind(type, notificationResources);
 
-    const handleMarkAsRead = async (event) => {
-        event.preventDefault();
-        try {
-            await markAsRead(id);
-            if (resources["postId"]) {
-                navigate(
-                    `forums/${resources.postId}#comment-${resources.commentId}`
-                );
-            }
-            if (resources["appointmentId"]) {
-                navigate(`appointments`);
-            }
-        } catch (err) {
-            console.error("Navigation error:", err);
-            setError(
-                "The page you're trying to navigate to was not found or deleted."
-            );
-            toast.error(error);
+    const handleOpen = async () => {
+        if (!isRead) await markAsRead(id);
+        if (notificationResources.postId) {
+            navigate(`/forums/${notificationResources.postId}${notificationResources.commentId ? `#comment-${notificationResources.commentId}` : ""}`);
+        } else if (notificationResources.appointmentId) {
+            navigate("/appointments");
         }
     };
 
     return (
-        <>
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full"
-                onClick={handleMarkAsRead}
-            >
-                <div
-                    className={`flex flex-col py-4 px-4 rounded-lg ${
-                        isRead ? "" : "bg-base-100 glass"
-                    }`}
-                >
-                    <div className="flex flex-row gap-x-4">
-                        <img
-                            src={
-                                notifierPhotoUrl || imagesDir + "/profile.webp"
-                            }
-                            className="w-12 h-12 rounded-full"
-                            alt={notifierUserName}
-                        />
-                        <div className="flex flex-col justify-center">
-                            <div className="text-md font-semibold">
-                                {message}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                                {convertUtcToRelativeTime(dateCreated)}
-                            </div>
-                        </div>
-                    </div>
-                    {type === "appointmentRequest" && (
-                        <div className="flex flex-row gap-4">
-                            <button className="btn btn-sm btn-outline">
-                                Accept
-                            </button>
-                            <button className="btn btn-sm btn-outline btn-error">
-                                Reject
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </motion.div>
-        </>
+        <button
+            type="button"
+            onClick={handleOpen}
+            className={`mb-1 flex w-full items-start gap-3 rounded-xl p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 ${isRead ? "bg-base-100 hover:bg-neutral-50" : "bg-primary-50 hover:bg-primary-100"}`}
+            aria-label={`${isRead ? "Read" : "Unread"}: ${label}. ${message}`}
+        >
+            <span className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full ${isRead ? "bg-neutral-100 text-neutral-700" : "bg-primary-100 text-primary-800"}`}>
+                <Icon aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+                <span className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-600">{label}</span>
+                    {!isRead && <span className="h-2 w-2 shrink-0 rounded-full bg-primary-700" aria-label="Unread" />}
+                </span>
+                <span className="mt-1 block text-sm font-medium leading-5 text-neutral-900">{message}</span>
+                <span className="mt-1 block text-xs text-neutral-600">{notifierUserName ? `${notifierUserName} · ` : ""}{convertUtcToRelativeTime(dateCreated)}</span>
+            </span>
+        </button>
     );
 };

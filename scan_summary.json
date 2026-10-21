@@ -1,0 +1,402 @@
+{
+  "files": [
+    {
+      "path": ".env",
+      "size": 80
+    },
+    {
+      "path": ".gitignore",
+      "size": 319
+    },
+    {
+      "path": "README.md",
+      "size": 2120
+    },
+    {
+      "path": "package-lock.json",
+      "size": 784601
+    },
+    {
+      "path": "package.json",
+      "size": 1429
+    },
+    {
+      "path": "postcss.config.js",
+      "size": 95
+    },
+    {
+      "path": "tailwind.config.js",
+      "size": 1790
+    },
+    {
+      "path": "public/favicon.ico",
+      "size": 3870
+    },
+    {
+      "path": "public/index.html",
+      "size": 2224
+    },
+    {
+      "path": "public/logo192.png",
+      "size": 5347
+    },
+    {
+      "path": "public/logo512.png",
+      "size": 9664
+    },
+    {
+      "path": "public/manifest.json",
+      "size": 492
+    },
+    {
+      "path": "public/profile.webp",
+      "size": 8226
+    },
+    {
+      "path": "public/robots.txt",
+      "size": 67
+    },
+    {
+      "path": "public/images/doctorPhoto.png",
+      "size": 155097
+    },
+    {
+      "path": "public/images/gif.webp",
+      "size": 695542
+    },
+    {
+      "path": "public/images/heart.png",
+      "size": 4807
+    },
+    {
+      "path": "public/images/loginPhoto.jpg",
+      "size": 1476429
+    },
+    {
+      "path": "public/images/loginPhoto.png",
+      "size": 220990
+    },
+    {
+      "path": "public/images/logo-no-background.png",
+      "size": 11113
+    },
+    {
+      "path": "public/images/logo.png",
+      "size": 48301
+    },
+    {
+      "path": "public/images/logo.webp",
+      "size": 4682
+    },
+    {
+      "path": "public/images/logooo.png",
+      "size": 51002
+    },
+    {
+      "path": "public/images/profile.webp",
+      "size": 8226
+    },
+    {
+      "path": "public/images/wave.png",
+      "size": 355711
+    },
+    {
+      "path": "src/App.js",
+      "size": 532
+    },
+    {
+      "path": "src/index.css",
+      "size": 2493
+    },
+    {
+      "path": "src/index.js",
+      "size": 537
+    },
+    {
+      "path": "src/logo.svg",
+      "size": 2632
+    },
+    {
+      "path": "src/reportWebVitals.js",
+      "size": 362
+    },
+    {
+      "path": "src/setupTests.js",
+      "size": 241
+    },
+    {
+      "path": "src/api/createWeeklySchedule.js",
+      "size": 1139
+    },
+    {
+      "path": "src/api/createWeeklyScheduleDay.js",
+      "size": 1143
+    },
+    {
+      "path": "src/api/deleteWeeklySchedule.js",
+      "size": 1092
+    },
+    {
+      "path": "src/api/deleteWeeklyScheduleDay.js",
+      "size": 1036
+    },
+    {
+      "path": "src/api/editWeeklyScheduleDay.js",
+      "size": 1068
+    },
+    {
+      "path": "src/api/getAppoinments.js",
+      "size": 1538
+    },
+    {
+      "path": "src/api/getDoctorReports.js",
+      "size": 1286
+    },
+    {
+      "path": "src/api/getNotifications.js",
+      "size": 984
+    },
+    {
+      "path": "src/api/getProfile.js",
+      "size": 1174
+    },
+    {
+      "path": "src/api/getReplies.js",
+      "size": 1039
+    },
+    {
+      "path": "src/api/getWeeklySchedule.js",
+      "size": 1494
+    },
+    {
+      "path": "src/api/postReply.js",
+      "size": 1379
+    },
+    {
+      "path": "src/api/updateProfile.js",
+      "size": 1745
+    },
+    {
+      "path": "src/api/useNews.js",
+      "size": 1029
+    },
+    {
+      "path": "src/api/auth/forgetPassword.js",
+      "size": 1006
+    },
+    {
+      "path": "src/api/auth/signIn.js",
+      "size": 1647
+    },
+    {
+      "path": "src/api/comments/createPost.js",
+      "size": 1418
+    },
+    {
+      "path": "src/api/comments/deletReply.js",
+      "size": 1079
+    },
+    {
+      "path": "src/api/comments/deleteComment.js",
+      "size": 1148
+    },
+    {
+      "path": "src/api/comments/deletePost.js",
+      "size": 1064
+    },
+    {
+      "path": "src/api/comments/getComments.js",
+      "size": 968
+    },
+    {
+      "path": "src/api/comments/postComment.js",
+      "size": 1330
+    },
+    {
+      "path": "src/api/comments/putComment.js",
+      "size": 1329
+    },
+    {
+      "path": "src/api/comments/putReply.js",
+      "size": 1415
+    },
+    {
+      "path": "src/api/comments/updatePost.js",
+      "size": 1470
+    },
+    {
+      "path": "src/api/posts/confirmAppointment.js",
+      "size": 1259
+    },
+    {
+      "path": "src/api/posts/getPostById.js",
+      "size": 956
+    },
+    {
+      "path": "src/api/posts/getPosts.js",
+      "size": 1867
+    },
+    {
+      "path": "src/api/posts/rejectAppointment.js",
+      "size": 1193
+    },
+    {
+      "path": "src/auth/authProvider.js",
+      "size": 1662
+    },
+    {
+      "path": "src/auth/forgetPassword.js",
+      "size": 1214
+    },
+    {
+      "path": "src/auth/login.js",
+      "size": 1252
+    },
+    {
+      "path": "src/auth/logout.js",
+      "size": 430
+    },
+    {
+      "path": "src/components/form/LoginForm.js",
+      "size": 9735
+    },
+    {
+      "path": "src/components/form/NewDayForm.js",
+      "size": 6245
+    },
+    {
+      "path": "src/components/form/ResetPasswordForm",
+      "size": 3961
+    },
+    {
+      "path": "src/components/form/ScheduleForm.js",
+      "size": 14059
+    },
+    {
+      "path": "src/components/layout/MainLayout.js",
+      "size": 1564
+    },
+    {
+      "path": "src/components/layout/Sidebar.js",
+      "size": 7014
+    },
+    {
+      "path": "src/components/layout/TopBar.js",
+      "size": 2415
+    },
+    {
+      "path": "src/components/ui/Comment.js",
+      "size": 13751
+    },
+    {
+      "path": "src/components/ui/CreatePostModal.js",
+      "size": 5068
+    },
+    {
+      "path": "src/components/ui/CustomDeletionModal.js",
+      "size": 2624
+    },
+    {
+      "path": "src/components/ui/CustomToast.js",
+      "size": 1453
+    },
+    {
+      "path": "src/components/ui/FilterationComponent.js",
+      "size": 7860
+    },
+    {
+      "path": "src/components/ui/Notification.js",
+      "size": 3105
+    },
+    {
+      "path": "src/components/ui/NotificationList.js",
+      "size": 1417
+    },
+    {
+      "path": "src/components/ui/Post.js",
+      "size": 12162
+    },
+    {
+      "path": "src/components/ui/PostSkeleton.js",
+      "size": 1306
+    },
+    {
+      "path": "src/components/ui/Reply.js",
+      "size": 6631
+    },
+    {
+      "path": "src/components/ui/UpdatePostModal.js",
+      "size": 3484
+    },
+    {
+      "path": "src/context/notificationsContext.js",
+      "size": 4965
+    },
+    {
+      "path": "src/context/profileContext.js",
+      "size": 2515
+    },
+    {
+      "path": "src/context/signalRContext.js",
+      "size": 159
+    },
+    {
+      "path": "src/hooks/useInView.js",
+      "size": 623
+    },
+    {
+      "path": "src/hooks/useSignalR.js",
+      "size": 2344
+    },
+    {
+      "path": "src/pages/Appointment.js",
+      "size": 25314
+    },
+    {
+      "path": "src/pages/Forums.js",
+      "size": 11576
+    },
+    {
+      "path": "src/pages/ForumsDetails.js",
+      "size": 3061
+    },
+    {
+      "path": "src/pages/Home.js",
+      "size": 14398
+    },
+    {
+      "path": "src/pages/Profile.js",
+      "size": 18648
+    },
+    {
+      "path": "src/pages/Schedule.js",
+      "size": 20141
+    },
+    {
+      "path": "src/routes/ProtectedRoute.js",
+      "size": 266
+    },
+    {
+      "path": "src/routes/index.js",
+      "size": 2107
+    },
+    {
+      "path": "src/utils/utcToRelativeTime.js",
+      "size": 243
+    }
+  ],
+  "ext_map": {
+    "(no ext)": 3,
+    ".md": 1,
+    ".json": 3,
+    ".js": 70,
+    ".ico": 1,
+    ".html": 1,
+    ".png": 9,
+    ".webp": 4,
+    ".txt": 1,
+    ".jpg": 1,
+    ".css": 1,
+    ".svg": 1
+  }
+}

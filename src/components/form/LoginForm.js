@@ -5,11 +5,10 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useAuth } from "../../auth/authProvider";
 import { useNavigate } from "react-router-dom";
-
 import { useState } from "react";
-import { useUserProfile } from "../../context/profileContext";
 import { useForgetPassword, useSignIn } from "../../api/auth.api";
 import toast from "react-hot-toast";
+import { FiKey } from "react-icons/fi";
 
 const validate = (values) => {
     const errors = {};
@@ -39,40 +38,42 @@ const FormField = ({
     touched,
     onToggleVisibility,
     isPasswordVisible,
+    idPrefix = "login",
 }) => (
-    <label className="form-control w-full">
+    <div className="form-control w-full">
         <div className="label">
-            <span className="text-lg font-semibold text-secondary">
+            <label htmlFor={`${idPrefix}-${name}`} className="text-sm font-semibold text-neutral-800">
                 {label}
-            </span>
+            </label>
         </div>
-        <label className="input input-bordered border-info border-2 input-info outline-none rounded-md flex items-center gap-2 focus-within:border-primary focus-within:ring-none focus-within:outline-none">
-            {icon}
+        <div className={`input input-bordered flex h-12 items-center gap-3 rounded-xl border bg-base-100 px-3 transition-all duration-200 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 ${error && touched ? "border-error" : "border-neutral-300"}`}>
+            <span aria-hidden="true" className="text-xl text-neutral-600">{icon}</span>
             <Field
+                id={`${idPrefix}-${name}`}
                 type={type}
                 name={name}
-                className="grow"
+                className="min-w-0 grow bg-transparent text-base text-neutral-900 outline-none placeholder:text-neutral-500"
                 placeholder={placeholder}
+                aria-invalid={Boolean(error && touched)}
             />
             {name === "password" && (
-                <span onClick={onToggleVisibility} className="cursor-pointer">
+                <button type="button" onClick={onToggleVisibility} className="rounded-md p-1 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-label={isPasswordVisible ? "Hide password" : "Show password"}>
                     {isPasswordVisible ? (
-                        <AiFillEyeInvisible className="text-secondary text-2xl" />
+                        <AiFillEyeInvisible className="text-xl" />
                     ) : (
-                        <AiFillEye className="text-secondary text-2xl" />
+                        <AiFillEye className="text-xl" />
                     )}
-                </span>
+                </button>
             )}
-        </label>
-        <ErrorMessage name={name} component="div" className="text-red-500" />
-    </label>
+        </div>
+        <ErrorMessage name={name} component="div" className="mt-1.5 text-sm font-medium text-red-700" />
+    </div>
 );
 
 const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
-    const [message, setMessage] = useState("");
     return (
         <ForgetPasswordCustomModal isOpen={isOpen} onClose={onRequestClose}>
-            <h2 className="text-lg font-semibold mb-4">Forget Password</h2>
+            <h2 id="password-reset-title" className="mb-4 text-lg font-semibold text-neutral-900">Reset your password</h2>
             <Formik
                 initialValues={{ email: "" }}
                 validate={(values) => {
@@ -91,6 +92,7 @@ const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
                         <FormField
                             label="Email"
                             name="email"
+                            idPrefix="reset"
                             type="email"
                             icon={
                                 <MdOutlineMailOutline className="text-secondary text-2xl mr-1" />
@@ -108,7 +110,6 @@ const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
                                 "Send"
                             )}
                         </button>
-                        <p className="text-success">{message}</p>
                     </Form>
                 )}
             </Formik>
@@ -121,7 +122,6 @@ export const LoginForm = () => {
     const navigate = useNavigate();
     const { isLoading, error, execute } = useSignIn();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-    const { initializeUserProfile } = useUserProfile();
     const [isForgetPasswordOpen, setIsForgetPasswordOpen] = useState(false);
     const { execute: executeForgetPassword } = useForgetPassword();
 
@@ -132,14 +132,23 @@ export const LoginForm = () => {
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
             const data = await execute(values);
+            // API requests and the SignalR token factory read from localStorage.
+            // Persist before profile loading so the first request cannot race
+            // the auth context's persistence effect.
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("roles", JSON.stringify(data.roles || []));
+            if (data.expiresOn) localStorage.setItem("expiresOn", data.expiresOn);
             setToken(data.token);
             setUserId(data.userId);
             setRoles(data.roles || []);
             setExpiresOn(data.expiresOn || null);
-            await initializeUserProfile();
+            // The profile provider loads the doctor profile when the auth token
+            // changes. Let it own that request so login doesn't issue a second
+            // /doctors/me call before the auth state has propagated.
             navigate("/", { replace: true });
         } catch (error) {
-            console.error(error);
+            console.error("Sign-in failed:", error);
         } finally {
             setSubmitting(false);
         }
@@ -166,8 +175,32 @@ export const LoginForm = () => {
                 validate={validate}
                 onSubmit={handleSubmit}
             >
-                {({ isSubmitting, errors, touched }) => (
-                    <Form className="login-form flex flex-col gap-y-3 ">
+                {({ isSubmitting, errors, touched, setValues }) => (
+                    <Form className="login-form flex flex-col gap-y-4">
+                        <aside className="rounded-xl border border-primary-200 bg-primary-50/70 p-3.5 sm:p-4" role="note" aria-label="Recruiter demo account">
+                            <div className="flex items-start gap-3">
+                                <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-base-100 text-primary-800 shadow-sm">
+                                    <FiKey aria-hidden="true" />
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-sm font-bold text-neutral-900">Recruiter demo access</h3>
+                                    <p className="mt-0.5 text-xs leading-5 text-neutral-700">Use this demo account to explore the Nexus workspace.</p>
+                                </div>
+                            </div>
+                            <dl className="mt-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-2 gap-y-1.5 text-xs sm:text-sm">
+                                <dt className="font-semibold text-neutral-600">Email</dt>
+                                <dd className="min-w-0 break-all font-mono font-medium text-neutral-900">doctor@example.com</dd>
+                                <dt className="font-semibold text-neutral-600">Password</dt>
+                                <dd className="min-w-0 break-all font-mono font-medium text-neutral-900">Password1!</dd>
+                            </dl>
+                            <button
+                                type="button"
+                                onClick={() => setValues((values) => ({ ...values, email: "doctor@example.com", password: "Password1!" }))}
+                                className="mt-3 inline-flex min-h-9 items-center justify-center rounded-lg border border-primary-700/20 bg-base-100 px-3 text-xs font-semibold text-primary-900 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 sm:text-sm"
+                            >
+                                Fill sign-in details
+                            </button>
+                        </aside>
                         <FormField
                             label="Email"
                             name="email"
@@ -194,8 +227,8 @@ export const LoginForm = () => {
                         />
                         <div className="actions flex justify-end w-full my-3 px-3">
                             <button
-                                className="text-primary font-semibold text-sm"
-                                href="#"
+                                type="button"
+                                className="rounded-md text-sm font-semibold text-primary-700 transition-colors hover:text-primary-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setIsForgetPasswordOpen(true);
@@ -206,8 +239,8 @@ export const LoginForm = () => {
                         </div>
                         <button
                             type="submit"
-                            className="btn btn-primary text-lg"
-                            disabled={isSubmitting}
+                            className="btn btn-primary mt-1 min-h-12 w-full rounded-xl text-base font-semibold shadow-md shadow-primary/15 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                            disabled={isSubmitting || isLoading}
                         >
                             {isSubmitting || isLoading ? (
                                 <span className="loading loading-spinner"></span>
@@ -215,8 +248,8 @@ export const LoginForm = () => {
                                 "Login"
                             )}
                         </button>
-                        <ul className="text-error">
-                            {error?.errors.map((error) => (
+                        <ul className="space-y-1 text-sm font-medium text-red-700" role="alert">
+                            {error?.errors?.map((error) => (
                                 <li key={error.code}>{error.description}</li>
                             ))}
                         </ul>
@@ -234,20 +267,22 @@ export const LoginForm = () => {
 
 const ForgetPasswordCustomModal = ({ isOpen, onClose, children }) => {
     useEffect(() => {
+        const previousOverflow = document.body.style.overflow;
         if (isOpen) {
             document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "unset";
         }
+        return () => { document.body.style.overflow = previousOverflow; };
     }, [isOpen]);
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md relative">
+        <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-950/55 p-4">
+            <div role="dialog" aria-modal="true" aria-labelledby="password-reset-title" className="relative w-full max-w-md rounded-2xl border border-neutral-200 bg-base-100 p-6 shadow-2xl">
                 <button
-                    className="absolute top-2 right-2 text-gray-600"
+                    type="button"
+                    aria-label="Close password reset"
+                    className="absolute right-3 top-3 rounded-lg p-2 text-neutral-700 transition-colors hover:bg-neutral-100"
                     onClick={onClose}
                 >
                     &times;

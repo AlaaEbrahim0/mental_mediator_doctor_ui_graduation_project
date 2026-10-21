@@ -6,14 +6,17 @@ import { Toaster } from "react-hot-toast";
 export const CustomToast = () => {
     return (
         <Toaster
-            position="top-center"
+            position="top-right"
             toastOptions={{
                 style: {
-                    fontSize: "16px",
-                    borderRadius: "8px",
+                    fontSize: "14px",
+                    borderRadius: "12px",
+                    padding: "12px 16px",
+                    boxShadow: "0 8px 24px rgb(15 23 42 / 0.12)",
+                    border: "1px solid #e2e8f0",
                 },
                 success: {
-                    position: "top-center",
+                    position: "top-right",
                     duration: 3000,
                     icon: (
                         <div>
@@ -21,9 +24,8 @@ export const CustomToast = () => {
                         </div>
                     ),
                     style: {
-                        color: "#48DAB3",
+                        color: "#15803d",
                         background: "#fff",
-                        boxShadow: "0 0 10px #48DAB3",
                     },
                 },
                 error: {
@@ -34,10 +36,10 @@ export const CustomToast = () => {
                         </div>
                     ),
                     style: {
-                        background: "#ec4f5f",
+                        background: "#b91c1c",
                         color: "#fff",
-                        width: "300px",
-                        borderRadius: "4px",
+                        maxWidth: "min(360px, calc(100vw - 32px))",
+                        borderRadius: "12px",
                     },
                 },
             }}

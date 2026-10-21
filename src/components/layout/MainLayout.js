@@ -3,10 +3,11 @@ import { CustomToast } from "../ui/CustomToast";
 import { TopBar } from "./TopBar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { useUserProfile } from "../../context/profileContext";
 
 const getTitle = (path) => {
-    switch (path) {
+    const normalizedPath = path.toLowerCase();
+    if (normalizedPath === "/community" || normalizedPath.startsWith("/forums")) return "Community";
+    switch (normalizedPath) {
         case "/appointments":
             return "Appointments";
         case "/schedule":
@@ -15,6 +16,8 @@ const getTitle = (path) => {
             return "Forums";
         case "/profile":
             return "Profile";
+        case "/notifications":
+            return "Notifications";
         case "/":
         default:
             return "Overview";
@@ -29,19 +32,20 @@ export function MainLayout() {
     return (
         <>
             <CustomToast />
-            <div className="min-h-screen bg-neutral flex flex-col lg:flex-row ">
+            <div className="flex min-h-screen min-w-0 flex-col bg-canvas lg:flex-row">
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />
                 <div
-                    className={`flex-1 transition-all lg:static absolute top-0 left-0 w-full duration-300`}
+                    className="relative min-w-0 w-full flex-1 transition-all duration-300"
                 >
                     <TopBar
                         // className="sticky"
                         title={title}
+                        sidebarOpen={isSidebarOpen}
                         toggleSidebar={() => setSidebarOpen(!isSidebarOpen)}
                     />
-                    <div className="p-2 lg:p-4 overflow-auto">
+                    <main className="w-full min-w-0 max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8">
                         <Outlet />
-                    </div>
+                    </main>
                 </div>
             </div>
         </>

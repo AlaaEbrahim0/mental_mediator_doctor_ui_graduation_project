@@ -1,6 +1,5 @@
 import {
     Navigate,
-    Outlet,
     RouterProvider,
     createBrowserRouter,
 } from "react-router-dom";
@@ -16,51 +15,42 @@ import { Schedule } from "../pages/Schedule";
 import { ForumsDetails } from "../pages/ForumsDetails";
 import { Profile } from "../pages/Profile";
 import { ResetPassword } from "../auth/forgetPassword";
+import { Notifications } from "../pages/Notifications";
 
-const Routes = () => {
-    const { token } = useAuth();
-
-    const routesForPublic = [
-        { path: "forgetPassword", element: <ResetPassword /> },
-    ];
-
-    const routesForAuthenticatedOnly = [
-        {
-            path: "/",
-            element: <ProtectedRoute />,
-            children: [
-                {
-                    path: "/",
-                    element: <MainLayout />,
-                    children: [
-                        { path: "/", element: <Home /> },
-                        { path: "appointments", element: <Appointments /> },
-                        { path: "schedule", element: <Schedule /> },
-                        { path: "profile", element: <Profile /> },
-                        { path: "Community", element: <Forums /> },
-                        { path: "forums/:id", element: <ForumsDetails /> },
-                        { path: "logout", element: <Logout /> },
-                    ],
-                },
-            ],
-        },
-    ];
-
-    const routesForNotAuthenticatedOnly = [
-        {
-            path: "/login",
-            element: <Login />,
-        },
-    ];
-
-    const router = createBrowserRouter([
-        ...routesForPublic,
-        ...(!token ? routesForNotAuthenticatedOnly : []),
-        ...routesForAuthenticatedOnly,
-        { path: "*", element: <Navigate to="/" /> },
-    ]);
-
-    return <RouterProvider router={router} />;
+const LoginRoute = () => {
+    const { token, roles } = useAuth();
+    return token && roles.includes("Doctor") ? <Navigate to="/" replace /> : <Login />;
 };
+
+// Keep one router instance for the lifetime of the app. Recreating a data
+// router whenever auth state changes can repeatedly remount <Navigate> and
+// trigger a redirect/update loop.
+const router = createBrowserRouter([
+    { path: "forgetPassword", element: <ResetPassword /> },
+    { path: "/login", element: <LoginRoute /> },
+    {
+        path: "/",
+        element: <ProtectedRoute />,
+        children: [
+            {
+                path: "/",
+                element: <MainLayout />,
+                children: [
+                    { path: "/", element: <Home /> },
+                    { path: "appointments", element: <Appointments /> },
+                    { path: "schedule", element: <Schedule /> },
+                    { path: "profile", element: <Profile /> },
+                    { path: "notifications", element: <Notifications /> },
+                    { path: "Community", element: <Forums /> },
+                    { path: "forums/:id", element: <ForumsDetails /> },
+                    { path: "logout", element: <Logout /> },
+                ],
+            },
+        ],
+    },
+    { path: "*", element: <Navigate to="/" replace /> },
+]);
+
+const Routes = () => <RouterProvider router={router} />;
 
 export default Routes;

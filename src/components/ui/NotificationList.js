@@ -10,7 +10,7 @@ export const NotificationsList = ({ notifications }) => {
         <>
             <div className="flex flex-row justify-between p-4 border-b-2 ">
                 <h1 className="text-xl text-left font-bold ">Notifications</h1>
-                <button onClick={markAllAsRead} className="text-sm text-info">
+                <button onClick={markAllAsRead} className="text-sm font-semibold text-primary-800">
                     Mark All As Read
                 </button>
             </div>
@@ -22,7 +22,7 @@ export const NotificationsList = ({ notifications }) => {
             )}
 
             {!loading && !notifications.length && (
-                <div className="text-center text-info text-lg">
+                <div className="text-center text-neutral-700 text-lg">
                     No notifications yet
                 </div>
             )}
@@ -40,4 +40,3 @@ export const NotificationsList = ({ notifications }) => {
         </>
     );
 };
-    
