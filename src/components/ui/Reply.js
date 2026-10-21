@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { CustomDeletionModal } from "./CustomDeletionModal";
-import { useDeleteReply } from "../../api/comments/deletReply";
+import { useDeleteReply, useUpdateReply } from "../../api/community.api";
+import { getApiErrorMessage } from "../../api/client";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
-import { useUpdateReply } from "../../api/comments/putReply";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
@@ -35,14 +34,10 @@ export const Reply = ({
 
     const {
         isLoading: replyDeletionLoading,
-        error: replyDeletionError,
-        data: replyDeletionData,
         execute: deleteReplyExecute,
     } = useDeleteReply();
     const {
         isLoading: replyUpdateLoading,
-        error: replyUpdateError,
-        data: replyUpdateData,
         execute: UpdateReplyExecute,
     } = useUpdateReply();
 
@@ -59,7 +54,7 @@ export const Reply = ({
             setReplyText(tempReplyText);
             setIsEditing(false);
         } catch (error) {
-            toast.error(error.errors[0].description, {
+            toast.error(getApiErrorMessage(error, "Could not update this reply. Please try again."), {
                 duration: 4000,
                 position: "top-center",
                 className: "text-lg text-primary",
@@ -74,43 +69,48 @@ export const Reply = ({
     };
 
     return (
-        <motion.div
+        <motion.article
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col shadow-lg rounded-lg mt-3 w-full p-2 md:p-4"
+            className="w-full min-w-0 rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-neutral-800 transition-colors duration-200 hover:bg-base-100 sm:p-4"
         >
-            <div className="info flex flex-col">
-                <div className="flex flex-row flex-grow">
+            <div className="flex min-w-0 items-start gap-3">
                     <img
-                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-2xl shadow-lg mr-4 "
+                        className="h-9 w-9 shrink-0 rounded-full border border-neutral-200 object-cover sm:h-10 sm:w-10"
                         src={image || imagesDir + "/profile.webp"}
-                        alt="Author"
+                        alt=""
                     />
-                    <div className=" flex flex-col justify-center w-full">
-                        <h1 className="text-md md:text-xl text-secondary font-bold">
-                            {username}
-                        </h1>
-                        <p className="text-info">
+                    <div className="min-w-0 flex-1 pt-0.5">
+                        <h3 className="truncate text-sm font-semibold leading-5 text-neutral-900 sm:text-base">
+                            {username || "Anonymous"}
+                        </h3>
+                        <p className="mt-0.5 text-xs font-medium text-neutral-600 sm:text-sm">
                             {convertUtcToRelativeTime(repliedAt)}
                         </p>
                     </div>
-                    <div className="actions flex flex-row mt-2">
+                    <div className="flex shrink-0 items-center gap-1">
                         {currentUserId === authorId && (
                             <>
                                 {!isEditing && (
                                     <button
-                                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md"
+                                        type="button"
+                                        aria-label="Edit reply"
+                                        title="Edit reply"
+                                        className="grid h-8 w-8 place-items-center rounded-lg text-neutral-600 transition-colors hover:bg-neutral-200 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 sm:h-9 sm:w-9"
                                         onClick={toggleEdit}
                                     >
                                         {replyUpdateLoading ? (
-                                            <span className="loading loading-spinner text-primary"></span>
+                                            <span className="loading loading-spinner loading-xs text-primary" />
                                         ) : (
-                                            <FaEdit />
+                                            <FaEdit aria-hidden="true" />
                                         )}
                                     </button>
                                 )}
                                 <button
-                                    className="btn btn-xs md:btn-sm ml-2 btn-error text-white text-md"
+                                    type="button"
+                                    aria-label="Delete reply"
+                                    title="Delete reply"
+                                    className="grid h-8 w-8 place-items-center rounded-lg text-neutral-600 transition-colors hover:bg-error/10 hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error sm:h-9 sm:w-9"
                                     onClick={() =>
                                         document
                                             .getElementById(
@@ -122,7 +122,7 @@ export const Reply = ({
                                     {replyDeletionLoading ? (
                                         <span className="loading loading-spinner text-primary"></span>
                                     ) : (
-                                        <RiDeleteBin5Line />
+                                        <RiDeleteBin5Line aria-hidden="true" />
                                     )}
                                 </button>
                                 <CustomDeletionModal
@@ -135,30 +135,30 @@ export const Reply = ({
                     </div>
                 </div>
 
-                <div className="my-1 p-2 w-full">
+                <div className="mt-3 min-w-0">
                     {isEditing ? (
-                        <div className="flex flex-row items-center gap-2 md:text-xl">
+                        <div className="space-y-2">
                             <textarea
-                                type="text"
-                                rows={2}
+                                rows={3}
                                 value={tempReplyText}
                                 onChange={handleReplyChange}
-                                className="textarea textarea-sm md:textarea-lg textarea-bordered w-full"
+                                aria-label="Edit reply text"
+                                className="textarea textarea-bordered min-h-16 w-full resize-y rounded-xl border-neutral-300 bg-base-100 text-sm leading-6 text-neutral-900 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20 sm:text-base"
                             />
-                            <button onClick={handleSaveEdit}>
-                                <MdOutlineDoneOutline className="text-success" />
-                            </button>
-                            <button onClick={toggleEdit}>
-                                <IoIosCloseCircleOutline className="text-error" />
-                            </button>
+                            <div className="flex justify-end gap-2">
+                                <button type="button" onClick={toggleEdit} className="btn btn-ghost btn-sm min-h-9 rounded-lg text-neutral-700">Cancel</button>
+                                <button type="button" onClick={handleSaveEdit} disabled={replyUpdateLoading || !tempReplyText.trim()} className="btn btn-primary btn-sm min-h-9 rounded-lg">
+                                    {replyUpdateLoading ? <span className="loading loading-spinner loading-xs" /> : <MdOutlineDoneOutline aria-hidden="true" />}
+                                    Save
+                                </button>
+                            </div>
                         </div>
                     ) : (
-                        <ReactMarkdown className="text-md md:text-lg break-all whitespace-pre-line">
+                        <ReactMarkdown className="break-words whitespace-pre-line text-sm leading-6 text-neutral-700 sm:text-base sm:leading-7 [&_a]:font-medium [&_a]:text-primary-800 [&_a]:underline [&_li]:ml-5 [&_li]:list-disc [&_p+p]:mt-2">
                             {replyText}
                         </ReactMarkdown>
                     )}
                 </div>
-            </div>
-        </motion.div>
+        </motion.article>
     );
 };

@@ -36,13 +36,16 @@ const ScheduleValidationSchema = Yup.object().shape({
         ),
 });
 
-export const NewDayForm = ({ onSubmit, onCancel }) => {
+export const NewDayForm = ({ onSubmit, onCancel, loading = false }) => {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="my-4 p-4 border border-gray-300 bg-base-100 shadow-md rounded-lg"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-availability-title"
+            className="my-auto max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl border border-neutral-200 bg-base-100 p-5 shadow-2xl sm:p-7"
         >
             <Formik
                 initialValues={{
@@ -52,19 +55,26 @@ export const NewDayForm = ({ onSubmit, onCancel }) => {
                     dayOfWeek: "",
                 }}
                 validationSchema={ScheduleValidationSchema}
-                onSubmit={(values, { setSubmitting }) => {
-                    onSubmit(values);
-                    setSubmitting(false);
+                onSubmit={async (values, { setSubmitting }) => {
+                    try {
+                        await onSubmit(values);
+                    } finally {
+                        setSubmitting(false);
+                    }
                 }}
             >
                 {({ isSubmitting }) => (
-                    <Form>
-                        <div className="form-group">
-                            <label className="block mb-2">Day of Week</label>
+                    <Form className="space-y-5">
+                        <div>
+                            <h2 id="add-availability-title" className="text-xl font-bold text-neutral-900">Add availability</h2>
+                            <p className="mt-1 text-sm text-neutral-600">Choose a day, then set the session hours and duration.</p>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <label className="block text-sm font-semibold text-neutral-700">Day of week
                             <Field
                                 as="select"
                                 name="dayOfWeek"
-                                className="input input-bordered w-full mt-1"
+                                className="select select-bordered mt-1.5 w-full bg-base-100 text-neutral-900 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20"
                             >
                                 <option value="">Select a day</option>
                                 <option value="Sunday">Sunday</option>
@@ -78,63 +88,61 @@ export const NewDayForm = ({ onSubmit, onCancel }) => {
                             <ErrorMessage
                                 name="dayOfWeek"
                                 component="div"
-                                className="text-red-600 mt-1"
+                                className="mt-1.5 text-sm font-medium text-danger-700"
                             />
-                        </div>
-                        <div className="form-group">
-                            <label className="block mb-2">Start Time</label>
+                        </label>
+                        <label className="block text-sm font-semibold text-neutral-700">Start time
                             <Field
                                 type="time"
                                 name="startTime"
-                                className="input input-bordered w-full mt-1"
+                                className="input input-bordered mt-1.5 w-full bg-base-100 text-neutral-900 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20"
                             />
                             <ErrorMessage
                                 name="startTime"
                                 component="div"
-                                className="text-red-600 mt-1"
+                                className="mt-1.5 text-sm font-medium text-danger-700"
                             />
-                        </div>
-                        <div className="form-group">
-                            <label className="block mb-2">End Time</label>
+                        </label>
+                        <label className="block text-sm font-semibold text-neutral-700">End time
                             <Field
                                 type="time"
                                 name="endTime"
-                                className="input input-bordered w-full mt-1"
+                                className="input input-bordered mt-1.5 w-full bg-base-100 text-neutral-900 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20"
                             />
                             <ErrorMessage
                                 name="endTime"
                                 component="div"
-                                className="text-red-600 mt-1"
+                                className="mt-1.5 text-sm font-medium text-danger-700"
                             />
-                        </div>
-                        <div className="form-group">
-                            <label className="block mb-2">
-                                Session Duration (hh:mm:ss)
-                            </label>
+                        </label>
+                        <label className="block text-sm font-semibold text-neutral-700">Session duration (hh:mm:ss)
                             <Field
                                 type="text"
                                 name="sessionDuration"
-                                className="input input-bordered w-full mt-1"
+                                className="input input-bordered mt-1.5 w-full bg-base-100 text-neutral-900 placeholder:text-neutral-500 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20"
                                 placeholder="hh:mm:ss"
                             />
                             <ErrorMessage
                                 name="sessionDuration"
                                 component="div"
-                                className="text-red-600 mt-1"
+                                className="mt-1.5 text-sm font-medium text-danger-700"
                             />
+                        </label>
                         </div>
-                        <div className="flex justify-between mt-4">
+                        <div className="flex flex-col-reverse gap-3 border-t border-neutral-200 pt-4 sm:flex-row sm:justify-end">
                             <button
                                 type="submit"
                                 className="btn btn-sm btn-primary"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || loading}
                             >
-                                Save
+                                {(loading || isSubmitting) && <span className="loading loading-spinner" />}
+                                {loading || isSubmitting ? "Saving…" : "Save availability"}
                             </button>
                             <button
                                 type="button"
                                 className="btn btn-sm btn-secondary"
                                 onClick={onCancel}
+                                disabled={isSubmitting || loading}
                             >
                                 Cancel
                             </button>

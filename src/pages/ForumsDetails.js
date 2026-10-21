@@ -1,18 +1,16 @@
 import { useEffect, useRef } from "react";
-import { useGetPostById } from "../api/posts/getPostById";
+import { useDeletePost, useGetPostById } from "../api/community.api";
 import { PostSkeleton } from "../components/ui/PostSkeleton";
 import { convertUtcToRelativeTime } from "../utils/utcToRelativeTime";
 import { Post } from "../components/ui/Post";
 import { useAuth } from "../auth/authProvider";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDeletePost } from "../api/comments/deletePost";
 import toast from "react-hot-toast";
 
 export const ForumsDetails = () => {
     const { isLoading, error, data: post, setData, execute } = useGetPostById();
     const {
         isLoadingDelete,
-        deleteError,
         execute: executeDelete,
     } = useDeletePost();
     const navigate = useNavigate();
@@ -76,6 +74,8 @@ export const ForumsDetails = () => {
                     image={post.photoUrl}
                     postPhoto={post.postPhotoUrl}
                     commentCount={post.commentsCount}
+                    likesCount={post.likesCount}
+                    isLikedByCurrentUser={post.isLikedByCurrentUser}
                     data={post}
                     setData={async () => {
                         setData(await execute(post.id));

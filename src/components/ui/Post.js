@@ -4,18 +4,16 @@ import { HiOutlineMenu } from "react-icons/hi";
 import { BiHide, BiShow, BiMessageAltAdd } from "react-icons/bi";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
 import { Comment } from "./Comment";
-import { useGetComments } from "../../api/comments/getComments";
+import { setPostLike, useCreateComment, useGetComments, useUpdatePost } from "../../api/community.api";
 import { Link } from "react-router-dom";
-import { useCreateComment } from "../../api/comments/postComment";
 import toast from "react-hot-toast";
-import { useUpdatePost } from "../../api/comments/updatePost";
 import UpdatePostModal from "./UpdatePostModal"; // Import the UpdatePostModal component
 import { CustomDeletionModal } from "./CustomDeletionModal";
-import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import { FiShare2 } from "react-icons/fi";
+import { getApiErrorMessage } from "../../api/client";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
-console.log(imagesDir);
 
 export const Post = ({
     id,
@@ -31,28 +29,30 @@ export const Post = ({
     currentUserId,
     handleDelete,
     postDeletionLoading,
+    likesCount: initialLikesCount = 0,
+    isLikedByCurrentUser: initialLiked = false,
 }) => {
     const [commentText, setCommentText] = useState("");
     const [showComments, setShowComments] = useState(false);
     const [commentCount, setCommentCount] = useState(initialCommentCount);
+    const [likesCount, setLikesCount] = useState(initialLikesCount);
+    const [isLiked, setIsLiked] = useState(initialLiked);
+    const [likeLoading, setLikeLoading] = useState(false);
     const [isUpdateModalVisible, setUpdateModalVisible] = useState(false); // Add state to control the visibility of the update modal
 
     const {
         isLoading: isUpdatePostLoading,
-        error: updatePostError,
         execute: updatePostExecute,
     } = useUpdatePost();
 
     const {
         isLoading: isCommentsLoading,
-        error: commentsError,
         data: commentsData,
         execute: getCommentsExecute,
     } = useGetComments();
 
     const {
         isLoading: isCreateLoading,
-        error: createCommentError,
         execute: createCommentExecute,
     } = useCreateComment();
 
@@ -73,7 +73,7 @@ export const Post = ({
             toast.success("Comment has been  added successfully", {});
         } catch (e) {
             console.log(e);
-            toast.error(e.errors[0].description, {
+            toast.error(getApiErrorMessage(e, "Could not add your comment. Please try again."), {
                 duration: 4000,
                 position: "top-center",
                 className: "text-lg text-primary",
@@ -87,16 +87,45 @@ export const Post = ({
         setShowComments(!showComments);
     };
 
+    const handleSharePost = async () => {
+        const url = `${window.location.origin}/forums/${id}`;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title, text: content, url });
+            } else if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(url);
+                toast.success("Post link copied to clipboard");
+            } else {
+                toast.error("Sharing is not available in this browser");
+            }
+        } catch (error) {
+            if (error.name !== "AbortError") toast.error("Could not share this post");
+        }
+    };
+
     useEffect(() => {
         setCommentCount(initialCommentCount);
     }, [initialCommentCount]);
+
+    useEffect(() => { setLikesCount(initialLikesCount); setIsLiked(initialLiked); }, [initialLikesCount, initialLiked]);
+
+    const toggleLike = async () => {
+        setLikeLoading(true);
+        try {
+            const result = await setPostLike(id, !isLiked);
+            setLikesCount(result.likesCount ?? 0);
+            setIsLiked(Boolean(result.isLikedByCurrentUser));
+        } catch (error) {
+            toast.error(getApiErrorMessage(error, "Could not update your like. Please try again."));
+        } finally { setLikeLoading(false); }
+    };
 
     const handleUpdatePost = async (id, title, content, postPhoto) => {
         if (!title || !content) {
             return;
         }
         try {
-            const updatedPost = await updatePostExecute(
+            await updatePostExecute(
                 id,
                 title,
                 content,
@@ -107,7 +136,7 @@ export const Post = ({
 
             setUpdateModalVisible(false);
         } catch (e) {
-            toast.error(e.errors[0].description, {
+            toast.error(getApiErrorMessage(e, "Could not update this post. Please try again."), {
                 duration: 4000,
                 position: "top-center",
                 className: "text-lg text-primary",
@@ -116,23 +145,23 @@ export const Post = ({
     };
 
     return (
-        <motion.div
+        <motion.article
             animate={{ opacity: 1 }}
             initial={{ opacity: 0 }}
-            className="flex flex-col mb-8 p-4 mt w-full bg-white bg-opacity-50 shadow-md rounded-lg"
+            className="group mb-5 mt-0 flex w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-base-100 text-neutral-800 shadow-sm transition-all duration-200 hover:border-neutral-300 hover:shadow-md"
         >
-            <div className="info flex flex-row justify-between">
-                <div className="flex flex-row">
+            <div className="flex items-start justify-between gap-3 p-4 pb-0 sm:p-5 sm:pb-0">
+                <div className="flex min-w-0 items-center gap-3">
                     <img
-                        className="w-12 h-12 md:w-24 md:h-24 rounded-2xl shadow-md object-cover"
+                        className="h-11 w-11 shrink-0 rounded-full border border-neutral-200 object-cover ring-2 ring-neutral-50 sm:h-12 sm:w-12"
                         src={image || imagesDir + "/profile.webp"}
-                        alt="Author"
+                        alt=""
                     />
-                    <div className="ml-4 flex flex-col justify-center">
-                        <h1 className="text-xl text-secondary font-bold">
+                    <div className="min-w-0">
+                        <h2 className="truncate text-sm font-bold text-neutral-900 sm:text-base">
                             {authorName || "Anonymous"}
-                        </h1>
-                        <p className="text-info">
+                        </h2>
+                        <p className="mt-0.5 text-xs font-medium text-neutral-600 sm:text-sm">
                             {convertUtcToRelativeTime(date)}
                         </p>
                     </div>
@@ -140,17 +169,19 @@ export const Post = ({
 
                 {authorId === currentUserId && (
                     <div className="dropdown dropdown-end">
-                        <div tabIndex={0} role="button" className="md:btn m-1">
-                            <HiOutlineMenu className="text-md md:text-2xl" />
-                        </div>
+                        <button type="button" tabIndex={0} aria-label="Post actions" aria-haspopup="menu" className="grid h-10 w-10 place-items-center rounded-xl text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700">
+                            <HiOutlineMenu className="text-xl" aria-hidden="true" />
+                        </button>
                         <ul
                             tabIndex={0}
-                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32"
+                            role="menu"
+                            className="dropdown-content z-[1] menu mt-1 w-36 rounded-xl border border-neutral-200 bg-base-100 p-2 shadow-lg"
                         >
                             <>
                                 <li className="mb-1">
                                     <button
-                                        className="btn btn-sm btn-secondary btn-outline text-md"
+                                        role="menuitem"
+                                        className="justify-start rounded-lg text-sm font-medium text-neutral-700"
                                         onClick={() =>
                                             setUpdateModalVisible(true)
                                         } // Show update modal on click
@@ -161,7 +192,8 @@ export const Post = ({
                                 <li className="mb-1">
                                     <>
                                         <button
-                                            className="btn btn-sm btn-error btn-outline text-md"
+                                            role="menuitem"
+                                            className="justify-start rounded-lg text-sm font-medium text-error"
                                             onClick={() =>
                                                 document
                                                     .getElementById(
@@ -194,22 +226,22 @@ export const Post = ({
                     </div>
                 )}
             </div>
-            <Link
-                className="w-full hover:cursor-pointer pl-2"
-                to={`/forums/${id}`}
-            >
-                <h1 className="text-sm sm:text-md md:text-2xl text-secondary font-semibold py-5 break-all">
+            <div className="mt-4 min-w-0 px-4 sm:px-5">
+                <Link className="inline-block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700" to={`/forums/${id}`}>
+                <h3 className="break-words text-xl font-bold leading-7 tracking-tight text-neutral-900 transition-colors group-hover:text-primary-900 sm:text-2xl sm:leading-8">
                     {title}
-                </h1>
-                <ReactMarkdown className="text-sm md:text-xl text-info-content break-all whitespace-pre-line">
+                </h3>
+                </Link>
+                <ReactMarkdown className="break-words whitespace-pre-line text-sm leading-6 text-neutral-700 sm:text-base sm:leading-7">
                     {content}
                 </ReactMarkdown>
-            </Link>
+            </div>
             {postPhoto && (
                 <img
                     src={postPhoto}
-                    className="w-full h-full object-cover rounded-lg mt-5"
-                    alt="Post"
+                    className="mx-4 mt-4 max-h-[32rem] w-auto max-w-[calc(100%-2rem)] rounded-xl border border-neutral-200 bg-neutral-50 object-contain sm:mx-5 sm:max-w-[calc(100%-2.5rem)]"
+                    alt="Post attachment"
+                    loading="lazy"
                 />
             )}
             {showComments && (
@@ -240,53 +272,51 @@ export const Post = ({
                 </div>
             )}
 
-            <div className="mt-4" />
-            <textarea
-                type="text"
-                value={commentText}
-                onChange={handleCommentChange}
-                placeholder="Add a comment..."
-                className="textarea textarea-bordered textarea-md md:textarea-lg w-full mb-2"
-                disabled={isCreateLoading}
-            />
-            <div className="flex flex-row items-center justify-between mt-1">
-                <button
-                    className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md max-w-52 relative"
-                    onClick={toggleComments}
-                    disabled={isCommentsLoading || commentCount === 0}
-                >
-                    {isCommentsLoading && (
-                        <span className="loading loading-spinner"></span>
-                    )}
-                    {showComments ? (
-                        <>
-                            <BiHide className="text-2xl" />
-                            Hide Comments
-                        </>
-                    ) : (
-                        <>
-                            <BiShow className="text-2xl" />
-                            Show Comments
-                        </>
-                    )}
-                    {commentCount > 0 && (
-                        <div className="badge badge-sm text-white badge-primary absolute -top-2 -right-2">
-                            {commentCount}
-                        </div>
-                    )}
+            <div className="mt-5 border-t border-neutral-200 px-4 py-4 sm:px-5">
+                <button type="button" onClick={toggleLike} disabled={likeLoading} aria-pressed={isLiked} className="mb-3 inline-flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-primary-800 hover:bg-primary/10 disabled:opacity-60">
+                    {likeLoading ? <span className="loading loading-spinner loading-xs" aria-hidden="true" /> : isLiked ? "♥" : "♡"} {isLiked ? "Liked" : "Like"} <span>{likesCount}</span>
                 </button>
-                <button
-                    className="btn btn-xs md:btn-sm btn-primary btn-outline text-md max-w-52"
-                    onClick={handleAddComment}
-                    disabled={isCreateLoading || !commentText}
-                >
-                    {isCreateLoading ? (
-                        <span className="loading loading-spinner"></span>
-                    ) : (
-                        <BiMessageAltAdd className="text-2xl" />
-                    )}
-                    Comment
-                </button>
+                <div className="flex items-end gap-2">
+                    <textarea
+                        value={commentText}
+                        onChange={handleCommentChange}
+                        placeholder="Add a thoughtful comment…"
+                        aria-label="Write a comment"
+                        rows={2}
+                        className="textarea textarea-bordered min-h-11 min-w-0 flex-1 resize-y rounded-xl border-neutral-300 bg-base-100 px-3 py-2.5 text-sm leading-5 text-neutral-900 placeholder:text-neutral-500 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20"
+                        disabled={isCreateLoading}
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-primary h-11 min-h-11 shrink-0 rounded-xl px-3 sm:px-4"
+                        onClick={handleAddComment}
+                        disabled={isCreateLoading || !commentText.trim()}
+                        aria-label="Add comment"
+                    >
+                        {isCreateLoading ? <span className="loading loading-spinner loading-sm" aria-hidden="true" /> : <BiMessageAltAdd className="text-lg" aria-hidden="true" />}
+                        <span className="hidden sm:inline">Comment</span>
+                    </button>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-3">
+                        {commentCount > 0 ? <button
+                            type="button"
+                            className="inline-flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                            onClick={toggleComments}
+                            disabled={isCommentsLoading}
+                        >
+                            {isCommentsLoading ? <span className="loading loading-spinner loading-xs" aria-hidden="true" /> : showComments ? <BiHide aria-hidden="true" /> : <BiShow aria-hidden="true" />}
+                            {showComments ? "Hide" : "View"} comments <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700">{commentCount}</span>
+                        </button> : <span className="px-2 text-xs text-neutral-600">Be the first to comment</span>}
+                    </div>
+                    <button
+                        type="button"
+                        className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                        onClick={handleSharePost}
+                    >
+                        <FiShare2 aria-hidden="true" /> Share
+                    </button>
+                </div>
             </div>
 
             <UpdatePostModal // Integrate the UpdatePostModal component
@@ -296,6 +326,6 @@ export const Post = ({
                 loading={isUpdatePostLoading} // Pass the loading state
                 initialData={{ id, title, content, postPhoto }}
             />
-        </motion.div>
+        </motion.article>
     );
 };

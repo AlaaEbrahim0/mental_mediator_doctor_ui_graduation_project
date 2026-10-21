@@ -1,19 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Reply } from "./Reply";
 import { convertUtcToRelativeTime } from "../../utils/utcToRelativeTime";
-import { useGetReplies } from "../../api/getReplies";
+import { useCreateReply, useDeleteComment, useGetReplies, useUpdateComment } from "../../api/community.api";
+import { getApiErrorMessage } from "../../api/client";
 import { BiHide, BiShow, BiMessageAltAdd } from "react-icons/bi";
 import { CustomDeletionModal } from "./CustomDeletionModal";
-import { useCreateReply } from "../../api/postReply";
-import { useUpdateComment } from "../../api/comments/putComment";
-import { useDeleteComment } from "../../api/comments/deleteComment";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { IoIosCloseCircleOutline } from "react-icons/io";
 import { MdOutlineDoneOutline } from "react-icons/md";
-import { useAuth } from "../../auth/authProvider";
 import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
-import { AnimatePresence } from "framer-motion";
 
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -49,7 +44,6 @@ export const Comment = ({
         useUpdateComment();
     const {
         isLoading: isRepliesLoading,
-        error: repliesError,
         data: repliesData,
         execute: getRepliesExecute,
     } = useGetReplies();
@@ -61,7 +55,7 @@ export const Comment = ({
 
     useEffect(() => {
         if (createReplyError) {
-            toast.error(createReplyError.errors[0].description, {
+            toast.error(getApiErrorMessage(createReplyError, "Could not load your reply. Please try again."), {
                 duration: 4000,
                 position: "top-center",
                 className: "text-lg text-primary",
@@ -103,7 +97,7 @@ export const Comment = ({
             setCommentText(tempCommentText);
             setIsEditing(false);
         } catch (error) {
-            toast.error(error.errors[0].description, {
+            toast.error(getApiErrorMessage(error, "Could not update this comment. Please try again."), {
                 duration: 4000,
                 position: "top-center",
                 className: "text-lg text-primary",
@@ -146,42 +140,47 @@ export const Comment = ({
     };
 
     return (
-        <motion.div
+        <motion.article
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col shadow-md rounded-lg mt-3 w-full px-2 py-4 md:p-4 glass"
+            className="mt-3 w-full min-w-0 rounded-xl border border-neutral-200 bg-base-100 p-3.5 text-neutral-800 shadow-sm transition-shadow duration-200 hover:shadow-md sm:p-4"
         >
-            <div className="info flex flex-col flex-1">
-                <div className="flex flex-row flex-grow">
+            <div className="flex min-w-0 items-start gap-3">
                     <img
-                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-2xl shadow-lg"
+                        className="h-10 w-10 shrink-0 rounded-full border border-neutral-200 object-cover sm:h-11 sm:w-11"
                         src={photoUrl || `${imagesDir}/profile.webp`}
-                        alt="Author"
+                        alt=""
                     />
-                    <div className="ml-4 flex flex-col justify-center flex-grow">
-                        <h1 className="text-md md:text-xl text-secondary font-bold">
-                            {authorName}
-                        </h1>
-                        <p className="text-info">
+                    <div className="min-w-0 flex-1 pt-0.5">
+                        <h3 className="truncate text-sm font-bold leading-5 text-neutral-900 sm:text-base">
+                            {authorName || "Anonymous"}
+                        </h3>
+                        <p className="mt-0.5 text-xs font-medium text-neutral-600 sm:text-sm">
                             {convertUtcToRelativeTime(commentedAt)}
                         </p>
                     </div>
-                    <div className="actions flex">
+                    <div className="flex shrink-0 items-center gap-1">
                         {authorId === currentUserId && (
                             <>
                                 <button
-                                    className="btn btn-xs md:btn-sm btn-secondary btn-outline"
+                                    type="button"
+                                    aria-label="Edit comment"
+                                    title="Edit comment"
+                                    className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
                                     onClick={toggleEdit}
                                 >
                                     {commentUpdateLoading ? (
-                                        <span className="loading loading-spinner text-primary"></span>
+                                        <span className="loading loading-spinner loading-xs text-primary" />
                                     ) : (
-                                        <FaEdit />
+                                        <FaEdit aria-hidden="true" />
                                     )}
                                 </button>
                                 <button
-                                    className="btn btn-xs md:btn-sm ml-2 btn-error text-white text-md"
+                                    type="button"
+                                    aria-label="Delete comment"
+                                    title="Delete comment"
+                                    className="grid h-9 w-9 place-items-center rounded-lg text-neutral-600 transition-colors hover:bg-error/10 hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error"
                                     onClick={() =>
                                         document
                                             .getElementById(
@@ -190,7 +189,7 @@ export const Comment = ({
                                             .showModal()
                                     }
                                 >
-                                    <RiDeleteBin5Line />
+                                    <RiDeleteBin5Line aria-hidden="true" />
                                 </button>
                             </>
                         )}
@@ -203,27 +202,27 @@ export const Comment = ({
                     </div>
                 </div>
 
-                <div className="my-1 p-2">
+                <div className="mt-3 min-w-0">
                     {isEditing ? (
-                        <div className="flex flex-col md:flex-row items-center gap-2 text-xl">
+                        <div className="space-y-2">
                             <textarea
                                 value={tempCommentText}
-                                rows={4}
+                                rows={3}
                                 onChange={(e) =>
                                     setTempCommentText(e.target.value)
                                 }
-                                className="textarea textarea-sm md:textarea-lg textarea-bordered w-full"
+                                aria-label="Edit comment text"
+                                className="textarea textarea-bordered min-h-20 w-full resize-y rounded-xl border-neutral-300 bg-base-100 text-sm leading-6 text-neutral-900 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20 sm:text-base"
                                 disabled={
                                     commentDeletionLoading ||
                                     commentUpdateLoading
                                 }
                             />
-                            <div className="flex gap-2">
-                                <button onClick={handleSaveEdit}>
-                                    <MdOutlineDoneOutline className="text-success" />
-                                </button>
-                                <button onClick={toggleEdit}>
-                                    <IoIosCloseCircleOutline className="text-error" />
+                            <div className="flex justify-end gap-2">
+                                <button type="button" onClick={toggleEdit} className="btn btn-ghost btn-sm min-h-9 rounded-lg text-neutral-700">Cancel</button>
+                                <button type="button" onClick={handleSaveEdit} disabled={commentUpdateLoading || !tempCommentText.trim()} className="btn btn-primary btn-sm min-h-9 rounded-lg">
+                                    {commentUpdateLoading ? <span className="loading loading-spinner loading-xs" /> : <MdOutlineDoneOutline aria-hidden="true" />}
+                                    Save
                                 </button>
                             </div>
                         </div>
@@ -238,52 +237,35 @@ export const Comment = ({
                                 "ul",
                                 "li",
                             ]}
-                            className="text-md md:text-lg break-all whitespace-pre-line"
-                            style={{ lineHeight: "1.2" }}
+                            className="break-words whitespace-pre-line text-sm leading-6 text-neutral-700 sm:text-base sm:leading-7 [&_a]:font-medium [&_a]:text-primary-800 [&_a]:underline [&_h1]:text-lg [&_h1]:font-bold [&_h2]:text-base [&_h2]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_p+p]:mt-2"
                         >
                             {commentText}
                         </ReactMarkdown>
                     )}
                 </div>
 
-                <div className="actions flex flex-row gap-x-2 mt-2">
+                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-neutral-100 pt-2">
                     <button
-                        className="btn btn-xs md:btn-sm btn-secondary btn-outline text-md max-w-52 relative"
+                        type="button"
+                        className="inline-flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={toggleReplies}
                         disabled={isRepliesLoading || repliesCount === 0}
                     >
-                        {isRepliesLoading && (
-                            <span className="loading loading-spinner"></span>
-                        )}
-                        {showReplies ? (
-                            <>
-                                <BiHide className="text-2xl" />
-                                Hide Replies
-                            </>
-                        ) : (
-                            <>
-                                <BiShow className="text-2xl" />
-                                Show Replies
-                            </>
-                        )}
-                        {repliesCount > 0 && (
-                            <div className="badge badge-sm text-white badge-primary absolute -top-2 -right-2">
-                                {repliesCount}
-                            </div>
-                        )}
+                        {isRepliesLoading ? <span className="loading loading-spinner loading-xs" /> : showReplies ? <BiHide aria-hidden="true" /> : <BiShow aria-hidden="true" />}
+                        {showReplies ? "Hide" : "View"} replies
+                        <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700">{repliesCount || 0}</span>
                     </button>
                     <button
-                        className="btn btn-xs md:btn-sm btn-primary btn-outline text-md max-w-52"
+                        type="button"
+                        className="inline-flex min-h-9 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-primary-800 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={scrollToAddReply}
                         disabled={isCreateLoading || !commentText}
                     >
-                        <BiMessageAltAdd className="text-2xl" />
-                        Reply
+                        <BiMessageAltAdd aria-hidden="true" /> Reply
                     </button>
                 </div>
-            </div>
             {showReplies && (
-                <div className="mt-4">
+                <div className="mt-4 space-y-2 border-l-2 border-neutral-200 pl-3 sm:pl-4">
                     {repliesData &&
                         repliesData.map((reply) => (
                             <Reply
@@ -311,30 +293,32 @@ export const Comment = ({
             )}
 
             {showReplyInput && (
-                <div className="mt-4 text-xs md:text-md">
+                <div className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 p-3">
                     <textarea
                         ref={addReplyRef}
                         value={replyText}
                         onChange={handleReplyChange}
-                        placeholder="Write your reply..."
-                        rows={1}
-                        className="textarea textarea-xs md:textarea-lg textarea-bordered w-full"
+                        placeholder="Write a reply…"
+                        aria-label="Write a reply"
+                        rows={2}
+                        className="textarea textarea-bordered min-h-16 w-full resize-y rounded-xl border-neutral-300 bg-base-100 text-sm leading-6 text-neutral-900 placeholder:text-neutral-500 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20 sm:text-base"
                         disabled={isCreateLoading}
                     />
                     <button
-                        className="btn btn-sm btn-primary btn-outline mt-3 text-md max-w-52"
+                        type="button"
+                        className="btn btn-sm btn-primary mt-2 min-h-10 rounded-lg"
                         onClick={handleAddReply}
-                        disabled={isCreateLoading || !replyText}
+                        disabled={isCreateLoading || !replyText.trim()}
                     >
                         {isCreateLoading ? (
                             <span className="loading loading-spinner"></span>
                         ) : (
-                            <BiMessageAltAdd className="text-2xl" />
+                            <BiMessageAltAdd aria-hidden="true" />
                         )}
                         Reply
                     </button>
                 </div>
             )}
-        </motion.div>
+        </motion.article>
     );
 };

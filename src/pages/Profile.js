@@ -1,27 +1,14 @@
 import { useEffect, useState } from "react";
-import { useGetProfile } from "../api/getProfile";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useUpdateProfile } from "../api/updateProfile";
 import { useUserProfile } from "../context/profileContext";
-import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
+const profileInputClass = "input input-bordered mt-1 w-full bg-base-100 text-neutral-900 placeholder:text-neutral-600 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20";
+const profileSelectClass = "select select-bordered mt-1 w-full bg-base-100 text-neutral-900 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20";
+const profileErrorClass = "mt-1.5 text-sm font-medium text-error";
 
 export function Profile() {
-    // const {
-    //     isLoading,
-    //     error: profileError,
-    //     data: profileData,
-    //     execute,
-    // } = useGetProfile();
-
-    // const {
-    //     isLoading: updateLoading,
-    //     error: updateError,
-    //     execute: updateProfile,
-    // } = useUpdateProfile();
-
     const {
         isLoading,
         userProfileData: profileData,
@@ -85,6 +72,8 @@ export function Profile() {
         location: Yup.string().max(200),
         city: Yup.string().max(100),
         fees: Yup.number().min(0),
+        phoneNumber: Yup.string().max(32),
+        qualifications: Yup.string().max(2000),
     });
 
     const [photoPreview, setPhotoPreview] = useState("");
@@ -108,6 +97,9 @@ export function Profile() {
             location: profileData?.location || "",
             city: profileData?.city || "",
             fees: profileData?.sessionFees || 0,
+            phoneNumber: profileData?.phoneNumber || "",
+            qualifications: profileData?.qualifications || "",
+            isAvailable: profileData?.isAvailable ?? true,
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -118,18 +110,19 @@ export function Profile() {
             }
         },
     });
+    const { setValues } = formik;
     useEffect(() => {
         if (profileData) {
-            formik.setValues({
-                ...formik.initialValues,
+            setValues((currentValues) => ({
+                ...currentValues,
                 ...profileData,
                 photo: null, // Reset photo to prevent overwriting with initial profile photo URL
-            });
+            }));
             setPhotoPreview(
                 profileData.photoUrl || `${imagesDir}/profile.webp`
             );
         }
-    }, [profileData]); // Only re-run the effect if profileData changes
+    }, [profileData, setValues]);
 
     const handlePhotoChange = (event) => {
         const file = event.currentTarget.files[0];
@@ -154,22 +147,26 @@ export function Profile() {
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {isLoading ? (
-                <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center min-h-[50vh]">
                     <span className="loading loading-spinner"></span>
                 </div>
             ) : (
                 <form
                     onSubmit={formik.handleSubmit}
-                    className="flex justify-center form-border-gradient shadow-md p-4 glass rounded-lg max-w-xl mt-4 mx-auto  mb-8"
+                    className="mx-auto mb-8 mt-4 w-full max-w-3xl rounded-2xl border border-neutral-200 bg-base-100 p-5 shadow-sm sm:p-7"
                 >
-                    <div className="grid grid-cols-2 gap-x-4 w-full">
+                    <div className="grid w-full grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2">
+                        <div className="col-span-full border-b border-neutral-200 pb-4">
+                            <h1 className="text-2xl font-bold text-neutral-900">Profile details</h1>
+                            <p className="mt-1 text-sm text-neutral-600">Keep your professional information up to date.</p>
+                        </div>
                         <div
-                            className="col-span-2 w-full"
+                            className="col-span-full w-full cursor-pointer rounded-xl bg-neutral-50 p-4 text-center transition hover:bg-neutral-100"
                             onClick={handlePhotoClick}
                         >
                             <img
                                 src={photoPreview}
-                                className="w-32 h-32 mb-2 object-cover mx-auto rounded-full cursor-pointer"
+                                className="mx-auto mb-2 h-24 w-24 rounded-full border-2 border-white object-cover shadow-sm sm:h-28 sm:w-28"
                                 alt="Profile"
                             />
                             <input
@@ -181,56 +178,56 @@ export function Profile() {
                                 onChange={handlePhotoChange}
                             />
                             {formik.touched.photo && formik.errors.photo ? (
-                                <div className="text-error mt-1 text-xs md:text-md">
+                                <div className={profileErrorClass}>
                                     {formik.errors.photo}
                                 </div>
                             ) : null}
                         </div>
-                        <label className="form-control w-full max-w-lg">
+                        <label className="form-control w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     First Name
                                 </span>
                             </div>
                             <input
                                 type="text"
                                 name="firstName"
-                                className="input input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className={profileInputClass}
                                 value={formik.values.firstName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                             {formik.touched.firstName &&
                             formik.errors.firstName ? (
-                                <div className="text-error mt-1 text-xs md:text-md">
+                                <div className={profileErrorClass}>
                                     {formik.errors.firstName}
                                 </div>
                             ) : null}
                         </label>
-                        <label className="form-control w-full max-w-lg">
+                        <label className="form-control w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Last Name
                                 </span>
                             </div>
                             <input
                                 type="text"
                                 name="lastName"
-                                className="input input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className={profileInputClass}
                                 value={formik.values.lastName}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                             {formik.touched.lastName &&
                             formik.errors.lastName ? (
-                                <div className="text-error mt-1 text-xs md:text-md">
+                                <div className={profileErrorClass}>
                                     {formik.errors.lastName}
                                 </div>
                             ) : null}
                         </label>
-                        <label className="form-control col-span-2 w-full">
+                        <label className="form-control col-span-full sm:col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Email
                                 </span>
                             </div>
@@ -238,66 +235,66 @@ export function Profile() {
                                 type="text"
                                 name="email"
                                 disabled
-                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                className={profileInputClass}
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                         </label>
-                        <label className="form-control col-span-2 w-full">
+                        <label className="form-control col-span-full sm:col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Biography
                                 </span>
                             </div>
                             <textarea
                                 name="biography"
                                 rows="3"
-                                className="textarea textarea-bordered hover:textarea-primary focus-within:textarea-primary w-full"
+                                className="textarea textarea-bordered mt-1 w-full bg-base-100 text-neutral-900 placeholder:text-neutral-600 focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700/20"
                                 value={formik.values.biography}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                         </label>
-                        <label className="form-control col-span-2 w-full">
+                        <label className="form-control col-span-full sm:col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     City
                                 </span>
                             </div>
                             <input
                                 type="text"
                                 name="city"
-                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                className={profileInputClass}
                                 value={formik.values.city}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                         </label>
-                        <label className="form-control col-span-2 w-full">
+                        <label className="form-control col-span-full sm:col-span-2 w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Location
                                 </span>
                             </div>
                             <input
                                 type="text"
                                 name="location"
-                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                className={profileInputClass}
                                 value={formik.values.location}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                         </label>
-                        <label className="form-control w-full max-w-lg">
+                        <label className="form-control w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Gender
                                 </span>
                             </div>
                             <select
                                 name="gender"
-                                className="select select-md select-bordered hover:select-primary focus-within:select-primary"
+                                className={profileSelectClass}
                                 value={formik.values.gender}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -315,14 +312,14 @@ export function Profile() {
                                 ))}
                             </select>
                             {formik.touched.gender && formik.errors.gender ? (
-                                <div className="text-error mt-1 text-xs md:text-md">
+                                <div className={profileErrorClass}>
                                     {formik.errors.gender}
                                 </div>
                             ) : null}
                         </label>
-                        <label className="form-control w-full max-w-lg">
+                        <label className="form-control w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Birth Date
                                 </span>
                             </div>
@@ -334,7 +331,7 @@ export function Profile() {
                                         .toISOString()
                                         .split("T")[0]
                                 }
-                                className="input  input-bordered hover:input-primary focus-within:input-primary w-full max-w-lg"
+                                className={profileInputClass}
                                 value={
                                     new Date(formik.values.birthDate)
                                         .toISOString()
@@ -345,20 +342,20 @@ export function Profile() {
                             />
                             {formik.touched.birthDate &&
                             formik.errors.birthDate ? (
-                                <div className="text-error mt-1 text-xs md:text-md">
+                                <div className={profileErrorClass}>
                                     {formik.errors.birthDate}
                                 </div>
                             ) : null}
                         </label>
                         <label className="form-control col-span-1 w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Specialization
                                 </span>
                             </div>
                             <select
                                 name="specialization"
-                                className="select select-bordered hover:select-primary focus-within:select-primary select- w-full"
+                                className={profileSelectClass}
                                 value={formik.values.specialization}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -378,25 +375,37 @@ export function Profile() {
                         </label>
                         <label className="form-control col-span-1 w-full">
                             <div className="label">
-                                <span className="label-text text-lg ">
+                                <span className="label-text text-sm font-semibold text-neutral-700">
                                     Session Fees
                                 </span>
                             </div>
                             <input
                                 type="number"
                                 name="fees"
-                                className="input input-bordered hover:input-primary focus-within:input-primary w-full"
+                                className={profileInputClass}
                                 value={formik.values.fees}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                             />
                         </label>
+                        <label className="form-control col-span-1 w-full">
+                            <span className="label-text text-sm font-semibold text-neutral-700">Phone</span>
+                            <input type="tel" name="phoneNumber" className={profileInputClass} value={formik.values.phoneNumber} onChange={formik.handleChange} />
+                        </label>
+                        <label className="form-control col-span-1 w-full">
+                            <span className="label-text text-sm font-semibold text-neutral-700">Qualifications</span>
+                            <textarea name="qualifications" rows={3} className="textarea textarea-bordered mt-1 w-full bg-base-100 text-neutral-900" value={formik.values.qualifications} onChange={formik.handleChange} />
+                        </label>
+                        <label className="label col-span-full cursor-pointer justify-start gap-3">
+                            <input type="checkbox" name="isAvailable" className="checkbox checkbox-primary" checked={formik.values.isAvailable} onChange={formik.handleChange} />
+                            <span className="label-text font-semibold">Available for new appointments</span>
+                        </label>
                         <button
                             type="submit"
-                            className="btn btn-primary btn-outline hover:btn-secondary col-span-2 my-4"
-                            disabled={formik.isSubmitting}
+                            className="btn btn-primary col-span-full mt-2 min-h-12 rounded-xl text-base font-semibold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                            disabled={formik.isSubmitting || updateLoading}
                         >
-                            Update
+                            {formik.isSubmitting || updateLoading ? <><span className="loading loading-spinner loading-sm" aria-hidden="true" /> Saving…</> : "Save profile"}
                         </button>
                     </div>
                 </form>

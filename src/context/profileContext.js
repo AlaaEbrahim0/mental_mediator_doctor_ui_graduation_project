@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { useGetProfile } from "../api/getProfile";
-import { useUpdateProfile } from "../api/updateProfile";
+import { useGetProfile, useUpdateProfile } from "../api/auth.api";
 import toast from "react-hot-toast";
 import { useAuth } from "../auth/authProvider";
 
@@ -12,11 +11,10 @@ export const UserProfileProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const { token } = useAuth();
 
-    const { data: profileData, execute: getProfile } = useGetProfile();
+    const { execute: getProfile } = useGetProfile();
     const {
-        updatedData,
         execute: updateProfile,
-        updateIsLoading,
+        isLoading: updateIsLoading,
     } = useUpdateProfile();
 
     useEffect(() => {

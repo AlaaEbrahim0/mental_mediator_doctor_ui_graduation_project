@@ -5,10 +5,10 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useAuth } from "../../auth/authProvider";
 import { useNavigate } from "react-router-dom";
-import { useSignIn } from "../../api/auth/signIn";
+
 import { useState } from "react";
 import { useUserProfile } from "../../context/profileContext";
-import { useForgetPassword } from "../../api/auth/forgetPassword.js";
+import { useForgetPassword, useSignIn } from "../../api/auth.api";
 import toast from "react-hot-toast";
 
 const validate = (values) => {
@@ -117,7 +117,7 @@ const ForgetPasswordModal = ({ isOpen, onRequestClose, onSubmit }) => {
 };
 
 export const LoginForm = () => {
-    const { setToken, setUserId } = useAuth();
+    const { setToken, setUserId, setRoles, setExpiresOn } = useAuth();
     const navigate = useNavigate();
     const { isLoading, error, execute } = useSignIn();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -134,7 +134,8 @@ export const LoginForm = () => {
             const data = await execute(values);
             setToken(data.token);
             setUserId(data.userId);
-            debugger;
+            setRoles(data.roles || []);
+            setExpiresOn(data.expiresOn || null);
             await initializeUserProfile();
             navigate("/", { replace: true });
         } catch (error) {

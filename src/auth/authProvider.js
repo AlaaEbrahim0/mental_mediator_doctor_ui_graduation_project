@@ -1,4 +1,3 @@
-import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const AuthContext = createContext();
@@ -6,36 +5,31 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [userId, setUserId] = useState(localStorage.getItem("userId"));
+    const [roles, setRoles] = useState(() => JSON.parse(localStorage.getItem("roles") || "[]"));
+    const [expiresOn, setExpiresOn] = useState(localStorage.getItem("expiresOn"));
 
     useEffect(() => {
         if (token) {
             localStorage.setItem("token", token);
             localStorage.setItem("userId", userId);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            localStorage.setItem("roles", JSON.stringify(roles));
+            if (expiresOn) localStorage.setItem("expiresOn", expiresOn);
         } else {
-            delete axios.defaults.headers.common["Authorization"];
             localStorage.removeItem("token");
             localStorage.removeItem("userId");
+            localStorage.removeItem("roles");
+            localStorage.removeItem("expiresOn");
         }
-    }, [token, userId]);
+    }, [token, userId, roles, expiresOn]);
 
     useEffect(() => {
-        const requestInterceptor = axios.interceptors.request.use(
-            (config) => {
-                if (token) {
-                    config.headers["Authorization"] = `Bearer ${token}`;
-                }
-                return config;
-            },
-            (error) => {
-                return Promise.reject(error);
-            }
-        );
-
-        return () => {
-            axios.interceptors.request.eject(requestInterceptor);
-        };
-    }, [token]);
+        const expire = () => { setToken(null); setUserId(null); setRoles([]); setExpiresOn(null); };
+        const expiry = expiresOn ? new Date(expiresOn).getTime() : 0;
+        if (token && expiry && expiry <= Date.now()) expire();
+        const timer = token && expiry > Date.now() ? window.setTimeout(expire, expiry - Date.now()) : null;
+        window.addEventListener("auth:expired", expire);
+        return () => { if (timer) window.clearTimeout(timer); window.removeEventListener("auth:expired", expire); };
+    }, [token, expiresOn]);
 
     const contextValue = useMemo(
         () => ({
@@ -43,8 +37,12 @@ const AuthProvider = ({ children }) => {
             setToken,
             userId,
             setUserId,
+            roles,
+            setRoles,
+            expiresOn,
+            setExpiresOn,
         }),
-        [token, userId]
+        [token, userId, roles, expiresOn]
     );
 
     return (
