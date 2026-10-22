@@ -45,7 +45,6 @@ export const useSignalR = (onReceiveNotification) => {
                     console.log("Connected to SignalR hub");
 
                     connection.on("ReceiveNotification", (notification) => {
-                        debugger;
                         console.log("Notification received:", notification);
                         if (onReceiveNotification) {
                             onReceiveNotification(notification);
