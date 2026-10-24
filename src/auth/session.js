@@ -1,80 +1,59 @@
-// Single source of truth for the persisted auth session.
-//
-// Every part of the app (axios interceptor, SignalR token factory, route
-// guards) used to read/write `localStorage` independently, which let the
-// session drift out of sync with React state. These helpers keep the storage
-// and the in-memory state consistent.
+// Single source of truth for the persisted auth session. The axios
+// interceptor, SignalR token factory, and route guards all read through
+// these helpers so browser storage and React state stay in sync.
 
-const TOKEN_KEY = "token";
-const USER_ID_KEY = "userId";
-const ROLES_KEY = "roles";
-const EXPIRES_ON_KEY = "expiresOn";
+const STORAGE_KEY = "nexus_auth_session";
+const LEGACY_KEYS = ["token", "userId", "roles", "expiresOn"];
 
-const safeParseRoles = (raw) => {
-    if (!raw) return [];
-    try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
-};
+const emptySession = () => ({
+    token: null,
+    userId: null,
+    roles: [],
+    expiresOn: null,
+});
 
-export const getToken = () => {
-    if (typeof window === "undefined") return null;
-    return window.localStorage.getItem(TOKEN_KEY);
-};
-
-export const getRoles = () => {
-    if (typeof window === "undefined") return [];
-    return safeParseRoles(window.localStorage.getItem(ROLES_KEY));
+const removeLegacyKeys = () => {
+    LEGACY_KEYS.forEach((key) => window.localStorage.removeItem(key));
 };
 
 export const readSession = () => {
-    if (typeof window === "undefined") {
-        return { token: null, userId: null, roles: [], expiresOn: null };
+    try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (!raw) return emptySession();
+
+        const parsed = JSON.parse(raw);
+        return {
+            token: parsed?.token || null,
+            userId: parsed?.userId || null,
+            roles: Array.isArray(parsed?.roles) ? parsed.roles : [],
+            expiresOn: parsed?.expiresOn || null,
+        };
+    } catch {
+        return emptySession();
     }
-    return {
-        token: window.localStorage.getItem(TOKEN_KEY),
-        userId: window.localStorage.getItem(USER_ID_KEY),
-        roles: safeParseRoles(window.localStorage.getItem(ROLES_KEY)),
-        expiresOn: window.localStorage.getItem(EXPIRES_ON_KEY),
-    };
 };
 
-export const saveSession = ({ token, userId, roles, expiresOn }) => {
-    if (typeof window === "undefined") return;
-    if (token) {
-        window.localStorage.setItem(TOKEN_KEY, token);
-    } else {
-        window.localStorage.removeItem(TOKEN_KEY);
-    }
-
-    if (userId) {
-        window.localStorage.setItem(USER_ID_KEY, userId);
-    } else {
-        window.localStorage.removeItem(USER_ID_KEY);
-    }
-
-    if (Array.isArray(roles)) {
-        window.localStorage.setItem(ROLES_KEY, JSON.stringify(roles));
-    } else {
-        window.localStorage.removeItem(ROLES_KEY);
-    }
-
-    if (expiresOn) {
-        window.localStorage.setItem(EXPIRES_ON_KEY, expiresOn);
-    } else {
-        window.localStorage.removeItem(EXPIRES_ON_KEY);
+export const saveSession = (session) => {
+    try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+        removeLegacyKeys();
+    } catch {
+        // Storage can be unavailable in private browsing; the in-memory
+        // session still works for the current tab.
     }
 };
 
 export const clearSession = () => {
-    if (typeof window === "undefined") return;
-    window.localStorage.removeItem(TOKEN_KEY);
-    window.localStorage.removeItem(USER_ID_KEY);
-    window.localStorage.removeItem(ROLES_KEY);
-    window.localStorage.removeItem(EXPIRES_ON_KEY);
+    try {
+        window.localStorage.removeItem(STORAGE_KEY);
+        removeLegacyKeys();
+    } catch {
+        // Nothing to clear when storage is unavailable.
+    }
 };
 
-export { TOKEN_KEY, USER_ID_KEY, ROLES_KEY, EXPIRES_ON_KEY };
+export const getToken = () => readSession().token;
+
+export const getUserId = () => readSession().userId;
+
+export const getRoles = () => readSession().roles;

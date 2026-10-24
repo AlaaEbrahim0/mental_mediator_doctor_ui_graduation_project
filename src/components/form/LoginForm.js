@@ -4,6 +4,7 @@ import { MdOutlineMailOutline } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useAuth } from "../../auth/authProvider";
+import { saveSession } from "../../auth/session";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useForgetPassword, useSignIn } from "../../api/auth.api";
@@ -135,10 +136,12 @@ export const LoginForm = () => {
             // API requests and the SignalR token factory read from the shared
             // session helpers, so persist before navigating to make sure the
             // first request after login already carries the token.
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("userId", data.userId);
-            localStorage.setItem("roles", JSON.stringify(data.roles || []));
-            if (data.expiresOn) localStorage.setItem("expiresOn", data.expiresOn);
+            saveSession({
+                token: data.token,
+                userId: data.userId,
+                roles: data.roles || [],
+                expiresOn: data.expiresOn || null,
+            });
             setToken(data.token);
             setUserId(data.userId);
             setRoles(data.roles || []);

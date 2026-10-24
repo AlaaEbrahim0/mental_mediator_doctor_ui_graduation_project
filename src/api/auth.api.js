@@ -11,6 +11,15 @@ export const requestPasswordReset = async (email) => {
     return data;
 };
 
+export const resetPassword = async ({ email, token, newPassword }) => {
+    const { data } = await apiClient.post("/api/auth/reset-password", {
+        email,
+        token,
+        newPassword,
+    });
+    return data;
+};
+
 export const getDoctorProfile = async () => {
     const { data } = await apiClient.get("/api/doctors/me");
     return data;

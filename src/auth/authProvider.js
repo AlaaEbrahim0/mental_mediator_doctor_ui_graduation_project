@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { clearSession, readSession, saveSession } from "./session";
 
 const AuthContext = createContext();
@@ -15,13 +15,15 @@ const AuthProvider = ({ children }) => {
 
     const { token, userId, roles, expiresOn } = session;
 
-    const updateSession = (patch) =>
-        setSession((previous) => ({ ...previous, ...patch }));
+    const updateSession = useCallback(
+        (patch) => setSession((previous) => ({ ...previous, ...patch })),
+        []
+    );
 
-    const signOut = () => {
+    const signOut = useCallback(() => {
         clearSession();
         setSession({ token: null, userId: null, roles: [], expiresOn: null });
-    };
+    }, []);
 
     // Persist the session whenever it changes. Writing through a single helper
     // keeps localStorage in lockstep with React state.
@@ -97,7 +99,7 @@ const AuthProvider = ({ children }) => {
             setExpiresOn: (value) => updateSession({ expiresOn: value }),
             signOut,
         }),
-        [token, userId, roles, expiresOn]
+        [token, userId, roles, expiresOn, signOut, updateSession]
     );
 
     return (

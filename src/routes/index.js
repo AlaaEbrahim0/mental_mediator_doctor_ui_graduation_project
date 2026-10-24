@@ -26,6 +26,7 @@ const LoginRoute = () => {
 // router whenever auth state changes can repeatedly remount <Navigate> and
 // trigger a redirect/update loop.
 const router = createBrowserRouter([
+    { path: "forgetpassword/resetpassword", element: <ResetPassword /> },
     { path: "forgetPassword", element: <ResetPassword /> },
     { path: "/login", element: <LoginRoute /> },
     {
