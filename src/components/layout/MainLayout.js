@@ -6,7 +6,9 @@ import { useState } from "react";
 
 const getTitle = (path) => {
     const normalizedPath = path.toLowerCase();
-    if (normalizedPath === "/community" || normalizedPath.startsWith("/forums")) return "Community";
+    // The chat rooms live under /community/rooms, so the prefix rule has to
+    // cover them too. The /forums prefix is kept for the forum detail page.
+    if (normalizedPath.startsWith("/community") || normalizedPath.startsWith("/forums")) return "Community";
     switch (normalizedPath) {
         case "/appointments":
             return "Appointments";

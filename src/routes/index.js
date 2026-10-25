@@ -9,6 +9,9 @@ import { Home } from "../pages/Home";
 import { Appointments } from "../pages/Appointment";
 import { Login } from "../auth/login";
 import { Forums } from "../pages/Forums";
+import { CommunityLayout } from "../pages/CommunityLayout";
+import { ChatRooms } from "../pages/ChatRooms";
+import { ChatRoom } from "../pages/ChatRoom";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
 import { Logout } from "../auth/logout";
 import { Schedule } from "../pages/Schedule";
@@ -42,7 +45,11 @@ const router = createBrowserRouter([
                     { path: "schedule", element: <Schedule /> },
                     { path: "profile", element: <Profile /> },
                     { path: "notifications", element: <Notifications /> },
-                    { path: "Community", element: <Forums /> },
+                    { path: "Community", element: <CommunityLayout />, children: [
+                        { index: true, element: <Forums /> },
+                        { path: "rooms", element: <ChatRooms /> },
+                        { path: "rooms/:id", element: <ChatRoom /> },
+                    ] },
                     { path: "forums/:id", element: <ForumsDetails /> },
                     { path: "logout", element: <Logout /> },
                 ],

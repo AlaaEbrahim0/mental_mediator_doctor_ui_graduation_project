@@ -15,7 +15,10 @@ export const TopBar = ({ title = "Nexus", toggleSidebar, sidebarOpen = false }) 
     const displayName = [userProfileData?.firstName, userProfileData?.lastName]
         .filter(Boolean)
         .join(" ") || "Your profile";
-    const isCommunityView = location.pathname.toLowerCase() === "/community" || location.pathname.toLowerCase().startsWith("/forums");
+    // The chat rooms live under /community/rooms. The "Create post" button
+    // belongs to the forums page only, so it is hidden across the whole
+    // community section.
+    const isCommunityView = location.pathname.toLowerCase().startsWith("/community") || location.pathname.toLowerCase().startsWith("/forums");
 
     const openPostComposer = () => navigate("/Community", { state: { openCreatePost: true } });
 
