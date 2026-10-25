@@ -23,3 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .vercel
+
+# The .env file itself is never committed; use .env.example as the template.
+.env
