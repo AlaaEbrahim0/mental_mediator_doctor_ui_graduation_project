@@ -4,6 +4,11 @@ import { CustomDeletionModal } from "../components/ui/CustomDeletionModal";
 import { HiOutlineMenu } from "react-icons/hi";
 import { motion } from "framer-motion";
 import { useCreateScheduleDay, useDeleteSchedule, useDeleteScheduleDay, useEditScheduleDay, useSchedule } from "../api/schedule.api";
+import { AvailabilityOverridesSection } from "../components/form/AvailabilityOverridesSection";
+import { RecurringBreaksSection } from "../components/form/RecurringBreaksSection";
+import { SchedulingSettingsSection } from "../components/form/SchedulingSettingsSection";
+import { TimeBlocksSection } from "../components/form/TimeBlocksSection";
+import { AvailableSlotsPreview } from "../components/form/AvailableSlotsPreview";
 import { useAuth } from "../auth/authProvider";
 import { FaPlus } from "react-icons/fa";
 import { NewDayForm } from "../components/form/NewDayForm";
@@ -413,6 +418,18 @@ export const Schedule = () => {
                     </div>
                 )}
             </div>}
+
+            {/* The scheduling primitives below are what the slot calculator
+                subtracts from the weekly hours above. Rendering them on the same
+                page keeps the cause (hours) and the effect (offered slots)
+                visible together. */}
+            <div className="mx-auto mt-6 flex w-full max-w-6xl min-w-0 flex-col gap-6">
+                <SchedulingSettingsSection />
+                <RecurringBreaksSection />
+                <AvailabilityOverridesSection />
+                <TimeBlocksSection />
+                <AvailableSlotsPreview />
+            </div>
         </div>
     );
 };
