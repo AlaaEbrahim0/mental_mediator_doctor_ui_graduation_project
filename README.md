@@ -114,7 +114,12 @@ Both portals share a design system defined in `tailwind.config.js`:
 - **Font:** Albert Sans
 - **Tokens:** Palette, spacing, radii, shadows, and semantic aliases all live in `tailwind.config.js`
 
-Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Comment`, …), the auth/session helpers, the API client, `src/index.css`, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal — 27 files in total — by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`.
+Shared primitive components (`Button`, `Card`, `Input`, `Modal`, …), the auth/session helpers, the API client, `src/index.css`, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal — 28 files in total — by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`.
+
+`src/components/ui/index.js` re-exports only the primitives; `Post`, `Comment`, and `Reply` are
+imported by direct path or from `src/components/ui/community.js`. They depend on `react-markdown`
+(ESM only), and Create React App's Jest never transforms `node_modules`, so exporting them from the
+primitives entry point breaks every test that imports `"../ui"`.
 
 Vendoring (rather than a `node_modules` import) is deliberate: `react-scripts` transpiles JSX only inside this app's `src/`, so raw-JSX sources installed from Git would fail the production build. No build-tool override (craco/rewired) was added.
 
