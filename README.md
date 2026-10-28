@@ -4,7 +4,7 @@
 
 - **Production URL:** https://mental-mediator-doctor-ui-graduation-project.vercel.app
 - **Backend API:** https://nexus-api.runasp.net/
-- **Patient portal:** https://mental-health-ochre.vercel.app
+- **Patient portal:** https://mental-health-ochre-xi.vercel.app
 - **Shared UI library:** https://github.com/AlaaEbrahim0/nexus-shared-ui
 
 ---
@@ -79,7 +79,7 @@ cp .env.example .env
 |----------|----------|-------------|
 | `REACT_APP_API_URL` | Yes | Backend API base URL. Production: `https://nexus-api.runasp.net/` |
 | `REACT_APP_IMAGE_BASE_URL` | No | Path to bundled static images. Default: `/images` |
-| `REACT_APP_PATIENT_APP_URL` | No | Patient portal base URL. When set, public doctor profiles show a "Book a session" link. Production: `https://mental-health-ochre.vercel.app` |
+| `REACT_APP_PATIENT_APP_URL` | No | Patient portal base URL. When set, public doctor profiles show a "Book a session" link. Production: `https://mental-health-ochre-xi.vercel.app` |
 
 > `.env` is gitignored. Never commit credentials or tokens.
 
@@ -114,11 +114,21 @@ Both portals share a design system defined in `tailwind.config.js`:
 - **Font:** Albert Sans
 - **Tokens:** Palette, spacing, radii, shadows, and semantic aliases all live in `tailwind.config.js`
 
-Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Comment`, …) are maintained in the [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) repository. To update a shared component:
+Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Comment`, …), the auth/session helpers, the API client, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`.
 
-1. Edit the source in `nexus-shared-ui`.
-2. Push the change.
-3. In this repo: `npm install github:AlaaEbrahim0/nexus-shared-ui` and rebuild.
+Vendoring (rather than a `node_modules` import) is deliberate: `react-scripts` transpiles JSX only inside this app's `src/`, so raw-JSX sources installed from Git would fail the production build. No build-tool override (craco/rewired) was added.
+
+To update a shared component:
+
+1. Edit the source in `nexus-shared-ui`, push it, and bump `version` in its `package.json`.
+2. In this repo, update the pin and pull the new files:
+   ```bash
+   npm run shared-ui:sync -- --ref <new commit sha>   # or edit .shared-ui.json, then:
+   npm run shared-ui:sync
+   ```
+3. Run `npm run shared-ui:check`, build, and commit the synced files together with the new pin.
+
+`npm run shared-ui:check` exits non-zero when a vendored file no longer matches the pinned upstream commit — run it in CI so the two portals cannot drift apart silently.
 
 ---
 
@@ -129,16 +139,33 @@ Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Commen
 | `npm start` | Development server at `http://localhost:3000` |
 | `npm run build` | Production build in `build/` |
 | `npm test` | Run tests with Jest / React Testing Library |
+| `npm run shared-ui:sync` | Copy the pinned `@nexus/shared-ui` files into this portal |
+| `npm run shared-ui:check` | Fail if a vendored file has drifted from the pinned upstream |
 
 ---
 
 ## Deployment
 
-The app is deployed on [Vercel](https://vercel.com). Pushing to `master` triggers an automatic deployment.
+Hosted on [Vercel](https://vercel.com) as project **`mental-mediator-doctor-ui-graduation-project`** in the `alaa-ebrahims-projects` team.
 
-The `vercel.json` at the project root configures client-side routing rewrites so all paths correctly serve `index.html`.
+**The project is not connected to GitHub**, so pushing to `master` does **not** trigger a build. Production is deployed from the CLI:
 
-Production environment variables are set in the Vercel project dashboard — they are **not** read from `.env` during Vercel builds.
+```bash
+npx vercel --prod
+```
+
+`REACT_APP_API_URL` and `REACT_APP_IMAGE_BASE_URL` are stored in the Vercel project settings for
+Production, Preview, and Development; they are **not** read from `.env` during a hosted build.
+`REACT_APP_PATIENT_APP_URL` is currently **not** set in the Vercel project, so the "Book a session"
+link on public doctor profiles only appears in local builds that define it — set it in the
+dashboard (or `npx vercel env add REACT_APP_PATIENT_APP_URL production`) and redeploy to enable it
+in production.
+
+The `vercel.json` at the project root rewrites every non-asset path to `/index.html` so
+client-side routes resolve on a hard refresh.
+
+Older deployments stay under the same project, so a previous release can be promoted again as a
+rollback.
 
 ---
 

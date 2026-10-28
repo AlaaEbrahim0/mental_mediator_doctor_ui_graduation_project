@@ -1,5 +1,9 @@
 # Shared UI primitives
 
+> Vendored from [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) at the
+> ref in `.shared-ui.json`. Edit upstream and run `npm run shared-ui:sync` — changes made
+> here are overwritten on the next sync.
+
 The shared UI layer lives in `src/components/ui`. Pages should import from the
 barrel:
 
