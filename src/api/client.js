@@ -14,6 +14,14 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) => {
+        // Public endpoints can opt out of the bearer token. This keeps a
+        // public profile reachable even when the browser holds an expired or
+        // otherwise invalid session token.
+        if (config.skipAuth) {
+            config.headers.delete("Authorization");
+            return config;
+        }
+
         const token = getToken();
         if (token) {
             config.headers.set("Authorization", `Bearer ${token}`);

@@ -12,6 +12,8 @@ import ReactMarkdown from "react-markdown"; // Import ReactMarkdown
 
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { getMemberProfilePath } from "../profile/profileUtils";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -35,6 +37,7 @@ export const Comment = ({
     const [commentText, setCommentText] = useState(content);
     const [tempCommentText, setTempCommentText] = useState(content);
     const [repliesCount, setRepliesCount] = useState(initialRepliesCount);
+    const authorPath = getMemberProfilePath(authorId, currentUserId);
 
     const addReplyRef = useRef(null);
 
@@ -147,14 +150,39 @@ export const Comment = ({
             className="mt-3 w-full min-w-0 rounded-xl border border-neutral-200 bg-base-100 p-3.5 text-neutral-800 shadow-sm transition-shadow duration-200 hover:shadow-md sm:p-4"
         >
             <div className="flex min-w-0 items-start gap-3">
-                    <img
-                        className="h-10 w-10 shrink-0 rounded-full border border-neutral-200 object-cover sm:h-11 sm:w-11"
-                        src={photoUrl || `${imagesDir}/profile.webp`}
-                        alt=""
-                    />
+                    {authorPath ? (
+                        <Link
+                            to={authorPath}
+                            aria-label={`View ${
+                                authorName || "this member"
+                            }'s profile`}
+                            className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                        >
+                            <img
+                                className="h-10 w-10 shrink-0 rounded-full border border-neutral-200 object-cover sm:h-11 sm:w-11"
+                                src={photoUrl || `${imagesDir}/profile.webp`}
+                                alt=""
+                            />
+                        </Link>
+                    ) : (
+                        <img
+                            className="h-10 w-10 shrink-0 rounded-full border border-neutral-200 object-cover sm:h-11 sm:w-11"
+                            src={photoUrl || `${imagesDir}/profile.webp`}
+                            alt=""
+                        />
+                    )}
                     <div className="min-w-0 flex-1 pt-0.5">
                         <h3 className="truncate text-sm font-bold leading-5 text-neutral-900 sm:text-base">
-                            {authorName || "Anonymous"}
+                            {authorPath ? (
+                                <Link
+                                    to={authorPath}
+                                    className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                                >
+                                    {authorName || "Anonymous"}
+                                </Link>
+                            ) : (
+                                authorName || "Anonymous"
+                            )}
                         </h3>
                         <p className="mt-0.5 text-xs font-medium text-neutral-600 sm:text-sm">
                             {convertUtcToRelativeTime(commentedAt)}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
     FiCalendar,
     FiCheck,
@@ -15,6 +16,8 @@ import { GrFormPrevious } from "react-icons/gr";
 import toast from "react-hot-toast";
 import { useCompleteAppointment, useConfirmAppointment, useGetAppointments, useRejectAppointment } from "../api/appointments.api";
 import { AppointmentsFilterationComponent } from "../components/ui/FilterationComponent";
+import { useAuth } from "../auth/authProvider";
+import { getMemberProfilePath } from "../components/profile/profileUtils";
 
 const statusStyles = {
     pending: "border-amber-200 bg-amber-50 text-amber-800",
@@ -174,6 +177,7 @@ function AppointmentModal({
 
 export function Appointments({ pageSize = 7 }) {
     const { isLoading, error, data, execute } = useGetAppointments();
+    const { userId } = useAuth();
     const { isLoading: confirmIsLoading, execute: confirmExecute } = useConfirmAppointment();
     const { isLoading: rejectIsLoading, execute: rejectExecute } = useRejectAppointment();
     const { isLoading: completeIsLoading, execute: completeExecute } = useCompleteAppointment();
@@ -343,17 +347,50 @@ export function Appointments({ pageSize = 7 }) {
                                             const pending = appointment.status?.toLowerCase() === "pending";
                                             const confirmed = appointment.status?.toLowerCase() === "confirmed";
                                             const client = appointment.clientName || "Client";
+                                            const clientPath = getMemberProfilePath(
+                                                appointment.userId,
+                                                userId
+                                            );
                                             return (
                                                 <motion.tr key={appointment.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group transition-colors hover:bg-base-200/40">
                                                     <td className="px-4 py-3">
                                                         <div className="flex min-w-0 items-center gap-3">
                                                             {appointment.clientPhotoUrl ? (
-                                                                <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-full border border-base-200 object-cover" />
+                                                                clientPath ? (
+                                                                    <Link
+                                                                        to={clientPath}
+                                                                        aria-label={`View ${client}'s profile`}
+                                                                        className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                                                                    >
+                                                                        <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-full border border-base-200 object-cover" />
+                                                                    </Link>
+                                                                ) : (
+                                                                    <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-full border border-base-200 object-cover" />
+                                                                )
+                                                            ) : clientPath ? (
+                                                                <Link
+                                                                    to={clientPath}
+                                                                    aria-label={`View ${client}'s profile`}
+                                                                    className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                                                                >
+                                                                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">{getInitials(client)}</div>
+                                                                </Link>
                                                             ) : (
                                                                 <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">{getInitials(client)}</div>
                                                             )}
                                                             <div className="min-w-0">
-                                                                <p className="truncate font-semibold text-slate-900">{client}</p>
+                                                                <p className="truncate font-semibold text-slate-900">
+                                                                    {clientPath ? (
+                                                                        <Link
+                                                                            to={clientPath}
+                                                                            className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                                                                        >
+                                                                            {client}
+                                                                        </Link>
+                                                                    ) : (
+                                                                        client
+                                                                    )}
+                                                                </p>
                                                                 <p className="mt-0.5 flex min-w-0 items-center gap-1.5 truncate text-sm text-slate-600"><FiMail className="shrink-0 text-slate-400" aria-hidden="true" /><span className="truncate">{appointment.clientEmail || "No email provided"}</span></p>
                                                             </div>
                                                         </div>

@@ -1,7 +1,9 @@
 import { FiClock, FiFlag, FiTrash2 } from "react-icons/fi";
+import { Link } from "react-router-dom";
 import { Badge } from "../ui";
 import { formatChatTimestamp } from "../../utils/chat";
 import { canDeleteChatMessage, canReportChatMessage, isOwnChatMessage } from "../../utils/chat";
+import { getPublicProfilePath } from "../profile/profileUtils";
 
 /**
  * One message row.
@@ -23,23 +25,53 @@ export const ChatMessageItem = ({
 
     const isPending = Boolean(message.pending);
     const hasFailed = Boolean(message.failed);
+    const senderPath = message.senderUserId
+        ? isOwn
+            ? "/profile"
+            : getPublicProfilePath(message.senderUserId)
+        : null;
+    const senderName = isOwn ? "You" : message.senderDisplayName;
 
     return (
         <article
             className={`flex gap-3 px-4 py-3 ${isOwn ? "bg-primary-50/40" : ""}`}
             aria-label={`Message from ${message.senderDisplayName}`}
         >
-            <span
-                aria-hidden="true"
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-200 text-sm font-bold text-neutral-700"
-            >
-                {(message.senderDisplayName || "?").trim().charAt(0).toUpperCase() || "?"}
-            </span>
+            {senderPath ? (
+                <Link
+                    to={senderPath}
+                    aria-label={`View ${senderName || "this member"}'s profile`}
+                    className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                >
+                    <span
+                        aria-hidden="true"
+                        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-200 text-sm font-bold text-neutral-700"
+                    >
+                        {(message.senderDisplayName || "?").trim().charAt(0).toUpperCase() || "?"}
+                    </span>
+                </Link>
+            ) : (
+                <span
+                    aria-hidden="true"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neutral-200 text-sm font-bold text-neutral-700"
+                >
+                    {(message.senderDisplayName || "?").trim().charAt(0).toUpperCase() || "?"}
+                </span>
+            )}
 
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="text-sm font-semibold text-neutral-900">
-                        {isOwn ? "You" : message.senderDisplayName}
+                        {senderPath ? (
+                            <Link
+                                to={senderPath}
+                                className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                            >
+                                {senderName}
+                            </Link>
+                        ) : (
+                            senderName
+                        )}
                     </span>
                     {message.senderIsDoctor && (
                         <Badge variant="primary" size="sm">

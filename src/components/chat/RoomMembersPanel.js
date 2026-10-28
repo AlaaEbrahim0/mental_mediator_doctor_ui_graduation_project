@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { FiShield, FiUserCheck } from "react-icons/fi";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Badge, EmptyState, Select } from "../ui";
 import { canManageChatMemberRole, getChatMemberInitial } from "../../utils/chat";
+import { useAuth } from "../../auth/authProvider";
+import { getMemberProfilePath } from "../profile/profileUtils";
 import {
     getChatErrorMessage,
     useUpdateChatMemberRole,
@@ -25,6 +28,7 @@ const roleBadgeVariant = (role) => {
 export const RoomMembersPanel = ({ room, members, onRoleChanged }) => {
     const [busyMemberId, setBusyMemberId] = useState(null);
     const { execute } = useUpdateChatMemberRole();
+    const { userId } = useAuth();
 
     const handleRoleChange = async (member, nextRole) => {
         if (!room || !member) return;
@@ -62,22 +66,50 @@ export const RoomMembersPanel = ({ room, members, onRoleChanged }) => {
             <ul className="mt-3 space-y-2">
                 {members.map((member) => {
                     const canManage = canManageChatMemberRole(room, member);
+                    const memberPath = getMemberProfilePath(
+                        member.userId,
+                        userId
+                    );
 
                     return (
                         <li
                             key={member.memberId}
                             className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-base-100 p-2.5"
                         >
-                            <span
-                                aria-hidden="true"
-                                className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-neutral-200 text-xs font-bold text-neutral-700"
-                            >
-                                {getChatMemberInitial(member.displayName)}
-                            </span>
+                            {memberPath ? (
+                                <Link
+                                    to={memberPath}
+                                    aria-label={`View ${member.displayName}'s profile`}
+                                    className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                                >
+                                    <span
+                                        aria-hidden="true"
+                                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-neutral-200 text-xs font-bold text-neutral-700"
+                                    >
+                                        {getChatMemberInitial(member.displayName)}
+                                    </span>
+                                </Link>
+                            ) : (
+                                <span
+                                    aria-hidden="true"
+                                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-neutral-200 text-xs font-bold text-neutral-700"
+                                >
+                                    {getChatMemberInitial(member.displayName)}
+                                </span>
+                            )}
 
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-semibold text-neutral-900">
-                                    {member.displayName}
+                                    {memberPath ? (
+                                        <Link
+                                            to={memberPath}
+                                            className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                                        >
+                                            {member.displayName}
+                                        </Link>
+                                    ) : (
+                                        member.displayName
+                                    )}
                                 </p>
                                 <p className="text-xs text-neutral-500">
                                     Joined {new Date(member.joinedAtUtc).toLocaleDateString()}

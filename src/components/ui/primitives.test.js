@@ -21,6 +21,18 @@ describe("Button", () => {
         expect(button).toHaveAttribute("aria-busy", "true");
     });
 
+    it("keeps icons and labels as direct flex children so they stay centered", () => {
+        render(
+            <Button>
+                <svg data-testid="button-icon" />
+                <span>Save profile</span>
+            </Button>
+        );
+
+        const button = screen.getByRole("button", { name: /save profile/i });
+        expect(button.firstElementChild).toBe(screen.getByTestId("button-icon"));
+    });
+
     it("can render as a router link for navigation actions", () => {
         render(
             <MemoryRouter>

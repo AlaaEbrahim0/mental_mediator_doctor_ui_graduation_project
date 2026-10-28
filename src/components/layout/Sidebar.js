@@ -4,12 +4,11 @@ import { GrSchedules, GrSchedule } from "react-icons/gr";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { HiOutlineLogin } from "react-icons/hi";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { IoIosClose } from "react-icons/io";
 import { useUserProfile } from "../../context/profileContext";
+import { formatSpecialization, PROFILE_PHOTO_FALLBACK } from "../profile/profileUtils";
 import { motion } from "framer-motion";
-
-const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export function Sidebar({ isOpen, setIsOpen }) {
     const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024);
@@ -124,20 +123,27 @@ export function Sidebar({ isOpen, setIsOpen }) {
                 <motion.div
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mx-3 my-4 flex shrink-0 items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-3"
+                    className="mx-3 my-4 shrink-0 rounded-2xl border border-neutral-200 bg-neutral-50 transition hover:border-primary-200 hover:bg-primary-50/40"
                 >
-                    <span className="relative shrink-0">
-                        <img
-                            className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-sm"
-                            src={userProfileData?.photoUrl || `${imagesDir}/profile.webp`}
-                            alt=""
-                        />
-                        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-neutral-50 bg-emerald-500" aria-label="Online" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-neutral-900">Dr. {userProfileData?.firstName || "Nexus"} {userProfileData?.lastName || "User"}</p>
-                        <p className="mt-0.5 truncate text-xs font-medium text-neutral-600">{userProfileData?.specialization?.match(/[A-Z][a-z]+/g)?.[0] || "Clinical"} practice</p>
-                    </div>
+                    <Link
+                        to="/profile"
+                        onClick={handleMenuItemClick}
+                        aria-label="Open your profile"
+                        className="flex items-center gap-3 rounded-2xl p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                    >
+                        <span className="relative shrink-0">
+                            <img
+                                className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-sm"
+                                src={userProfileData?.photoUrl || PROFILE_PHOTO_FALLBACK}
+                                alt=""
+                            />
+                            <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-neutral-50 bg-emerald-500" aria-label="Online" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-bold text-neutral-900">Dr. {userProfileData?.firstName || "Nexus"} {userProfileData?.lastName || "User"}</p>
+                            <p className="mt-0.5 truncate text-xs font-medium text-neutral-600">{formatSpecialization(userProfileData?.doctor?.specialization)}</p>
+                        </div>
+                    </Link>
                 </motion.div>
             )}
 

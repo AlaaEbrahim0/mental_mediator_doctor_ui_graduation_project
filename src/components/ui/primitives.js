@@ -102,7 +102,7 @@ export const Button = forwardRef(function Button(
             className={`inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${sizeClasses} ${variantClasses} ${fullWidth ? "w-full" : ""} ${className}`}
         >
             {loading && <Spinner size="sm" />}
-            <span>{loading && loadingText ? loadingText : children}</span>
+            {loading && loadingText ? <span>{loadingText}</span> : children}
         </Component>
     );
 });

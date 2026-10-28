@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { FiArrowRight, FiCalendar, FiClock } from "react-icons/fi";
 import { Badge, Button, Card } from "../ui";
 import { useGetAppointments } from "../../api/appointments.api";
+import { useAuth } from "../../auth/authProvider";
+import { getMemberProfilePath } from "../profile/profileUtils";
 
 const statusVariant = {
     pending: "warning",
@@ -34,6 +36,7 @@ const formatAppointment = (value, timeZone) => {
  */
 export const UpcomingAppointmentsCard = ({ timeZone = "UTC" }) => {
     const { execute, isLoading } = useGetAppointments();
+    const { userId } = useAuth();
     const [appointments, setAppointments] = useState([]);
 
     const load = useCallback(async () => {
@@ -83,6 +86,10 @@ export const UpcomingAppointmentsCard = ({ timeZone = "UTC" }) => {
                     <ul className="space-y-2">
                         {appointments.map((appointment) => {
                             const when = formatAppointment(appointment.startTime, timeZone);
+                            const clientPath = getMemberProfilePath(
+                                appointment.userId,
+                                userId
+                            );
                             return (
                                 <li
                                     key={appointment.id}
@@ -90,7 +97,16 @@ export const UpcomingAppointmentsCard = ({ timeZone = "UTC" }) => {
                                 >
                                     <div className="min-w-0">
                                         <p className="truncate text-sm font-semibold text-neutral-900">
-                                            {appointment.clientName || "Client"}
+                                            {clientPath ? (
+                                                <Link
+                                                    to={clientPath}
+                                                    className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                                                >
+                                                    {appointment.clientName || "Client"}
+                                                </Link>
+                                            ) : (
+                                                appointment.clientName || "Client"
+                                            )}
                                         </p>
                                         <p className="mt-1 flex items-center gap-2 text-xs text-neutral-600">
                                             <FiCalendar aria-hidden="true" /> {when.date}

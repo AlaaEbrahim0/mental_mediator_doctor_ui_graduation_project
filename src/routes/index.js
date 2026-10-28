@@ -17,6 +17,8 @@ import { Logout } from "../auth/logout";
 import { Schedule } from "../pages/Schedule";
 import { ForumsDetails } from "../pages/ForumsDetails";
 import { Profile } from "../pages/Profile";
+import { ProfileEditor } from "../pages/ProfileEditor";
+import { PublicDoctorProfile } from "../pages/PublicDoctorProfile";
 import { ResetPassword } from "../auth/forgetPassword";
 import { Notifications } from "../pages/Notifications";
 
@@ -32,6 +34,8 @@ const router = createBrowserRouter([
     { path: "forgetpassword/resetpassword", element: <ResetPassword /> },
     { path: "forgetPassword", element: <ResetPassword /> },
     { path: "/login", element: <LoginRoute /> },
+    { path: "/doctors/:id", element: <PublicDoctorProfile /> },
+    { path: "/profiles/:id", element: <PublicDoctorProfile /> },
     {
         path: "/",
         element: <ProtectedRoute />,
@@ -44,6 +48,7 @@ const router = createBrowserRouter([
                     { path: "appointments", element: <Appointments /> },
                     { path: "schedule", element: <Schedule /> },
                     { path: "profile", element: <Profile /> },
+                    { path: "profile/edit", element: <ProfileEditor /> },
                     { path: "notifications", element: <Notifications /> },
                     { path: "Community", element: <CommunityLayout />, children: [
                         { index: true, element: <Forums /> },

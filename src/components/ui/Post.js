@@ -12,6 +12,7 @@ import { CustomDeletionModal } from "./CustomDeletionModal";
 import { motion } from "framer-motion";
 import { FiShare2 } from "react-icons/fi";
 import { getApiErrorMessage } from "../../api/client";
+import { getMemberProfilePath } from "../profile/profileUtils";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
@@ -39,6 +40,7 @@ export const Post = ({
     const [isLiked, setIsLiked] = useState(initialLiked);
     const [likeLoading, setLikeLoading] = useState(false);
     const [isUpdateModalVisible, setUpdateModalVisible] = useState(false); // Add state to control the visibility of the update modal
+    const authorPath = getMemberProfilePath(authorId, currentUserId);
 
     const {
         isLoading: isUpdatePostLoading,
@@ -190,14 +192,39 @@ export const Post = ({
         >
             <div className="flex items-start justify-between gap-3 p-4 pb-0 sm:p-5 sm:pb-0">
                 <div className="flex min-w-0 items-center gap-3">
-                    <img
-                        className="h-11 w-11 shrink-0 rounded-full border border-neutral-200 object-cover ring-2 ring-neutral-50 sm:h-12 sm:w-12"
-                        src={image || imagesDir + "/profile.webp"}
-                        alt=""
-                    />
+                    {authorPath ? (
+                        <Link
+                            to={authorPath}
+                            aria-label={`View ${
+                                authorName || "this member"
+                            }'s profile`}
+                            className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                        >
+                            <img
+                                className="h-11 w-11 shrink-0 rounded-full border border-neutral-200 object-cover ring-2 ring-neutral-50 sm:h-12 sm:w-12"
+                                src={image || imagesDir + "/profile.webp"}
+                                alt=""
+                            />
+                        </Link>
+                    ) : (
+                        <img
+                            className="h-11 w-11 shrink-0 rounded-full border border-neutral-200 object-cover ring-2 ring-neutral-50 sm:h-12 sm:w-12"
+                            src={image || imagesDir + "/profile.webp"}
+                            alt=""
+                        />
+                    )}
                     <div className="min-w-0">
                         <h2 className="truncate text-sm font-bold text-neutral-900 sm:text-base">
-                            {authorName || "Anonymous"}
+                            {authorPath ? (
+                                <Link
+                                    to={authorPath}
+                                    className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
+                                >
+                                    {authorName || "Anonymous"}
+                                </Link>
+                            ) : (
+                                authorName || "Anonymous"
+                            )}
                         </h2>
                         <p className="mt-0.5 text-xs font-medium text-neutral-600 sm:text-sm">
                             {convertUtcToRelativeTime(date)}
