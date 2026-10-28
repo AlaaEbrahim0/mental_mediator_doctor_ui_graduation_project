@@ -114,7 +114,7 @@ Both portals share a design system defined in `tailwind.config.js`:
 - **Font:** Albert Sans
 - **Tokens:** Palette, spacing, radii, shadows, and semantic aliases all live in `tailwind.config.js`
 
-Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Comment`, …), the auth/session helpers, the API client, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`.
+Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Comment`, …), the auth/session helpers, the API client, `src/index.css`, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal — 27 files in total — by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`.
 
 Vendoring (rather than a `node_modules` import) is deliberate: `react-scripts` transpiles JSX only inside this app's `src/`, so raw-JSX sources installed from Git would fail the production build. No build-tool override (craco/rewired) was added.
 
@@ -154,12 +154,13 @@ Hosted on [Vercel](https://vercel.com) as project **`mental-mediator-doctor-ui-g
 npx vercel --prod
 ```
 
-`REACT_APP_API_URL` and `REACT_APP_IMAGE_BASE_URL` are stored in the Vercel project settings for
-Production, Preview, and Development; they are **not** read from `.env` during a hosted build.
-`REACT_APP_PATIENT_APP_URL` is currently **not** set in the Vercel project, so the "Book a session"
-link on public doctor profiles only appears in local builds that define it — set it in the
-dashboard (or `npx vercel env add REACT_APP_PATIENT_APP_URL production`) and redeploy to enable it
-in production.
+`REACT_APP_API_URL`, `REACT_APP_IMAGE_BASE_URL`, and `REACT_APP_PATIENT_APP_URL` are stored in the
+Vercel project settings; they are **not** read from `.env` during a hosted build.
+`REACT_APP_PATIENT_APP_URL` is set to `https://mental-health-ochre-xi.vercel.app` in Production and
+Development, which is what makes the "Book a session" link on public doctor profiles point at the
+live patient portal. Because `REACT_APP_*` values are inlined at build time, changing one requires a
+redeploy, not just an env edit. No `Preview` value is configured for it, since preview builds require
+a Git connection.
 
 The `vercel.json` at the project root rewrites every non-asset path to `/index.html` so
 client-side routes resolve on a hard refresh.
