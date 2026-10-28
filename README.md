@@ -1,185 +1,155 @@
-# Nexus Doctor Portal — Doctor UI
+# Nexus — Doctor Portal
 
-**Doctor Attendance & Mental Health Support Portal** — A professional graduation project (Computer Science, 2026)
-Hosted at: https://mental-mediator.onrender.com
+**React frontend for the Mental Mediator platform.** Provides clinical workflows for doctors: appointment scheduling, patient community, profile management, and real-time chat rooms.
 
----
-
-## 📦 Overview
-
-Nexus is a full-stack web application designed to streamline doctor attendance tracking and patient mental health support. This repository contains the **Doctor UI** — a React-based frontend that presents clinical workflows in a clean, production-grade interface.
-
-### What This Portal Does
-
-| Area | Purpose |
-|------|---------|
-| **Doctor Queue & Dashboard** | Real-time workload overview, patient queues, session status |
-| **Appointment Scheduling** | Book, view, and manage patient appointments with doctors |
-| **Weekly Schedule** | Visual calendar grid showing daily clinic slots and progression |
-| **Patient Records & Reviews** | Anonymized patient overview cards and consultation history |
-| **Forums & Discussions** | Anonymous peer support threads with nested replies and moderation |
-| **News & Announcements** | Clinic news, policy updates, and important notices |
-| **Stats & Charts** | Attendance metrics and session analytics at a glance |
+- **Production URL:** https://mental-mediator-doctor-ui-graduation-project.vercel.app
+- **Backend API:** https://nexus-api.runasp.net/
+- **Patient portal:** https://mental-health-ochre.vercel.app
+- **Shared UI library:** https://github.com/AlaaEbrahim0/nexus-shared-ui
 
 ---
 
-## 🚀 Quick Start
+## Features
 
-### Prerequisites
-
-- **Node.js** ≥ 18 (LTS recommended)
-- **npm** (installed with Node)
-- **Git**
-
-### Install & Run
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/AlaaEbrahim0/mental-mediator-doctor-ui-graduation-project.git
-cd mental-mediator-doctor-ui-graduation-project
-
-# 2. Install dependencies
-npm install
-
-# 3. Start the development server
-npm run dev
-```
-
-The app will be available at **http://localhost:5173**
-
-### Build for Production
-
-```bash
-npm run build
-# Output: dist/ (ready for deployment / GitHub Pages / Vercel / Render)
-```
+| Area | Description |
+|------|-------------|
+| **Dashboard** | Real-time workload overview and session status |
+| **Appointment scheduling** | Weekly schedule editor; book, confirm, reject, and cancel appointments |
+| **Public profiles** | Shareable doctor profiles with certificates, qualifications, social links, and public contact details — viewable without signing in |
+| **Profile editor** | Photo/cover upload, visibility controls, languages, interests, and practice details |
+| **Forums & discussions** | Anonymous peer-support threads with nested comments and replies |
+| **Chat rooms** | Real-time SignalR-based group chat with moderation |
+| **Notifications** | In-app real-time notifications via SignalR |
 
 ---
 
-## 🛠️ Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |-------|-----------|
-| **Framework** | React 18 (Vite) |
-| **Styling** | Tailwind CSS + DaisyUI |
-| **Components** | Framer Motion (animations), react-icons |
-| **Forms** | Formik + Yup (validation) |
-| **Charts** | Chart.js |
-| **Notifications** | React Toastify |
-| **Deployment** | Render / Vercel / GitHub Pages |
+| Framework | React 18 (Create React App) |
+| Styling | Tailwind CSS 3 + DaisyUI 4 (`nexus` theme) |
+| Forms | Formik + Yup |
+| Charts | Chart.js + react-chartjs-2 |
+| Real-time | `@microsoft/signalr` |
+| HTTP | Axios |
+| Routing | React Router v6 |
+| Shared UI | [@nexus/shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) |
 
 ---
 
-## 🎨 Design System
+## Quick start
 
-The UI is built on a consistent design system:
+### Prerequisites
 
-- **Primary palette**: Teal (`teal-500/600`) + Slate neutrals
-- **Semantic colors**: Success `emerald-500`, Warning `amber-500`, Danger `rose-600`
-- **Typography**: `Gilroy` (Sora fallback stack) with tabular-nums for schedules/timestamps
-- **Spacing**: 4px baseline scale, `rounded-xl`/`12px` border radius
-- **Shadows**: Subtle `shadow-sm` / `shadow-md` for elevation
+- Node.js ≥ 18 (LTS recommended)
+- npm
 
-### Core UI Components
+### Install and run
 
-All components are centralized in `src/components/ui/index.js`:
+```bash
+git clone https://github.com/AlaaEbrahim0/mental_mediator_doctor_ui_graduation_project.git
+cd mental_mediator_doctor_ui_graduation_project
 
-#### Base Primitives
-- **Button** — primary, secondary, ghost, danger, success, link variants; solid/outline; loading state; full width; icon support
-- **Card** — content cards with optional hover elevation, configurable shadow, padding
-- **Badge** — semantic status indicators (default, primary, success, warning, error, info); size variants
-- **Modal** — accessible dialogs with backdrop, focus trap support, responsive sizes
-- **Input / Select / Textarea** — unified styled form controls with labeled wrappers, error/success states, floating labels, accessible focus rings
-- **Avatar** — user profile images with fallback initials, multiple sizes
-- **Spinner / Skeleton** — async loading states with shimmer animations (SkeletonBlock, SkeletonText)
+npm install
 
-#### Interactive Components
-- **Alert** — success, warning, error, info feedback banners with colored icons
-- **Rating** — interactive star rating with read-only mode
-- **Toggle** — interactive on/off switch with label
-- **Switch** — styled on/off toggle with label and description
-- **Tabs** — tabbed interface component
-- **CollapsibleSection** — accordion-style expandable sections
-- **Pagination** — page navigation controls with previous/next
-- **EmptyState** — helpful empty states with optional action buttons
-- **ProgressBar** — animated progress bars with color variants
-- **StepIndicator** — multi-step progress indicator
-- **BackToTop** — scroll-to-top button with scroll detection
-- **ImageUpload** — drag-and-drop file upload with preview
-- **SearchInput** — search field with clear button and animated icon
-- **CopyToClipboard** — one-click copy with feedback
-- **ConfirmDialog** — reusable confirmation dialog
-- **CardAction** — ghost action button for cards
-- **ChatBubble** — contextual chat message bubble
-- **SocialProof** — social proof indicators
-- **WaveSection** — decorative wave divider for section separation
-- **LoadingOverlay** — full-screen background loading overlay
+cp .env.example .env
+# Edit .env — see "Environment variables" below
 
-### Dashboard Visual Elements
-- **StatCard** — metric cards with trend indicators and icon badges
-- **DataTable** — responsive tables with skeleton loading, hover states
-
----
-
-## 📁 Project Structure
-
+npm start        # http://localhost:3000
 ```
-src/
-├── components/
-│   ├── layout/     # MainLayout, Sidebar, TopBar
-│   ├── ui/         # Design system primitives (Button, Card, Modal, etc.)
-│   └── form/       # ScheduleForm, LoginForm, AppointmentForm
-├── pages/          # Dashboard, Schedule, Appointments, Forums, etc.
-├── context/        # Profile context (auth state)
-├── routes/         # Route definitions
-├── api/            # API client functions
-├── utilities/      # Helpers
-└── index.css       # Global styles + design token overrides
+
+### Build for production
+
+```bash
+npm run build    # Output: build/
 ```
 
 ---
 
-## 🔑 Available Scripts
+## Environment variables
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server (port 5173) |
-| `npm run build` | Production-ready build in `dist/` |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint |
-
----
-
-## 📜 Environment Variables
-
-Create a `.env` file by copying `.env.example`:
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Required | Usage |
-|----------|----------|-------|
-| `VITE_APP_API_URL` | Yes | Backend API base URL (e.g. `https://api.example.com/api`) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `REACT_APP_API_URL` | Yes | Backend API base URL. Production: `https://nexus-api.runasp.net/` |
+| `REACT_APP_IMAGE_BASE_URL` | No | Path to bundled static images. Default: `/images` |
+| `REACT_APP_PATIENT_APP_URL` | No | Patient portal base URL. When set, public doctor profiles show a "Book a session" link. Production: `https://mental-health-ochre.vercel.app` |
 
-> **Note:** Never commit `.env`; `.env` is already in `.gitignore`.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-ui`)
-3. Write/modify code following existing patterns
-4. Commit using [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, etc.)
-5. Push and open a Pull Request
+> `.env` is gitignored. Never commit credentials or tokens.
 
 ---
 
-## 📄 License
+## Project structure
 
-MIT © 2026 — **Alaa Ebrahim** (alaaebrahim0)
+```
+src/
+├── api/            # Axios modules (auth, community, chat, schedule, profile, appointments)
+├── auth/           # AuthProvider, session helpers, login and reset forms
+├── components/
+│   ├── chat/       # ChatMessageItem, ChatComposer, RoomMembersPanel, ReportMessageModal
+│   ├── form/       # LoginForm, WeeklyScheduleEditor, TimeOffSection, UpcomingAppointmentsCard
+│   ├── layout/     # MainLayout, Sidebar, TopBar
+│   ├── profile/    # ProfileView, CertificateModal, QualificationModal
+│   └── ui/         # Design system: Button, Card, Input, Modal, Post, Comment, Reply, …
+├── context/        # profileContext, notificationsContext
+├── hooks/          # useChatHub, useSignalR, useInView, useRefreshOnFocus
+├── pages/          # Home, Forums, ChatRooms, ChatRoom, Appointments, Schedule, Profile, ProfileEditor, PublicDoctorProfile
+├── routes/         # Route definitions + ProtectedRoute
+└── utils/          # chat helpers, date formatting
+```
 
 ---
 
-> **Project Status:** Graduation Project · PSAD 2026 · Backend API companion: [mental-mediator-api-graduation-project](https://github.com/AlaaEbrahim0/mental-mediator-api-graduation-project)
+## Design system
+
+Both portals share a design system defined in `tailwind.config.js`:
+
+- **Theme:** DaisyUI `nexus` (teal primary + slate neutrals)
+- **Font:** Albert Sans
+- **Tokens:** Palette, spacing, radii, shadows, and semantic aliases all live in `tailwind.config.js`
+
+Shared primitive components (`Button`, `Card`, `Input`, `Modal`, `Post`, `Comment`, …) are maintained in the [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) repository. To update a shared component:
+
+1. Edit the source in `nexus-shared-ui`.
+2. Push the change.
+3. In this repo: `npm install github:AlaaEbrahim0/nexus-shared-ui` and rebuild.
+
+---
+
+## Available scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Development server at `http://localhost:3000` |
+| `npm run build` | Production build in `build/` |
+| `npm test` | Run tests with Jest / React Testing Library |
+
+---
+
+## Deployment
+
+The app is deployed on [Vercel](https://vercel.com). Pushing to `master` triggers an automatic deployment.
+
+The `vercel.json` at the project root configures client-side routing rewrites so all paths correctly serve `index.html`.
+
+Production environment variables are set in the Vercel project dashboard — they are **not** read from `.env` during Vercel builds.
+
+---
+
+## Related repositories
+
+| Repository | Description |
+|-----------|-------------|
+| [mental-mediator-api-graduation-project](https://github.com/AlaaEbrahim0/mental-mediator-api-graduation-project) | ASP.NET Core 8 backend API |
+| [mental_mediator_patient_ui_graduation_project-](https://github.com/AlaaEbrahim0/mental_mediator_patient_ui_graduation_project-) | Patient portal |
+| [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) | Shared UI library |
+
+---
+
+> Graduation project · Computer Science 2026 · Alaa Ebrahim
