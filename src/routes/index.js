@@ -10,7 +10,7 @@ import { Appointments } from "../pages/Appointment";
 import { Login } from "../auth/login";
 import { Forums } from "../pages/Forums";
 import { CommunityLayout } from "../pages/CommunityLayout";
-import { ChatRooms } from "../pages/ChatRooms";
+import { Rooms } from "../pages/Rooms";
 import { ChatRoom } from "../pages/ChatRoom";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
 import { Logout } from "../auth/logout";
@@ -50,9 +50,12 @@ const router = createBrowserRouter([
                     { path: "profile", element: <Profile /> },
                     { path: "profile/edit", element: <ProfileEditor /> },
                     { path: "notifications", element: <Notifications /> },
+                    // The directory moved to its own top-level page; the old
+                    // community URL stays as a redirect so bookmarks keep working.
+                    { path: "rooms", element: <Rooms /> },
                     { path: "Community", element: <CommunityLayout />, children: [
                         { index: true, element: <Forums /> },
-                        { path: "rooms", element: <ChatRooms /> },
+                        { path: "rooms", element: <Navigate to="/rooms" replace /> },
                         { path: "rooms/:id", element: <ChatRoom /> },
                     ] },
                     { path: "forums/:id", element: <ForumsDetails /> },

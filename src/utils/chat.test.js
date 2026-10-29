@@ -16,6 +16,7 @@ import {
     mergeChatMessages,
     mergeRoomArchiveEvent,
     mergeRoomMemberEvent,
+    mergeRoomUpdateEvent,
     removeChatMember,
     upsertChatMember,
 } from "./chat";
@@ -249,6 +250,72 @@ describe("mergeRoomArchiveEvent", () => {
     it("returns the room unchanged when there is no event", () => {
         const room = buildRoom();
         expect(mergeRoomArchiveEvent(room, null)).toBe(room);
+    });
+});
+
+describe("mergeRoomUpdateEvent", () => {
+    it("merges room-level fields from a moderator broadcast", () => {
+        const merged = mergeRoomUpdateEvent(buildRoom(), {
+            id: 12,
+            name: "Renamed room",
+            visibility: "Private",
+            isPrivate: true,
+            requiresPassword: true,
+            isLocked: true,
+            isArchived: false,
+            coverImageUrl: "https://res.cloudinary.com/demo/cover.png",
+            scheduledStartAtUtc: "2026-11-01T18:00:00Z",
+            memberCount: 10,
+            ownerDisplayName: "Dr. Host",
+            ownerIsDoctor: true,
+        });
+
+        expect(merged.name).toBe("Renamed room");
+        expect(merged.isPrivate).toBe(true);
+        expect(merged.requiresPassword).toBe(true);
+        expect(merged.isLocked).toBe(true);
+        expect(merged.coverImageUrl).toBe("https://res.cloudinary.com/demo/cover.png");
+        expect(merged.scheduledStartAtUtc).toBe("2026-11-01T18:00:00Z");
+        expect(merged.memberCount).toBe(10);
+        expect(merged.ownerDisplayName).toBe("Dr. Host");
+        expect(merged.ownerIsDoctor).toBe(true);
+    });
+
+    it("never copies viewer-specific fields or description from the broadcast", () => {
+        // The payload is built for the broadcaster, so membership, role and
+        // the redacted description must survive from the local room.
+        const room = buildRoom({
+            myRole: "Member",
+            myMemberId: 44,
+            isMember: true,
+            lastMessagePreview: "mine",
+            description: "local description",
+        });
+        const merged = mergeRoomUpdateEvent(room, {
+            id: 12,
+            description: "broadcaster description",
+            isPrivate: true,
+            myRole: "Owner",
+            myMemberId: 7,
+            isMember: false,
+            lastMessagePreview: "leaked preview",
+        });
+
+        expect(merged.description).toBe("local description");
+        expect(merged.myRole).toBe("Member");
+        expect(merged.myMemberId).toBe(44);
+        expect(merged.isMember).toBe(true);
+        expect(merged.lastMessagePreview).toBe("mine");
+    });
+
+    it("clears the cover when the broadcast reports null", () => {
+        const room = buildRoom({ coverImageUrl: "https://res.cloudinary.com/demo/cover.png" });
+        expect(mergeRoomUpdateEvent(room, { id: 12, coverImageUrl: null }).coverImageUrl).toBeNull();
+    });
+
+    it("returns the room unchanged when the event is missing", () => {
+        const room = buildRoom();
+        expect(mergeRoomUpdateEvent(room, null)).toBe(room);
     });
 });
 

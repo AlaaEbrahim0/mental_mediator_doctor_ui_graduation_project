@@ -6,6 +6,8 @@ import {
     FiChevronLeft,
     FiFlag,
     FiLogOut,
+    FiPauseCircle,
+    FiPlayCircle,
     FiShield,
     FiUsers,
 } from "react-icons/fi";
@@ -24,6 +26,7 @@ import { ChatMessageItem } from "../components/chat/ChatMessageItem";
 import { ReportMessageModal } from "../components/chat/ReportMessageModal";
 import { RoomMembersPanel } from "../components/chat/RoomMembersPanel";
 import { RoomReportsPanel } from "../components/chat/RoomReportsPanel";
+import { JoinRoomModal } from "../components/ui/community";
 import { useChatHub } from "../hooks/useChatHub";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 import {
@@ -36,7 +39,9 @@ import {
     useDeleteChatMessage,
     useJoinChatRoom,
     useLeaveChatRoom,
+    useLockChatRoom,
     useSendChatMessage,
+    useUnlockChatRoom,
 } from "../api/chat.api";
 import {
     canModerateRoom,
@@ -46,6 +51,7 @@ import {
     markRoomMemberLeft,
     mergeRoomArchiveEvent,
     mergeRoomMemberEvent,
+    mergeRoomUpdateEvent,
     removeChatMember,
     upsertChatMember,
 } from "../utils/chat";
@@ -114,12 +120,16 @@ const ChatRoomView = ({ roomId }) => {
     const { execute: joinRoom } = useJoinChatRoom();
     const { execute: leaveRoom } = useLeaveChatRoom();
     const { execute: archiveRoom } = useArchiveChatRoom();
+    const { execute: lockRoom } = useLockChatRoom();
+    const { execute: unlockRoom } = useUnlockChatRoom();
     const { execute: deleteMessage } = useDeleteChatMessage();
     const { execute: sendMessage } = useSendChatMessage();
 
     const [reportTarget, setReportTarget] = useState(null);
     const [isArchiveDialogOpen, setArchiveDialogOpen] = useState(false);
     const [isLeaveDialogOpen, setLeaveDialogOpen] = useState(false);
+    const [isJoinDialogOpen, setJoinDialogOpen] = useState(false);
+    const [isLockBusy, setIsLockBusy] = useState(false);
     const [showReports, setShowReports] = useState(false);
     const [busyMessageId, setBusyMessageId] = useState(null);
     const [isSending, setIsSending] = useState(false);
@@ -251,6 +261,12 @@ const ChatRoomView = ({ roomId }) => {
             setRoom((previous) => mergeRoomArchiveEvent(previous, event));
             toast.success("This room has been archived.");
         },
+        onRoomUpdated: (event) => {
+            // Lock, privacy, schedule and cover changes made by any moderator.
+            // The actor gets a toast from the action itself, so the broadcast
+            // only updates the snapshot here.
+            setRoom((previous) => mergeRoomUpdateEvent(previous, event));
+        },
     });
 
     /**
@@ -337,11 +353,22 @@ const ChatRoomView = ({ roomId }) => {
         }
     };
 
+    // The join modal owns its own error line, so its submit path rethrows
+    // instead of toasting; the one-click path on an open room toasts.
+    const submitJoin = async (passphrase) => {
+        await joinRoom(roomId, passphrase);
+        await loadRoom();
+        toast.success("You joined the room.");
+    };
+
     const handleJoin = async () => {
+        if (room?.requiresPassword) {
+            setJoinDialogOpen(true);
+            return;
+        }
+
         try {
-            await joinRoom(roomId);
-            await loadRoom();
-            toast.success("You joined the room.");
+            await submitJoin(null);
         } catch (error) {
             toast.error(getChatErrorMessage(error, "You could not join this room."));
         }
@@ -352,10 +379,27 @@ const ChatRoomView = ({ roomId }) => {
             await leaveRoom(roomId);
             setLeaveDialogOpen(false);
             toast.success("You left the room.");
-            navigate("/Community/rooms");
+            navigate("/rooms");
         } catch (error) {
             setLeaveDialogOpen(false);
             toast.error(getChatErrorMessage(error, "You could not leave this room."));
+        }
+    };
+
+    const handleToggleLock = async () => {
+        const wasLocked = Boolean(room?.isLocked);
+        setIsLockBusy(true);
+
+        try {
+            const updated = wasLocked ? await unlockRoom(roomId) : await lockRoom(roomId);
+            if (updated) {
+                setRoom((previous) => mergeRoomUpdateEvent(previous, updated));
+            }
+            toast.success(wasLocked ? "The room is active again." : "The room is paused.");
+        } catch (error) {
+            toast.error(getChatErrorMessage(error, "The room could not be updated."));
+        } finally {
+            setIsLockBusy(false);
         }
     };
 
@@ -499,11 +543,11 @@ const ChatRoomView = ({ roomId }) => {
     return (
         <div className="w-full">
             <Link
-                to="/Community/rooms"
+                to="/rooms"
                 className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 transition hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
             >
                 <FiChevronLeft aria-hidden="true" />
-                All chat rooms
+                All rooms
             </Link>
 
             <Card className="mb-4">
@@ -542,7 +586,22 @@ const ChatRoomView = ({ roomId }) => {
                             </Button>
                         )}
 
-                        {isOwner && (
+                        {canModerate && !isArchived && (
+                            <Button
+                                variant="outline"
+                                onClick={handleToggleLock}
+                                loading={isLockBusy}
+                            >
+                                {room.isLocked ? (
+                                    <FiPlayCircle aria-hidden="true" />
+                                ) : (
+                                    <FiPauseCircle aria-hidden="true" />
+                                )}
+                                {room.isLocked ? "Resume room" : "Pause room"}
+                            </Button>
+                        )}
+
+                        {canModerate && (
                             <Button
                                 variant="outline"
                                 onClick={() => setArchiveDialogOpen(true)}
@@ -554,7 +613,11 @@ const ChatRoomView = ({ roomId }) => {
                         )}
 
                         {!isMember && (
-                            <Button onClick={handleJoin} disabled={isArchived}>
+                            <Button
+                                onClick={handleJoin}
+                                disabled={isArchived || room.isLocked}
+                                title={room.isLocked ? "This room is paused and is not accepting new members." : undefined}
+                            >
                                 Join room
                             </Button>
                         )}
@@ -566,6 +629,13 @@ const ChatRoomView = ({ roomId }) => {
                 <Alert variant="warning" title="This room is archived" className="mb-4">
                     Archived rooms are read-only. New messages are no longer accepted and
                     the room is hidden from the directory.
+                </Alert>
+            )}
+
+            {!isArchived && room.isLocked && (
+                <Alert variant="warning" title="This room is paused" className="mb-4">
+                    A moderator paused this room. The conversation stays readable, but
+                    nobody can post and no new members can join until it is resumed.
                 </Alert>
             )}
 
@@ -676,8 +746,12 @@ const ChatRoomView = ({ roomId }) => {
                             <ChatComposer
                                 onSend={handleSend}
                                 isSending={isSending}
-                                disabled={isArchived}
-                                disabledReason="This room is archived, so it is read-only."
+                                disabled={isArchived || room.isLocked}
+                                disabledReason={
+                                    room.isLocked
+                                        ? "This room is paused, so nobody can post right now."
+                                        : "This room is archived, so it is read-only."
+                                }
                             />
                         )}
                     </Card>
@@ -730,8 +804,8 @@ const ChatRoomView = ({ roomId }) => {
                                 <p className="flex items-start gap-2 text-xs leading-5 text-neutral-600">
                                     <FiShield aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
                                     <span>
-                                        You can remove messages and review reports in this
-                                        room. Only the owner can change roles or archive it.
+                                        You can remove messages, review reports, pause the
+                                        room, and archive it. Only the owner can change roles.
                                     </span>
                                 </p>
                             )}
@@ -774,6 +848,14 @@ const ChatRoomView = ({ roomId }) => {
                 title="Archive this room?"
                 message="The room becomes read-only and is hidden from the directory. This cannot be undone."
                 confirmLabel="Archive room"
+            />
+
+            <JoinRoomModal
+                isOpen={isJoinDialogOpen}
+                room={room}
+                onClose={() => setJoinDialogOpen(false)}
+                onJoined={() => setJoinDialogOpen(false)}
+                onSubmit={submitJoin}
             />
         </div>
     );

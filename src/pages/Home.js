@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, registerables, defaults } from "chart.js";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 import { BsJournalMedical } from "react-icons/bs";
 import { useGetDoctorReport } from "../api/appointments.api";
 import { MdOutlinePendingActions } from "react-icons/md";
@@ -12,6 +13,12 @@ import { FiArrowUpRight, FiBookOpen, FiClock, FiTrendingUp } from "react-icons/f
 import { FiActivity, FiCalendar, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { useUserProfile } from "../context/profileContext";
+import { useJoinChatRoom } from "../api/chat.api";
+import { useDoctorActivity, useDoctorDashboard } from "../api/workspace.api";
+import { JoinRoomModal } from "../components/ui/community";
+import { MetricCards } from "../components/dashboard/MetricCards";
+import { LiveRoomsPanel } from "../components/dashboard/LiveRoomsPanel";
+import { ActivityFeed } from "../components/dashboard/ActivityFeed";
 
 // Register components
 ChartJS.register(...registerables);
@@ -29,9 +36,33 @@ export function Home() {
     } = useGetDoctorReport();
     const { userProfileData } = useUserProfile();
 
+    const {
+        dashboard,
+        isLoading: isDashboardLoading,
+        error: dashboardError,
+        refresh: refreshDashboard,
+    } = useDoctorDashboard();
+    const {
+        activity,
+        isLoading: isActivityLoading,
+        error: activityError,
+        refresh: refreshActivity,
+    } = useDoctorActivity();
+    const { execute: joinRoom } = useJoinChatRoom();
+    const [joinTarget, setJoinTarget] = useState(null);
+
     useEffect(() => {
         executeGetReport();
     }, [executeGetReport]);
+
+    const handleJoinRoom = async (room, passphrase) => {
+        await joinRoom(room.id, passphrase);
+        toast.success(`You joined ${room.name}.`);
+        // The room is now open to this doctor, so both the "your rooms"
+        // counters and the feed can change.
+        refreshDashboard().catch(() => undefined);
+        refreshActivity().catch(() => undefined);
+    };
 
     const weekdayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const weekdayReports = [...(reportData?.appointmentsPerWeekday || [])].sort(
@@ -162,7 +193,7 @@ export function Home() {
     return (
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 p-1 text-neutral-900 sm:gap-7 sm:p-2">
             <aside className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-950" role="note">
-                <strong>Preview:</strong> Patient medical history, consultation notes, chat, prescriptions, and video sessions are not connected because the backend does not yet provide contracts for them.
+                <strong>Preview:</strong> Patient medical history, prescriptions, and video sessions are not connected because the backend does not yet provide contracts for them. Chat rooms and consultation notes are live.
             </aside>
             <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end" aria-labelledby="dashboard-title">
                 <div>
@@ -178,6 +209,33 @@ export function Home() {
                     </span>
                     <Link to="/appointments" className="btn btn-primary btn-sm min-h-10 rounded-xl px-4">View appointments <FiChevronRight aria-hidden="true" /></Link>
                     <Link to="/schedule" className="btn btn-ghost btn-sm min-h-10 rounded-xl text-neutral-700">Edit availability</Link>
+                </div>
+            </section>
+
+            {dashboardError && (
+                <p role="alert" className="rounded-xl border border-error/20 bg-error/5 px-4 py-3 text-sm font-medium text-error">
+                    Your consultation metrics could not be loaded.{" "}
+                    <button type="button" onClick={() => refreshDashboard().catch(() => undefined)} className="underline">
+                        Try again
+                    </button>
+                </p>
+            )}
+
+            <MetricCards dashboard={dashboard} />
+
+            <section className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-5" aria-label="Rooms and patient activity">
+                <LiveRoomsPanel
+                    dashboard={dashboard}
+                    isLoading={isDashboardLoading}
+                    onJoin={setJoinTarget}
+                />
+                <div className="min-w-0 lg:col-span-2">
+                    <ActivityFeed
+                        items={activity}
+                        isLoading={isActivityLoading}
+                        error={activityError}
+                        onRetry={() => refreshActivity().catch(() => undefined)}
+                    />
                 </div>
             </section>
 
@@ -218,6 +276,14 @@ export function Home() {
                     <Line data={lineData} options={lineOptions} />
                 </DashboardChartCard>
             </section>
+
+            <JoinRoomModal
+                isOpen={Boolean(joinTarget)}
+                room={joinTarget}
+                onClose={() => setJoinTarget(null)}
+                onJoined={() => setJoinTarget(null)}
+                onSubmit={(passphrase) => handleJoinRoom(joinTarget, passphrase)}
+            />
         </div>
     );
 }

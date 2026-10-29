@@ -9,6 +9,7 @@ const getTitle = (path) => {
     // The chat rooms live under /community/rooms, so the prefix rule has to
     // cover them too. The /forums prefix is kept for the forum detail page.
     if (normalizedPath.startsWith("/community") || normalizedPath.startsWith("/forums")) return "Community";
+    if (normalizedPath.startsWith("/rooms")) return "Rooms";
     if (normalizedPath === "/profile/edit") return "Edit profile";
     if (normalizedPath.startsWith("/profile")) return "Profile";
     switch (normalizedPath) {

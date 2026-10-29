@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { GrSchedules, GrSchedule } from "react-icons/gr";
 import { BiMessageSquareDetail } from "react-icons/bi";
-import { FiSettings, FiBell } from "react-icons/fi";
+import { FiSettings, FiBell, FiVideo } from "react-icons/fi";
 import { HiOutlineLogin } from "react-icons/hi";
 import { Link, NavLink } from "react-router-dom";
 import { IoIosClose } from "react-icons/io";
@@ -38,6 +38,11 @@ export function Sidebar({ isOpen, setIsOpen }) {
                 name: "Notifications",
                 icon: <FiBell className={iconStyles} />,
                 link: "/notifications",
+            },
+            {
+                name: "Rooms",
+                icon: <FiVideo className={iconStyles} />,
+                link: "/rooms",
             },
             {
                 name: "Community",

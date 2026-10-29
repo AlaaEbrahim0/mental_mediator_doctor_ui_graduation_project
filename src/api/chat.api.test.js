@@ -1,6 +1,13 @@
 import { act, renderHook } from "@testing-library/react";
 import apiClient from "./client";
-import { useChatRoom, useChatRooms, useSingleFlight } from "./chat.api";
+import {
+    getChatErrorCode,
+    getChatErrorMessage,
+    joinChatRoom,
+    useChatRoom,
+    useChatRooms,
+    useSingleFlight,
+} from "./chat.api";
 
 jest.mock("./client", () => ({
     __esModule: true,
@@ -202,7 +209,6 @@ describe("room-scoped loaders", () => {
         // The stale first-page response arrived last and must be discarded.
         expect(result.current.rooms).toEqual([{ id: 2, name: "New room" }]);
     });
-
     it("does not write an old room response into the new room", async () => {
         const firstRoom = deferred();
         const secondRoom = deferred();
@@ -244,5 +250,88 @@ describe("room-scoped loaders", () => {
         });
 
         expect(result.current.room).toEqual({ id: 2, name: "Room two" });
+    });
+});
+
+const chatError = (code, status = 400) => ({
+    response: {
+        status,
+        data: {
+            title: "Chat request failed",
+            detail: "server detail",
+            errors: [{ code, message: "server message" }],
+        },
+    },
+});
+
+describe("chat error mapping", () => {
+    it("reads the machine readable code out of the problem body", () => {
+        expect(getChatErrorCode(chatError("Chat.RoomLocked"))).toBe("Chat.RoomLocked");
+        expect(getChatErrorCode(new Error("network"))).toBeNull();
+    });
+
+    it("maps a wrong passphrase to the same copy the portal shows in a toast", () => {
+        expect(getChatErrorMessage(chatError("Chat.RoomPassphraseIncorrect", 403)))
+            .toBe("Incorrect room password. Try again.");
+        expect(getChatErrorMessage(chatError("Chat.RoomPassphraseRequired", 403)))
+            .toBe("This room needs a password to join.");
+    });
+
+    it("maps lock and archive states to actionable copy", () => {
+        expect(getChatErrorMessage(chatError("Chat.RoomLocked", 409)))
+            .toMatch(/paused/i);
+        expect(getChatErrorMessage(chatError("Chat.RoomArchived", 409)))
+            .toMatch(/archived/i);
+    });
+
+    it("maps the room management validation codes", () => {
+        expect(getChatErrorMessage(chatError("Chat.InvalidRoomPassphrase")))
+            .toMatch(/8 to 128/);
+        expect(getChatErrorMessage(chatError("Chat.InvalidScheduledStart")))
+            .toMatch(/90 days/);
+        expect(getChatErrorMessage(chatError("Chat.InvalidRoomCover")))
+            .toMatch(/image/i);
+        expect(getChatErrorMessage(chatError("Chat.CreateRoomForbidden", 403)))
+            .toMatch(/cannot create rooms/i);
+    });
+
+    it("falls back to the generic message for unknown codes and honours a custom fallback", () => {
+        expect(getChatErrorMessage(chatError("Chat.SomethingNew")))
+            .toBe("Something went wrong. Please try again.");
+        expect(getChatErrorMessage(chatError("Chat.SomethingNew"), "Custom fallback"))
+            .toBe("Custom fallback");
+    });
+
+    it("maps a bare rate limit to its dedicated copy", () => {
+        expect(getChatErrorMessage({ response: { status: 429, data: {} } }))
+            .toMatch(/rate limit/i);
+    });
+});
+
+describe("joinChatRoom", () => {
+    it("posts no body when no passphrase was collected", async () => {
+        apiClient.post.mockResolvedValueOnce({ data: { id: 12 } });
+
+        await joinChatRoom(12, null);
+
+        expect(apiClient.post).toHaveBeenCalledWith("/api/chat/rooms/12/join", undefined);
+    });
+
+    it("sends the passphrase in the documented body shape", async () => {
+        apiClient.post.mockResolvedValueOnce({ data: { id: 12 } });
+
+        await joinChatRoom(12, "correct horse battery");
+
+        expect(apiClient.post).toHaveBeenCalledWith("/api/chat/rooms/12/join", {
+            passphrase: "correct horse battery",
+        });
+    });
+
+    it("attaches the mapped copy so the shared join modal does not leak the raw detail", async () => {
+        const failure = chatError("Chat.RoomPassphraseIncorrect", 403);
+        apiClient.post.mockRejectedValueOnce(failure);
+
+        await expect(joinChatRoom(12, "nope")).rejects.toBe(failure);
+        expect(failure.friendlyMessage).toBe("Incorrect room password. Try again.");
     });
 });
