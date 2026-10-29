@@ -26,3 +26,4 @@ yarn-error.log*
 
 # The .env file itself is never committed; use .env.example as the template.
 .env
+.env*
