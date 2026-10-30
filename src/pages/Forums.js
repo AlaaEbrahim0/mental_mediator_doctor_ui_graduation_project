@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { uploadPostMedia, useCreatePost, useDeletePost, useGetPosts } from "../api/community.api";
+import { deletePost, deletePostMedia, getLatestDraft, savePostDraft, updatePost, uploadPostMedia, useCreatePost, useDeletePost, useGetPosts } from "../api/community.api";
+import { getMyChatRooms } from "../api/chat.api";
 import { getApiErrorMessage } from "../api/client";
 import toast from "react-hot-toast";
 import { PostSkeleton } from "../components/ui/PostSkeleton";
@@ -24,6 +25,9 @@ export const Forums = () => {
     const canPostDoctorsOnly = (roles || []).some((role) => typeof role === "string" && ["doctor", "admin"].includes(role.toLowerCase()));
     const { userProfileData } = useUserProfile();
     const [isModalVisible, setModalVisible] = useState(false);
+    const [latestDraft, setLatestDraft] = useState(null);
+    const [groupOptions, setGroupOptions] = useState([]);
+    const [isPublishing, setPublishing] = useState(false);
     const [isFilterVisible, setFilterVisible] = useState(false);
     const [feedSort, setFeedSort] = useState("recent");
     const sortedPosts = React.useMemo(() => [...(data || [])].sort((left, right) => {
@@ -106,9 +110,57 @@ export const Forums = () => {
 
     const { isLoading: isCreatePostLoading, execute: createPostExecute } =
         useCreatePost();
-    const handleCreatePost = async (payload) => {
+
+    useEffect(() => {
+        if (!userId) {
+            setGroupOptions([]);
+            return undefined;
+        }
+
+        let active = true;
+        getMyChatRooms()
+            .then((rooms) => {
+                if (active) {
+                    setGroupOptions(
+                        rooms.map((room) => ({ id: room.id, label: room.name }))
+                    );
+                }
+            })
+            .catch(() => {
+                if (active) setGroupOptions([]);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [userId]);
+
+    useEffect(() => {
+        if (!isModalVisible || !userId) return undefined;
+
+        let active = true;
+        getLatestDraft()
+            .then((draft) => {
+                if (active) setLatestDraft(draft);
+            })
+            .catch(() => {
+                if (active) setLatestDraft(null);
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [isModalVisible, userId]);
+
+    const handleCreatePost = async (payload, draftId) => {
         try {
-            await createPostExecute(payload);
+            if (draftId) {
+                setPublishing(true);
+                await updatePost(draftId, { ...payload, isDraft: false });
+            } else {
+                await createPostExecute(payload);
+            }
+            setLatestDraft(null);
             const nextFilters = {
                 fullname: "",
                 title: "",
@@ -129,7 +181,21 @@ export const Forums = () => {
                 className: "text-lg text-primary",
             });
             throw e;
+        } finally {
+            setPublishing(false);
         }
+    };
+
+    const handleSaveDraft = async (payload, draftId) => {
+        const saved = await savePostDraft(payload, draftId);
+        if (saved?.id) setLatestDraft(saved);
+        toast.success("Draft saved to your account");
+        return saved;
+    };
+
+    const handleDiscardDraft = async (draftId) => {
+        if (draftId) await deletePost(draftId);
+        setLatestDraft(null);
     };
 
     const handleFilter = (appliedFilters) => {
@@ -293,8 +359,13 @@ export const Forums = () => {
                         isVisible={isModalVisible}
                         onClose={handleCloseModal}
                         onCreate={handleCreatePost}
-                        loading={isCreatePostLoading}
+                        loading={isCreatePostLoading || isPublishing}
                         onUploadMedia={uploadPostMedia}
+                        onDeleteMedia={deletePostMedia}
+                        onSaveDraft={handleSaveDraft}
+                        onDiscardDraft={handleDiscardDraft}
+                        groups={groupOptions}
+                        initialDraft={latestDraft}
                         canPostDoctorsOnly={canPostDoctorsOnly}
                         currentUserId={userId}
                     />

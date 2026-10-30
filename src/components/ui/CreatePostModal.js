@@ -60,6 +60,11 @@ export const CreatePostModal = ({
     onCreate,
     loading = false,
     onUploadMedia,
+    onDeleteMedia,
+    onSaveDraft,
+    onDiscardDraft,
+    groups = [],
+    initialDraft = null,
     canPostDoctorsOnly = false,
     currentUserId,
     draftKey,
@@ -72,12 +77,15 @@ export const CreatePostModal = ({
     const [isTagListOpen, setTagListOpen] = useState(false);
     const [activeSuggestion, setActiveSuggestion] = useState(0);
     const [visibility, setVisibility] = useState(POST_VISIBILITY.PUBLIC);
+    const [targetGroupId, setTargetGroupId] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [media, setMedia] = useState([]);
     const [error, setError] = useState("");
     const [statusMessage, setStatusMessage] = useState("");
     const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
     const [isDragging, setDragging] = useState(false);
+    const [draftId, setDraftId] = useState(null);
+    const [isSavingDraft, setSavingDraft] = useState(false);
 
     const titleId = useId();
     const contentId = useId();
@@ -91,6 +99,7 @@ export const CreatePostModal = ({
     const dialogRef = useRef(null);
     const previewUrlsRef = useRef(new Set());
     const onCloseRef = useRef(onClose);
+    const cancelRef = useRef(() => onCloseRef.current?.());
 
     onCloseRef.current = onClose;
 
@@ -108,7 +117,9 @@ export const CreatePostModal = ({
         !uploadsInProgress &&
         content.trim().length > 0 &&
         POST_CATEGORIES.includes(category) &&
-        (visibility !== POST_VISIBILITY.DOCTORS_ONLY || canPostDoctorsOnly);
+        (visibility !== POST_VISIBILITY.DOCTORS_ONLY || canPostDoctorsOnly) &&
+        (visibility !== POST_VISIBILITY.SPECIFIC_GROUP ||
+            (Boolean(targetGroupId) && groups.length > 0));
     const hasDraftableContent = Boolean(
         title.trim() ||
             content.trim() ||
@@ -131,10 +142,13 @@ export const CreatePostModal = ({
         setTagQuery("");
         setTagListOpen(false);
         setVisibility(POST_VISIBILITY.PUBLIC);
+        setTargetGroupId("");
         setIsAnonymous(false);
         setMedia([]);
         setError("");
         setStatusMessage("");
+        setDraftId(null);
+        setSavingDraft(false);
     };
 
     useEffect(() => {
@@ -142,6 +156,41 @@ export const CreatePostModal = ({
 
         revokePreviews();
         resetForm();
+
+        if (initialDraft?.id) {
+            const draftVisibility = initialDraft.visibility === POST_VISIBILITY.DOCTORS_ONLY &&
+                !canPostDoctorsOnly
+                ? POST_VISIBILITY.PUBLIC
+                : initialDraft.visibility || POST_VISIBILITY.PUBLIC;
+
+            setDraftId(initialDraft.id);
+            setTitle(initialDraft.title || "");
+            setContent(initialDraft.content || "");
+            setCategory(initialDraft.category || "");
+            setTags(
+                (initialDraft.tags || "")
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter(Boolean)
+            );
+            setVisibility(draftVisibility);
+            setTargetGroupId(initialDraft.targetGroupId || "");
+            setIsAnonymous(Boolean(initialDraft.isAnonymous));
+            setMedia(
+                (initialDraft.media || []).map((item, index) => ({
+                    id: `server-draft-${index}`,
+                    kind: item.type,
+                    name: `Saved ${item.type}`,
+                    previewUrl: item.url,
+                    url: item.url,
+                    progress: 100,
+                    status: "done",
+                }))
+            );
+            setHasRestoredDraft(true);
+            setStatusMessage("Draft restored from your account.");
+            return () => revokePreviews();
+        }
 
         const draft = readPostDraft(storage, resolvedDraftKey);
         if (draft) {
@@ -155,6 +204,7 @@ export const CreatePostModal = ({
                     ? POST_VISIBILITY.PUBLIC
                     : draft.visibility
             );
+            setTargetGroupId(draft.targetGroupId || "");
             setIsAnonymous(draft.isAnonymous);
             setMedia(
                 draft.media.map((item, index) => ({
@@ -176,7 +226,7 @@ export const CreatePostModal = ({
         // The form is reset only when the modal opens; resetForm and storage
         // are recreated every render and must not retrigger it.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isVisible, resolvedDraftKey, canPostDoctorsOnly]);
+    }, [isVisible, resolvedDraftKey, canPostDoctorsOnly, initialDraft]);
 
     useEffect(() => {
         if (!isVisible) return undefined;
@@ -192,7 +242,7 @@ export const CreatePostModal = ({
         const handleKeyDown = (event) => {
             if (event.key === "Escape") {
                 event.preventDefault();
-                if (!loading) onCloseRef.current?.();
+                if (!loading) cancelRef.current?.();
                 return;
             }
             if (event.key !== "Tab") return;
@@ -367,6 +417,11 @@ export const CreatePostModal = ({
             URL.revokeObjectURL(item.previewUrl);
             previewUrlsRef.current.delete(item.previewUrl);
         }
+        if (item?.status === "done" && item.url) {
+            // A 409 is expected when the asset is attached to a saved draft;
+            // the draft update removes it safely in that case.
+            deleteUploadedMedia(item.url);
+        }
         setMedia((previous) =>
             previous.filter((candidate) => candidate.id !== id)
         );
@@ -440,37 +495,85 @@ export const CreatePostModal = ({
         }, 0);
     };
 
-    const handleSaveDraft = () => {
-        const saved = writePostDraft(storage, resolvedDraftKey, {
-            title,
-            content,
-            category,
-            tags,
-            visibility,
-            isAnonymous,
-            media: media
-                .filter((item) => item.status === "done" && item.url)
-                .map((item) => ({ url: item.url, type: item.kind })),
-        });
+    const draftPayload = () => ({
+        title: title.trim(),
+        content,
+        category: category || null,
+        tags,
+        visibility,
+        targetGroupId:
+            visibility === POST_VISIBILITY.SPECIFIC_GROUP && targetGroupId
+                ? Number(targetGroupId)
+                : null,
+        isAnonymous,
+        media: media
+            .filter((item) => item.status === "done" && item.url)
+            .map((item) => ({ url: item.url, type: item.kind })),
+    });
 
-        if (saved) {
-            const stamp = new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-            });
-            setStatusMessage(`Draft saved on this device at ${stamp}.`);
-            setError("");
-        } else {
-            setError("This browser could not store the draft.");
+    const handleSaveDraft = async () => {
+        if (isSavingDraft || !hasDraftableContent) return;
+
+        setSavingDraft(true);
+        setError("");
+
+        const payload = draftPayload();
+        const savedLocally = writePostDraft(storage, resolvedDraftKey, payload);
+
+        try {
+            if (typeof onSaveDraft === "function") {
+                const saved = await onSaveDraft(payload, draftId);
+                if (saved?.id) setDraftId(saved.id);
+                setStatusMessage("Draft saved to your account.");
+            } else if (savedLocally) {
+                const stamp = new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+                setStatusMessage(`Draft saved on this device at ${stamp}.`);
+            } else {
+                throw new Error("Draft storage is unavailable.");
+            }
+            setHasRestoredDraft(true);
+        } catch {
+            setError(
+                savedLocally
+                    ? "The draft could not be saved to your account. A copy is kept on this device."
+                    : "The draft could not be saved. Please try again."
+            );
+        } finally {
+            setSavingDraft(false);
         }
     };
 
-    const discardDraft = () => {
+    const discardDraft = async () => {
+        if (draftId && typeof onDiscardDraft === "function") {
+            try {
+                await onDiscardDraft(draftId);
+            } catch {
+                // The local copy is still cleared; the server draft can be
+                // deleted from the account later if this call failed.
+            }
+        }
         clearPostDraft(storage, resolvedDraftKey);
         resetForm();
         setHasRestoredDraft(false);
         titleRef.current?.focus();
     };
+
+    const deleteUploadedMedia = (url) => {
+        if (!url || typeof onDeleteMedia !== "function") return;
+        Promise.resolve(onDeleteMedia(url)).catch(() => undefined);
+    };
+
+    const handleCancel = () => {
+        media
+            .filter((item) => item.status === "done" && item.url)
+            .forEach((item) => deleteUploadedMedia(item.url));
+        onCloseRef.current?.();
+    };
+
+    cancelRef.current = handleCancel;
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -482,17 +585,13 @@ export const CreatePostModal = ({
         }
 
         try {
-            await onCreate?.({
-                title: title.trim(),
-                content: content.trim(),
-                category,
-                tags,
-                media: media
-                    .filter((item) => item.status === "done" && item.url)
-                    .map((item) => ({ url: item.url, type: item.kind })),
-                visibility,
-                isAnonymous,
-            });
+            await onCreate?.(
+                {
+                    ...draftPayload(),
+                    content: content.trim(),
+                },
+                draftId
+            );
             clearPostDraft(storage, resolvedDraftKey);
             onCloseRef.current?.();
         } catch {
@@ -508,7 +607,7 @@ export const CreatePostModal = ({
             className="fixed inset-0 z-modal flex items-center justify-center overflow-hidden bg-slate-950/55 p-3 sm:p-6"
             onMouseDown={(event) => {
                 if (event.target === event.currentTarget && !loading) {
-                    onCloseRef.current?.();
+                    cancelRef.current?.();
                 }
             }}
         >
@@ -550,10 +649,12 @@ export const CreatePostModal = ({
                                             key={option.value}
                                             value={option.value}
                                             disabled={
-                                                option.disabled ||
                                                 (option.value ===
                                                     POST_VISIBILITY.DOCTORS_ONLY &&
-                                                    !canPostDoctorsOnly)
+                                                    !canPostDoctorsOnly) ||
+                                                (option.value ===
+                                                    POST_VISIBILITY.SPECIFIC_GROUP &&
+                                                    groups.length === 0)
                                             }
                                         >
                                             {option.label}
@@ -563,7 +664,7 @@ export const CreatePostModal = ({
                             </label>
                             <button
                                 type="button"
-                                onClick={onClose}
+                                onClick={handleCancel}
                                 disabled={loading}
                                 aria-label="Close create post"
                                 className="rounded-lg p-2 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:opacity-50"
@@ -594,9 +695,45 @@ export const CreatePostModal = ({
                                     </button>
                                 }
                             >
-                                We restored an unpublished draft saved on this
-                                device.
+                                We restored an unpublished draft saved for this
+                                account.
                             </Alert>
+                        )}
+
+                        {visibility === POST_VISIBILITY.SPECIFIC_GROUP && (
+                            <div>
+                                <label
+                                    htmlFor={`${titleId}-group`}
+                                    className="mb-1.5 block text-sm font-semibold text-neutral-800"
+                                >
+                                    Group
+                                    <span
+                                        aria-hidden="true"
+                                        className="ml-1 text-error after:content-['*']"
+                                    />
+                                </label>
+                                <select
+                                    id={`${titleId}-group`}
+                                    value={targetGroupId || ""}
+                                    onChange={(event) =>
+                                        setTargetGroupId(event.target.value)
+                                    }
+                                    disabled={loading || groups.length === 0}
+                                    className="select select-bordered h-11 min-h-11 w-full rounded-xl border-neutral-300 bg-white text-sm text-neutral-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                                >
+                                    <option value="">Choose a group…</option>
+                                    {groups.map((group) => (
+                                        <option key={group.id} value={group.id}>
+                                            {group.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <p className="mt-1 text-xs text-neutral-600">
+                                    {groups.length === 0
+                                        ? "Join a room first to share with that group."
+                                        : "Only active members of the selected room can read this post."}
+                                </p>
+                            </div>
                         )}
 
                         <Input
@@ -977,7 +1114,7 @@ export const CreatePostModal = ({
                             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                                 <Button
                                     variant="ghost"
-                                    onClick={onClose}
+                                    onClick={handleCancel}
                                     disabled={loading}
                                 >
                                     Cancel
@@ -985,6 +1122,8 @@ export const CreatePostModal = ({
                                 <Button
                                     variant="outline"
                                     onClick={handleSaveDraft}
+                                    loading={isSavingDraft}
+                                    loadingText="Saving…"
                                     disabled={
                                         loading ||
                                         uploadsInProgress ||

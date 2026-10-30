@@ -61,11 +61,7 @@ export const POST_VISIBILITY = {
 export const POST_VISIBILITY_OPTIONS = [
     { value: POST_VISIBILITY.PUBLIC, label: "Public" },
     { value: POST_VISIBILITY.DOCTORS_ONLY, label: "Doctors Only" },
-    {
-        value: POST_VISIBILITY.SPECIFIC_GROUP,
-        label: "Specific Group (coming soon)",
-        disabled: true,
-    },
+    { value: POST_VISIBILITY.SPECIFIC_GROUP, label: "Specific Group" },
 ];
 
 export const POST_DRAFT_VERSION = 1;
@@ -208,10 +204,18 @@ export const readPostDraft = (storage, key) => {
               )
               .slice(0, POST_MAX_TAGS)
         : [];
-    const visibility =
-        parsed.visibility === POST_VISIBILITY.DOCTORS_ONLY
-            ? POST_VISIBILITY.DOCTORS_ONLY
-            : POST_VISIBILITY.PUBLIC;
+    const visibility = [
+        POST_VISIBILITY.DOCTORS_ONLY,
+        POST_VISIBILITY.SPECIFIC_GROUP,
+    ].includes(parsed.visibility)
+        ? parsed.visibility
+        : POST_VISIBILITY.PUBLIC;
+    const targetGroupId =
+        visibility === POST_VISIBILITY.SPECIFIC_GROUP &&
+        Number.isInteger(parsed.targetGroupId) &&
+        parsed.targetGroupId > 0
+            ? parsed.targetGroupId
+            : null;
     const media = sanitizeMedia(parsed.media);
     const isAnonymous = parsed.isAnonymous === true;
 
@@ -226,7 +230,16 @@ export const readPostDraft = (storage, key) => {
         return null;
     }
 
-    return { title, content, category, tags, visibility, isAnonymous, media };
+    return {
+        title,
+        content,
+        category,
+        tags,
+        visibility,
+        targetGroupId,
+        isAnonymous,
+        media,
+    };
 };
 
 export const writePostDraft = (storage, key, draft) => {
