@@ -23,22 +23,36 @@ export const getPosts = (pageNumber = 1, pageSize = 20, filters = {}) => unwrap(
     },
 }));
 export const getPostById = (id) => unwrap(apiClient.get(`/api/posts/${id}`));
-export const createPost = (title, content, postPhoto, category, tags) => {
+export const createPost = ({ title, content, category, tags, media, visibility, isAnonymous } = {}) => {
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
+    formData.append("title", title ?? "");
+    formData.append("content", content ?? "");
     if (category) formData.append("category", category);
-    if (tags) formData.append("tags", tags);
-    if (postPhoto) formData.append("photoPost", postPhoto);
+    if (tags?.length) formData.append("tags", tags.join(","));
+    if (media?.length) formData.append("media", JSON.stringify(media));
+    if (visibility) formData.append("visibility", visibility);
+    formData.append("isAnonymous", String(Boolean(isAnonymous)));
     return unwrap(apiClient.post("/api/posts", formData, moderation));
 };
-export const updatePost = (id, title, content, postPhoto, category, tags) => {
+export const updatePost = (id, { title, content } = {}) => {
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    if (category) formData.append("category", category);
-    if (tags) formData.append("tags", tags);
+    formData.append("title", title ?? "");
+    formData.append("content", content ?? "");
     return unwrap(apiClient.put(`/api/posts/${id}`, formData, moderation));
+};
+export const uploadPostMedia = (file, onUploadProgress) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return unwrap(apiClient.post("/api/posts/media", formData, {
+        // Videos can be up to 20 MB, which outlives the default request budget.
+        timeout: 120000,
+        onUploadProgress: (event) => {
+            const percent = event.total
+                ? Math.round((event.loaded * 100) / event.total)
+                : Math.round((event.progress || 0) * 100);
+            onUploadProgress?.(percent);
+        },
+    }));
 };
 export const deletePost = (id) => unwrap(apiClient.delete(`/api/posts/${id}`));
 export const setPostLike = (id, liked) => unwrap(liked ? apiClient.put(`/api/posts/${id}/like`) : apiClient.delete(`/api/posts/${id}/like`));

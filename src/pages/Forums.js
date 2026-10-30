@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useCreatePost, useDeletePost, useGetPosts } from "../api/community.api";
+import { uploadPostMedia, useCreatePost, useDeletePost, useGetPosts } from "../api/community.api";
 import { getApiErrorMessage } from "../api/client";
 import toast from "react-hot-toast";
 import { PostSkeleton } from "../components/ui/PostSkeleton";
@@ -20,7 +20,8 @@ export const Forums = () => {
     const { isLoadingDelete, execute: executeDelete } = useDeletePost();
     const navigate = useNavigate();
     const location = useLocation();
-    const { userId } = useAuth();
+    const { userId, roles } = useAuth();
+    const canPostDoctorsOnly = (roles || []).some((role) => typeof role === "string" && ["doctor", "admin"].includes(role.toLowerCase()));
     const { userProfileData } = useUserProfile();
     const [isModalVisible, setModalVisible] = useState(false);
     const [isFilterVisible, setFilterVisible] = useState(false);
@@ -105,31 +106,29 @@ export const Forums = () => {
 
     const { isLoading: isCreatePostLoading, execute: createPostExecute } =
         useCreatePost();
-    const handleCreatePost = async (title, content, postPhoto, category, tags) => {
-        if (!title || !content) {
-            toast.error("Title and content are required");
-            return;
-        }
+    const handleCreatePost = async (payload) => {
         try {
-            await createPostExecute(title, content, postPhoto, category, tags);
-            reset();
-            setFilters({
+            await createPostExecute(payload);
+            const nextFilters = {
                 fullname: "",
                 title: "",
                 content: "",
                 from: "",
                 to: "",
-                showConfessions: false,
-            });
-            await execute(1, 20, filters);
+                showConfessions: Boolean(payload.isAnonymous),
+            };
+            reset();
+            setFilters(nextFilters);
+            await execute(1, 20, nextFilters);
             setModalVisible(false);
-            toast.success("Post created successfully");
+            toast.success(payload.isAnonymous ? "Anonymous post published under Confessions" : "Post created successfully");
         } catch (e) {
             toast.error(getApiErrorMessage(e, "Could not create your post. Please try again."), {
                 duration: 4000,
                 position: "top-center",
                 className: "text-lg text-primary",
             });
+            throw e;
         }
     };
 
@@ -201,7 +200,7 @@ export const Forums = () => {
                                 </div>
                             </div>
                             {isFilterVisible && (
-                                <div className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto bg-slate-950/50 p-3 sm:p-6">
+                                <div className="fixed inset-0 z-modal flex items-start justify-center overflow-y-auto bg-slate-950/50 p-3 sm:p-6">
                                     <FilterationComponent
                                         onClose={toggleShowFilters}
                                         onFilter={handleFilter}
@@ -281,7 +280,7 @@ export const Forums = () => {
                                     {activeDiscussions.length ? <ul className="space-y-2">
                                         {activeDiscussions.map((post) => <li key={post.id}>
                                             <button type="button" onClick={() => navigate(`/forums/${post.id}`)} className="w-full rounded-xl p-3 text-left transition-colors hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600">
-                                                <span className="block line-clamp-2 text-sm font-semibold text-neutral-800">{post.title}</span>
+                                                <span className="block line-clamp-2 text-sm font-semibold text-neutral-800">{post.title || "Untitled discussion"}</span>
                                                 <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-neutral-600"><FiMessageCircle aria-hidden="true" /> {post.commentsCount} comments</span>
                                             </button>
                                         </li>)}
@@ -295,6 +294,9 @@ export const Forums = () => {
                         onClose={handleCloseModal}
                         onCreate={handleCreatePost}
                         loading={isCreatePostLoading}
+                        onUploadMedia={uploadPostMedia}
+                        canPostDoctorsOnly={canPostDoctorsOnly}
+                        currentUserId={userId}
                     />
                 </InfiniteScroll>
             </motion.div>
@@ -338,6 +340,8 @@ const AnimatedPost = ({
                 date={post.postedOn}
                 image={post.photoUrl}
                 postPhoto={post.postPhotoUrl}
+                media={post.media}
+                isOwnPost={post.isOwnPost}
                 commentCount={post.commentsCount}
                 likesCount={post.likesCount}
                 isLikedByCurrentUser={post.isLikedByCurrentUser}

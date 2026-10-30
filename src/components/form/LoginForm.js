@@ -291,8 +291,8 @@ const ForgetPasswordCustomModal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-950/55 p-4">
-            <div role="dialog" aria-modal="true" aria-labelledby="password-reset-title" className="relative w-full max-w-md rounded-2xl border border-neutral-200 bg-base-100 p-6 shadow-2xl">
+        <div className="fixed inset-0 z-modal flex items-start justify-center overflow-y-auto bg-slate-950/55 p-4">
+            <div role="dialog" aria-modal="true" aria-labelledby="password-reset-title" className="relative my-auto w-full max-w-md rounded-2xl border border-neutral-200 bg-base-100 p-6 shadow-2xl">
                 <button
                     type="button"
                     aria-label="Close password reset"

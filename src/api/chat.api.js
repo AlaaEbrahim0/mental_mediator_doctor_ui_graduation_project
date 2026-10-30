@@ -53,6 +53,10 @@ export const joinChatRoom = async (roomId, passphrase) => {
 export const leaveChatRoom = (roomId) =>
     apiClient.post(`/api/chat/rooms/${roomId}/leave`).then(() => undefined);
 
+// Marks the caller's read position in the room. Answers 204, like leave.
+export const markChatRoomRead = (roomId) =>
+    apiClient.put(`/api/chat/rooms/${roomId}/read`).then(() => undefined);
+
 export const getChatRoomMembers = (roomId) =>
     request(apiClient.get(`/api/chat/rooms/${roomId}/members`));
 

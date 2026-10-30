@@ -113,7 +113,7 @@ function AppointmentModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto bg-slate-950/55 p-3 backdrop-blur-sm sm:p-6"
+            className="fixed inset-0 z-modal flex items-start justify-center overflow-y-auto bg-slate-950/55 p-3 backdrop-blur-sm sm:p-6"
             onMouseDown={(event) => event.target === event.currentTarget && !loading && onClose()}
         >
             <motion.section
@@ -122,7 +122,7 @@ function AppointmentModal({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="appointment-modal-title"
-                className="w-full max-w-xl rounded-2xl border border-base-200 bg-base-100 p-5 shadow-2xl sm:p-7"
+                className="my-auto w-full max-w-xl rounded-2xl border border-base-200 bg-base-100 p-5 shadow-2xl sm:p-7"
             >
                 <div className="flex items-start justify-between gap-4">
                     <div>
@@ -272,7 +272,7 @@ export function Appointments({ pageSize = 7 }) {
     return (
         <section className="w-full min-w-0 rounded-2xl border border-base-200 bg-base-100 p-4 shadow-sm sm:p-6 lg:p-7">
             {isFilterVisible && (
-                <div className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto bg-slate-950/55 p-3 backdrop-blur-sm sm:p-6">
+                <div className="fixed inset-0 z-modal flex items-start justify-center overflow-y-auto bg-slate-950/55 p-3 backdrop-blur-sm sm:p-6">
                     <AppointmentsFilterationComponent
                         initialFilters={filterData}
                         onClose={() => setFilterVisible(false)}
