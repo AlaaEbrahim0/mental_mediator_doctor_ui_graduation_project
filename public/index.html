@@ -24,7 +24,20 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-        <title>Nexus</title>
+            <script>
+            (function () {
+                try {
+                    var stored = window.localStorage.getItem("nexus-theme");
+                    var dark = stored
+                        ? stored === "dark"
+                        : window.matchMedia("(prefers-color-scheme: dark)").matches;
+                    document.documentElement.setAttribute("data-theme", dark ? "dark" : "nexus");
+                } catch (error) {
+                    document.documentElement.setAttribute("data-theme", "nexus");
+                }
+            })();
+        </script>
+    <title>Nexus</title>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -1,23 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import { FiBell, FiLogOut, FiUser } from "react-icons/fi";
 import { useNotifications } from "../../context/notificationsContext";
 import { useUserProfile } from "../../context/profileContext";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { Notification } from "../ui/Notification";
 
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export const TopBar = ({ title = "Nexus", toggleSidebar, sidebarOpen = false }) => {
-    const location = useLocation();
     const { notifications = [], count = 0, loading, markAllAsRead } = useNotifications();
     const { userProfileData } = useUserProfile();
     const displayName = [userProfileData?.firstName, userProfileData?.lastName]
         .filter(Boolean)
         .join(" ") || "Your profile";
-    // The chat rooms live under /community/rooms; keep the notification
-    // actions aligned when the composer shortcut is absent.
-    const isCommunityView = location.pathname.toLowerCase().startsWith("/community") || location.pathname.toLowerCase().startsWith("/forums");
-
     return (
         <header className="sticky top-0 z-sticky flex min-h-16 min-w-0 items-center gap-2 border-b border-neutral-200 bg-base-100/95 px-3 shadow-sm backdrop-blur sm:gap-4 sm:px-5">
             <button
@@ -38,15 +34,17 @@ export const TopBar = ({ title = "Nexus", toggleSidebar, sidebarOpen = false }) 
             <span className="hidden h-6 border-l border-neutral-200 lg:block" aria-hidden="true" />
             <h1 className="hidden min-w-0 truncate text-base font-semibold text-neutral-800 lg:block">{title}</h1>
 
+            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-1 sm:gap-2">
+            <ThemeToggle />
             <Link
                 to="/notifications"
-                className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl text-neutral-700 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 md:hidden ${isCommunityView ? "ml-auto" : ""}`}
+                className="relative grid h-10 w-10 shrink-0 place-items-center rounded-xl text-neutral-700 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 md:hidden"
                 aria-label={`View notifications${count ? `, ${count} unread` : ""}`}
             >
                 <FiBell aria-hidden="true" className="text-xl" />
                 {count > 0 && <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[10px] font-bold leading-none text-white">{count > 99 ? "99+" : count}</span>}
             </Link>
-            <div className={`dropdown dropdown-end hidden shrink-0 md:block ${isCommunityView ? "ml-auto" : ""}`}>
+            <div className="dropdown dropdown-end hidden shrink-0 md:block">
                 <button type="button" tabIndex={0} className="relative rounded-xl p-2.5 text-neutral-700 transition hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700" aria-label={`Notifications${count ? `, ${count} unread` : ""}`}>
                     <FiBell aria-hidden="true" className="text-xl" />
                     {count > 0 && <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-error px-1 text-[10px] font-bold leading-none text-white">{count > 99 ? "99+" : count}</span>}
@@ -76,6 +74,7 @@ export const TopBar = ({ title = "Nexus", toggleSidebar, sidebarOpen = false }) 
                     <li><Link to="/profile" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-800 hover:bg-neutral-100"><FiUser aria-hidden="true" /> Profile</Link></li>
                     <li><Link to="/logout" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-800 hover:bg-neutral-100"><FiLogOut aria-hidden="true" /> Sign out</Link></li>
                 </ul>
+            </div>
             </div>
         </header>
     );
