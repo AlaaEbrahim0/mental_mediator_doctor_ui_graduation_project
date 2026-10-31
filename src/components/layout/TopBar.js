@@ -1,6 +1,6 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-import { FiBell, FiLogOut, FiPlus, FiUser } from "react-icons/fi";
+import { FiBell, FiLogOut, FiUser } from "react-icons/fi";
 import { useNotifications } from "../../context/notificationsContext";
 import { useUserProfile } from "../../context/profileContext";
 import { Notification } from "../ui/Notification";
@@ -8,19 +8,15 @@ import { Notification } from "../ui/Notification";
 const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL;
 
 export const TopBar = ({ title = "Nexus", toggleSidebar, sidebarOpen = false }) => {
-    const navigate = useNavigate();
     const location = useLocation();
     const { notifications = [], count = 0, loading, markAllAsRead } = useNotifications();
     const { userProfileData } = useUserProfile();
     const displayName = [userProfileData?.firstName, userProfileData?.lastName]
         .filter(Boolean)
         .join(" ") || "Your profile";
-    // The chat rooms live under /community/rooms. The "Create post" button
-    // belongs to the forums page only, so it is hidden across the whole
-    // community section.
+    // The chat rooms live under /community/rooms; keep the notification
+    // actions aligned when the composer shortcut is absent.
     const isCommunityView = location.pathname.toLowerCase().startsWith("/community") || location.pathname.toLowerCase().startsWith("/forums");
-
-    const openPostComposer = () => navigate("/Community", { state: { openCreatePost: true } });
 
     return (
         <header className="sticky top-0 z-sticky flex min-h-16 min-w-0 items-center gap-2 border-b border-neutral-200 bg-base-100/95 px-3 shadow-sm backdrop-blur sm:gap-4 sm:px-5">
@@ -41,10 +37,6 @@ export const TopBar = ({ title = "Nexus", toggleSidebar, sidebarOpen = false }) 
             </Link>
             <span className="hidden h-6 border-l border-neutral-200 lg:block" aria-hidden="true" />
             <h1 className="hidden min-w-0 truncate text-base font-semibold text-neutral-800 lg:block">{title}</h1>
-
-            {!isCommunityView && <button type="button" onClick={openPostComposer} className="ml-auto inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary-700 p-2.5 text-sm font-semibold text-white transition hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2 sm:px-3 sm:py-2">
-                <FiPlus aria-hidden="true" /> <span className="hidden md:inline">Create post</span>
-            </button>}
 
             <Link
                 to="/notifications"

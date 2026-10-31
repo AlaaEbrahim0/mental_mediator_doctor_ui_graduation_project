@@ -10,6 +10,7 @@ const getTitle = (path) => {
     // cover them too. The /forums prefix is kept for the forum detail page.
     if (normalizedPath.startsWith("/community") || normalizedPath.startsWith("/forums")) return "Community";
     if (normalizedPath.startsWith("/rooms")) return "Rooms";
+    if (normalizedPath.startsWith("/workspace")) return "Patient workspace";
     if (normalizedPath === "/profile/edit") return "Edit profile";
     if (normalizedPath.startsWith("/profile")) return "Profile";
     switch (normalizedPath) {

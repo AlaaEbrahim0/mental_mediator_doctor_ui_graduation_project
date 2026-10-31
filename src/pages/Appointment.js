@@ -2,12 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-    FiCalendar,
     FiCheck,
-    FiClock,
     FiFilter,
     FiInbox,
-    FiMail,
     FiRefreshCw,
     FiX,
 } from "react-icons/fi";
@@ -92,6 +89,83 @@ function AppointmentDetails({ appointment }) {
                 <p className="mt-1 font-semibold text-slate-900">{appointment.fees != null ? `${appointment.fees} EGP` : "Not specified"}</p>
             </div>
             {appointment.reason && <div className="sm:col-span-3"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Client’s reason</p><p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{appointment.reason}</p></div>}
+        </div>
+    );
+}
+
+function ClientIdentity({ appointment, userId }) {
+    const client = appointment.clientName || "Client";
+    const clientPath = getMemberProfilePath(appointment.userId, userId);
+    return (
+        <div className="flex min-w-0 items-center gap-2.5">
+            {appointment.clientPhotoUrl ? (
+                clientPath ? (
+                    <Link
+                        to={clientPath}
+                        aria-label={`View ${client}'s profile`}
+                        className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                    >
+                        <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-9 w-9 shrink-0 rounded-full border border-base-200 object-cover" />
+                    </Link>
+                ) : (
+                    <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-9 w-9 shrink-0 rounded-full border border-base-200 object-cover" />
+                )
+            ) : clientPath ? (
+                <Link
+                    to={clientPath}
+                    aria-label={`View ${client}'s profile`}
+                    className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
+                >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">{getInitials(client)}</span>
+                </Link>
+            ) : (
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">{getInitials(client)}</span>
+            )}
+            <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-900">
+                    {clientPath ? (
+                        <Link to={clientPath} className="rounded hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700">
+                            {client}
+                        </Link>
+                    ) : client}
+                </p>
+                <p className="truncate text-xs text-slate-600">{appointment.clientEmail || "No email provided"}</p>
+            </div>
+        </div>
+    );
+}
+
+function AppointmentActions({
+    appointment,
+    userId,
+    onConfirm,
+    onReject,
+    onComplete,
+    completeLoading,
+    fullWidth = false,
+}) {
+    const pending = appointment.status?.toLowerCase() === "pending";
+    const confirmed = appointment.status?.toLowerCase() === "confirmed";
+    return (
+        <div className={`flex flex-wrap items-center gap-1.5 ${fullWidth ? "w-full" : "justify-end"}`}>
+            {appointment.userId && (
+                <Link
+                    to={`/workspace/patients/${encodeURIComponent(appointment.userId)}`}
+                    className="btn btn-ghost btn-sm min-h-9 border border-slate-300 px-2.5 text-xs text-slate-700 hover:bg-neutral-100"
+                >
+                    History
+                </Link>
+            )}
+            {pending ? (
+                <>
+                    <button type="button" onClick={() => onConfirm(appointment)} className="btn btn-primary btn-sm min-h-9 px-2.5 text-xs">Confirm</button>
+                    <button type="button" onClick={() => onReject(appointment)} className="btn btn-ghost btn-sm min-h-9 border border-slate-300 px-2.5 text-xs text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700">Decline</button>
+                </>
+            ) : confirmed ? (
+                <button type="button" onClick={() => onComplete(appointment)} disabled={completeLoading} className="btn btn-outline btn-sm min-h-9 border-sky-300 px-2.5 text-xs text-sky-800">
+                    {completeLoading ? "Updating…" : "Complete"}
+                </button>
+            ) : null}
         </div>
     );
 }
@@ -330,86 +404,46 @@ export function Appointments({ pageSize = 7 }) {
                         </div>
                     ) : (
                         <>
-                            <div className="overflow-x-auto">
-                                <table className="w-full min-w-[700px] border-collapse text-left">
-                                    <thead className="bg-base-200/80 text-xs font-semibold uppercase tracking-wider text-slate-600">
+                            <div className="hidden lg:block">
+                                <table className="w-full table-fixed border-collapse text-left">
+                                    <caption className="sr-only">Appointment requests</caption>
+                                    <colgroup>
+                                        <col className="w-[30%]" />
+                                        <col className="w-[20%]" />
+                                        <col className="w-[14%]" />
+                                        <col className="w-[15%]" />
+                                        <col className="w-[21%]" />
+                                    </colgroup>
+                                    <thead className="bg-base-200/80 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
                                         <tr>
-                                            <th scope="col" className="px-4 py-3">Client</th>
-                                            <th scope="col" className="px-4 py-3">Date & time</th>
-                                            <th scope="col" className="px-4 py-3">Duration</th>
-                                            <th scope="col" className="px-4 py-3">Status</th>
-                                            <th scope="col" className="px-4 py-3 text-right">Actions</th>
+                                            <th scope="col" className="px-3 py-2.5">Client</th>
+                                            <th scope="col" className="px-3 py-2.5">Date &amp; time</th>
+                                            <th scope="col" className="px-3 py-2.5">Duration</th>
+                                            <th scope="col" className="px-3 py-2.5">Status</th>
+                                            <th scope="col" className="px-3 py-2.5 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-base-200">
                                         {appointments.map((appointment) => {
                                             const dateTime = formatDateTime(appointment.startTime);
-                                            const pending = appointment.status?.toLowerCase() === "pending";
-                                            const confirmed = appointment.status?.toLowerCase() === "confirmed";
-                                            const client = appointment.clientName || "Client";
-                                            const clientPath = getMemberProfilePath(
-                                                appointment.userId,
-                                                userId
-                                            );
                                             return (
-                                                <motion.tr key={appointment.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="group transition-colors hover:bg-base-200/40">
-                                                    <td className="px-4 py-3">
-                                                        <div className="flex min-w-0 items-center gap-3">
-                                                            {appointment.clientPhotoUrl ? (
-                                                                clientPath ? (
-                                                                    <Link
-                                                                        to={clientPath}
-                                                                        aria-label={`View ${client}'s profile`}
-                                                                        className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
-                                                                    >
-                                                                        <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-full border border-base-200 object-cover" />
-                                                                    </Link>
-                                                                ) : (
-                                                                    <img src={appointment.clientPhotoUrl} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-full border border-base-200 object-cover" />
-                                                                )
-                                                            ) : clientPath ? (
-                                                                <Link
-                                                                    to={clientPath}
-                                                                    aria-label={`View ${client}'s profile`}
-                                                                    className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
-                                                                >
-                                                                    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">{getInitials(client)}</div>
-                                                                </Link>
-                                                            ) : (
-                                                                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">{getInitials(client)}</div>
-                                                            )}
-                                                            <div className="min-w-0">
-                                                                <p className="truncate font-semibold text-slate-900">
-                                                                    {clientPath ? (
-                                                                        <Link
-                                                                            to={clientPath}
-                                                                            className="rounded transition hover:text-primary-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
-                                                                        >
-                                                                            {client}
-                                                                        </Link>
-                                                                    ) : (
-                                                                        client
-                                                                    )}
-                                                                </p>
-                                                                <p className="mt-0.5 flex min-w-0 items-center gap-1.5 truncate text-sm text-slate-600"><FiMail className="shrink-0 text-slate-400" aria-hidden="true" /><span className="truncate">{appointment.clientEmail || "No email provided"}</span></p>
-                                                            </div>
-                                                        </div>
+                                                <motion.tr key={appointment.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="align-middle transition-colors hover:bg-base-200/40">
+                                                    <td className="min-w-0 px-3 py-2.5"><ClientIdentity appointment={appointment} userId={userId} /></td>
+                                                    <td className="px-3 py-2.5 text-sm">
+                                                        <p className="whitespace-nowrap font-semibold text-slate-900">{dateTime?.date || "Date unavailable"}</p>
+                                                        <p className="mt-0.5 whitespace-nowrap text-xs text-slate-600">{dateTime?.time || "Time unavailable"}</p>
                                                     </td>
-                                                    <td className="px-4 py-3">
-                                                        <p className="flex items-center gap-2 whitespace-nowrap font-semibold text-slate-900"><FiCalendar className="shrink-0 text-primary" aria-hidden="true" /><span>{dateTime?.date || "Date unavailable"}</span></p>
-                                                        <p className="mt-1 whitespace-nowrap pl-6 text-sm text-slate-600">{dateTime?.time || "Time unavailable"}</p>
-                                                    </td>
-                                                    <td className="px-4 py-3"><span className="inline-flex items-center gap-2 text-sm font-medium text-slate-700"><FiClock className="text-slate-400" aria-hidden="true" />{formatDuration(appointment.duration)}</span></td>
-                                                    <td className="px-4 py-3"><StatusBadge status={appointment.status} /></td>
-                                                    <td className="px-4 py-3 text-right">
-                                                        {pending ? (
-                                                            <div className="flex justify-end gap-2">
-                                                                <button type="button" onClick={() => openModal(appointment, "confirm")} className="btn btn-sm btn-primary">Confirm</button>
-                                                                <button type="button" onClick={() => openModal(appointment, "reject")} className="btn btn-sm btn-ghost border border-slate-300 text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700">Decline</button>
-                                                            </div>
-                                                        ) : confirmed ? (
-                                                            <button type="button" onClick={() => handleComplete(appointment)} disabled={completeIsLoading} className="btn btn-sm btn-outline border-sky-300 text-sky-800">{completeIsLoading ? "Updating…" : "Complete"}</button>
-                                                        ) : <span className="text-sm text-slate-500">No action needed</span>}
+                                                    <td className="px-3 py-2.5 text-xs font-medium text-slate-700">{formatDuration(appointment.duration)}</td>
+                                                    <td className="px-3 py-2.5"><StatusBadge status={appointment.status} /></td>
+                                                    <td className="px-3 py-2.5">
+                                                        <AppointmentActions
+                                                            appointment={appointment}
+                                                            userId={userId}
+                                                            onConfirm={(item) => openModal(item, "confirm")}
+                                                            onReject={(item) => openModal(item, "reject")}
+                                                            onComplete={handleComplete}
+                                                            completeLoading={completeIsLoading}
+                                                        />
                                                     </td>
                                                 </motion.tr>
                                             );
@@ -417,6 +451,39 @@ export function Appointments({ pageSize = 7 }) {
                                     </tbody>
                                 </table>
                             </div>
+
+                            <ul className="divide-y divide-base-200 lg:hidden" aria-label="Appointment requests">
+                                {appointments.map((appointment) => {
+                                    const dateTime = formatDateTime(appointment.startTime);
+                                    return (
+                                        <li key={appointment.id} className="space-y-3 px-4 py-4">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <ClientIdentity appointment={appointment} userId={userId} />
+                                                <StatusBadge status={appointment.status} />
+                                            </div>
+                                            <dl className="grid grid-cols-2 gap-2 text-sm">
+                                                <div>
+                                                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Date &amp; time</dt>
+                                                    <dd className="mt-0.5 font-semibold text-slate-900">{dateTime ? `${dateTime.date} · ${dateTime.time}` : "Not specified"}</dd>
+                                                </div>
+                                                <div>
+                                                    <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Duration</dt>
+                                                    <dd className="mt-0.5 text-slate-700">{formatDuration(appointment.duration)}</dd>
+                                                </div>
+                                            </dl>
+                                            <AppointmentActions
+                                                appointment={appointment}
+                                                userId={userId}
+                                                onConfirm={(item) => openModal(item, "confirm")}
+                                                onReject={(item) => openModal(item, "reject")}
+                                                onComplete={handleComplete}
+                                                completeLoading={completeIsLoading}
+                                                fullWidth
+                                            />
+                                        </li>
+                                    );
+                                })}
+                            </ul>
                             <div className="flex flex-col gap-3 border-t border-base-200 bg-base-100 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                                 <p className="text-sm text-slate-600">Page <span className="font-semibold text-slate-900">{pageNumber}</span> · {appointments.length} appointment{appointments.length === 1 ? "" : "s"}</p>
                                 <div className="flex items-center gap-2 self-end sm:self-auto">

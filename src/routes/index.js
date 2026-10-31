@@ -13,8 +13,11 @@ import { CommunityLayout } from "../pages/CommunityLayout";
 import { Rooms } from "../pages/Rooms";
 import { ChatRoom } from "../pages/ChatRoom";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
+import { RootScrollLayout } from "../components/routing/ScrollManager";
 import { Logout } from "../auth/logout";
 import { Schedule } from "../pages/Schedule";
+import { Workspace } from "../pages/Workspace";
+import { PatientHistoryView } from "../pages/PatientHistoryView";
 import { ForumsDetails } from "../pages/ForumsDetails";
 import { Profile } from "../pages/Profile";
 import { ProfileEditor } from "../pages/ProfileEditor";
@@ -31,6 +34,9 @@ const LoginRoute = () => {
 // router whenever auth state changes can repeatedly remount <Navigate> and
 // trigger a redirect/update loop.
 const router = createBrowserRouter([
+    {
+        element: <RootScrollLayout />,
+        children: [
     { path: "forgetpassword/resetpassword", element: <ResetPassword /> },
     { path: "forgetPassword", element: <ResetPassword /> },
     { path: "/login", element: <LoginRoute /> },
@@ -47,6 +53,8 @@ const router = createBrowserRouter([
                     { path: "/", element: <Home /> },
                     { path: "appointments", element: <Appointments /> },
                     { path: "schedule", element: <Schedule /> },
+                    { path: "workspace", element: <Workspace /> },
+                    { path: "workspace/patients/:patientId", element: <PatientHistoryView /> },
                     { path: "profile", element: <Profile /> },
                     { path: "profile/edit", element: <ProfileEditor /> },
                     { path: "notifications", element: <Notifications /> },
@@ -65,6 +73,8 @@ const router = createBrowserRouter([
         ],
     },
     { path: "*", element: <Navigate to="/" replace /> },
+        ],
+    },
 ]);
 
 const Routes = () => <RouterProvider router={router} />;
