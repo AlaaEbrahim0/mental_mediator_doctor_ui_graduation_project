@@ -7,8 +7,8 @@ import apiClient from "./client";
 
 const request = async (promise) => (await promise).data;
 
-export const getDoctorDashboard = () =>
-    request(apiClient.get("/api/doctors/me/dashboard"));
+export const getDoctorDashboard = (days = 30) =>
+    request(apiClient.get("/api/doctors/me/dashboard", { params: { days } }));
 
 export const getDoctorActivity = (params = {}) =>
     request(apiClient.get("/api/doctors/me/activity", { params }));
@@ -38,7 +38,7 @@ export const updateFollowUp = (followUpId, payload) =>
  * the cards do not collapse to skeletons on every visit; the error is exposed
  * separately and does not clear the last good snapshot.
  */
-export function useDoctorDashboard() {
+export function useDoctorDashboard(days = 30) {
     const [dashboard, setDashboard] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -52,7 +52,7 @@ export function useDoctorDashboard() {
         setError(null);
 
         try {
-            const result = await getDoctorDashboard();
+            const result = await getDoctorDashboard(days);
             if (requestIdRef.current !== requestId) return null;
 
             setDashboard(result);
@@ -67,7 +67,7 @@ export function useDoctorDashboard() {
                 setIsLoading(false);
             }
         }
-    }, []);
+    }, [days]);
 
     useEffect(() => {
         load().catch(() => {});

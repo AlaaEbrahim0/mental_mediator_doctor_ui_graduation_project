@@ -17,6 +17,7 @@ import { useJoinChatRoom } from "../api/chat.api";
 import { useDoctorActivity, useDoctorDashboard } from "../api/workspace.api";
 import { JoinRoomModal } from "../components/ui/community";
 import { MetricCards } from "../components/dashboard/MetricCards";
+import { DashboardInsights } from "../components/dashboard/DashboardInsights";
 import { LiveRoomsPanel } from "../components/dashboard/LiveRoomsPanel";
 import { ActivityFeed } from "../components/dashboard/ActivityFeed";
 
@@ -35,13 +36,14 @@ export function Home() {
         data: reportData,
     } = useGetDoctorReport();
     const { userProfileData } = useUserProfile();
+    const [dashboardDays, setDashboardDays] = useState(30);
 
     const {
         dashboard,
         isLoading: isDashboardLoading,
         error: dashboardError,
         refresh: refreshDashboard,
-    } = useDoctorDashboard();
+    } = useDoctorDashboard(dashboardDays);
     const {
         activity,
         isLoading: isActivityLoading,
@@ -222,6 +224,13 @@ export function Home() {
             )}
 
             <MetricCards dashboard={dashboard} />
+
+            <DashboardInsights
+                dashboard={dashboard}
+                days={dashboardDays}
+                onDaysChange={setDashboardDays}
+                isLoading={isDashboardLoading}
+            />
 
             <section className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-5" aria-label="Rooms and patient activity">
                 <LiveRoomsPanel

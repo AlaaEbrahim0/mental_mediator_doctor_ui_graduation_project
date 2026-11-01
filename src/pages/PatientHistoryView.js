@@ -10,15 +10,18 @@ export const PatientHistoryView = () => {
     const { patientId } = useParams();
     const [history, setHistory] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
+    const [category, setCategory] = useState("all");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const load = useCallback(async (page = 1) => {
+    const load = useCallback(async (page = 1, activeCategory = category, from = dateFrom, to = dateTo) => {
         if (!patientId) return;
         setIsLoading(true);
         setError("");
         try {
-            const result = await getPatientHistory(patientId, page, 20);
+            const result = await getPatientHistory(patientId, page, 20, { category: activeCategory, from, to });
             setHistory(result);
             setPageNumber(page);
         } catch (requestError) {
@@ -26,11 +29,12 @@ export const PatientHistoryView = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [patientId]);
+    }, [patientId, category, dateFrom, dateTo]);
 
     useEffect(() => {
         load(1);
-    }, [load]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [patientId, category, dateFrom, dateTo]);
 
     return (
         <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -66,6 +70,14 @@ export const PatientHistoryView = () => {
                 onRetry={() => load(pageNumber)}
                 onPageChange={load}
                 showVisibility
+                category={category}
+                onCategoryChange={setCategory}
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                onDateChange={({ from, to }) => {
+                    setDateFrom(from);
+                    setDateTo(to);
+                }}
             />
         </div>
     );

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiHash, FiPlus, FiSearch } from "react-icons/fi";
 import toast from "react-hot-toast";
 import {
@@ -17,8 +18,12 @@ import {
     RoomCard,
 } from "../components/ui/community";
 import { CreateRoomModal } from "../components/chat/CreateRoomModal";
+import { RoomInvitationList } from "../components/chat/RoomInvitationList";
 import {
+    acceptChatInvitation,
+    declineChatInvitation,
     getChatErrorMessage,
+    getMyInvitations,
     useChatRoomBrowse,
     useJoinChatRoom,
 } from "../api/chat.api";
@@ -85,6 +90,33 @@ export const Rooms = () => {
 
     const hasFilters = Boolean(query.trim()) || tab !== "All";
 
+    const [invitations, setInvitations] = useState([]);
+    const [areInvitationsLoading, setInvitationsLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const loadInvitations = useCallback(() => {
+        getMyInvitations()
+            .then((result) => setInvitations(Array.isArray(result) ? result : []))
+            .catch(() => setInvitations([]))
+            .finally(() => setInvitationsLoading(false));
+    }, []);
+
+    useEffect(() => {
+        loadInvitations();
+    }, [loadInvitations]);
+
+    const handleAcceptInvitation = async (invitation) => {
+        await acceptChatInvitation(invitation.id);
+        toast.success(`You joined ${invitation.roomName || "the room"}.`);
+        loadInvitations();
+        navigate("/Community/rooms/" + invitation.roomId);
+    };
+
+    const handleDeclineInvitation = async (invitation) => {
+        await declineChatInvitation(invitation.id);
+        setInvitations((previous) => previous.filter((item) => item.id !== invitation.id));
+    };
+
     return (
         <div className="mx-auto w-full max-w-7xl">
             <section className="mb-5" aria-labelledby="rooms-title">
@@ -107,6 +139,15 @@ export const Rooms = () => {
                     </Button>
                 </div>
             </section>
+
+            <div className="mb-5">
+                <RoomInvitationList
+                    invitations={invitations}
+                    isLoading={areInvitationsLoading}
+                    onAccept={handleAcceptInvitation}
+                    onDecline={handleDeclineInvitation}
+                />
+            </div>
 
             <section
                 className="mb-5 flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-base-100 p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-4"
