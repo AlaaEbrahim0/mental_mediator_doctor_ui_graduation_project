@@ -46,6 +46,7 @@ import {
     updateChatRoomPrivacy,
     updateChatRoomSchedule,
     uploadChatRoomCover,
+    uploadChatRoomMedia,
     useArchiveChatRoom,
     useChatMembers,
     useChatMessages,
@@ -474,12 +475,16 @@ const ChatRoomView = ({ roomId }) => {
         }
     };
 
-    const handleSend = async (content) => {
-        const optimistic = addOptimistic(content, {
-            memberId: room?.myMemberId,
-            displayName: "You",
-            isDoctor: true,
-        });
+    const handleSend = async (content, media) => {
+        const optimistic = addOptimistic(
+            content,
+            {
+                memberId: room?.myMemberId,
+                displayName: "You",
+                isDoctor: true,
+            },
+            media || {},
+        );
 
         setIsSending(true);
         stickToBottomRef.current = true;
@@ -487,6 +492,8 @@ const ChatRoomView = ({ roomId }) => {
         try {
             const persisted = await sendMessage(roomId, {
                 content,
+                mediaUrl: media?.url || undefined,
+                mediaType: media?.type || undefined,
                 clientMessageId: optimistic.clientMessageId,
             });
 
@@ -812,6 +819,7 @@ const ChatRoomView = ({ roomId }) => {
                         {isMember && (
                             <ChatComposer
                                 onSend={handleSend}
+                                uploadMedia={(file, onProgress) => uploadChatRoomMedia(roomId, file, onProgress)}
                                 isSending={isSending}
                                 disabled={isArchived || room.isLocked}
                                 disabledReason={
