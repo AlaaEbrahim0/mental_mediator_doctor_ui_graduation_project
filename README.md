@@ -114,16 +114,7 @@ Both portals share a design system defined in `tailwind.config.js`:
 - **Font:** Albert Sans
 - **Tokens:** Palette, spacing, radii, shadows, and semantic aliases all live in `tailwind.config.js`
 
-Shared primitive components (`Button`, `Card`, `Input`, `Modal`, …), the auth/session helpers, the API client, `src/index.css`, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal — 30 files in total — by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`.
-
-> **Pending upstream re-pin.** The content-safety modules added for the slow-moderation
-> handling - `src/utils/moderationState.js`, `src/hooks/useModerationStage.js`, and the
-> rewritten `src/utils/utcToRelativeTime.js` - are registered in `.shared-ui.json` and
-> copied into this portal, but they are not yet in the pinned upstream commit of
-> nexus-shared-ui. `npm run shared-ui:check` will therefore report drift here until that
-> repository is committed and pushed and this pin is re-bumped to the new sha:
-> `npm run shared-ui:sync -- --ref <sha> && npm run shared-ui:sync && npm run shared-ui:check`.
-> Push shared-ui first, then the portals - not the other way round.
+Shared primitive components (`Button`, `Card`, `Input`, `Modal`, …), the auth/session helpers, the API client (`client.js`, `chat.api.js`, `notifications.api.js`), the shared chat surface (`ChatComposer`, `CreateRoomModal`, `ReportMessageModal`, `RoomReportsPanel`, `RoomCard`, `RoomSettingsModal`, `JoinRoomModal`, `RoomInviteModal`, `RoomInvitationList`, `roomsFilter`), `src/utils/chat.js`, the profile components (`ProfileView`, `CertificateModal`, `QualificationModal`, `profileUtils`), the content-safety modules, `src/index.css`, and `tailwind.config.js` are maintained in [nexus-shared-ui](https://github.com/AlaaEbrahim0/nexus-shared-ui) and **vendored** into this portal — 51 files in total — by `scripts/shared-ui-sync.mjs`. The pinned upstream commit is recorded in `.shared-ui.json`; `npm run shared-ui:check` reports `In sync`.
 
 `src/components/ui/index.js` re-exports only the primitives; `Post`, `Comment`, and `Reply` are
 imported by direct path or from `src/components/ui/community.js`. They depend on `react-markdown`
