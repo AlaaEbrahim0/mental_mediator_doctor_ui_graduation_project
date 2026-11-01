@@ -24,7 +24,6 @@ export const ChatMessageItem = ({
     const canReport = canReportChatMessage(message, room);
 
     const isPending = Boolean(message.pending);
-    const hasFailed = Boolean(message.failed);
     const senderPath = message.senderUserId
         ? isOwn
             ? "/profile"
@@ -88,11 +87,6 @@ export const ChatMessageItem = ({
                         <span className="inline-flex items-center gap-1 text-xs text-neutral-500">
                             <FiClock aria-hidden="true" />
                             Sending…
-                        </span>
-                    )}
-                    {hasFailed && (
-                        <span className="text-xs font-medium text-error">
-                            Not sent
                         </span>
                     )}
                 </div>
