@@ -232,13 +232,13 @@ export function Home() {
                 isLoading={isDashboardLoading}
             />
 
-            <section className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-5" aria-label="Rooms and patient activity">
+            <section className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5" aria-label="Rooms and patient activity">
                 <LiveRoomsPanel
                     dashboard={dashboard}
                     isLoading={isDashboardLoading}
                     onJoin={setJoinTarget}
                 />
-                <div className="min-w-0 lg:col-span-2">
+                <div className="min-w-0 ">
                     <ActivityFeed
                         items={activity}
                         isLoading={isActivityLoading}
@@ -246,7 +246,7 @@ export function Home() {
                         onRetry={() => refreshActivity().catch(() => undefined)}
                     />
                 </div>
-            </section>
+            </section>·
 
             <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4" aria-label="Practice summary">
                 {metrics.map((metric, index) => (
