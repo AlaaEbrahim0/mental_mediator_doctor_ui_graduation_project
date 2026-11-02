@@ -10,7 +10,20 @@ in `.shared-ui.json`.
 
 ## [Unreleased]
 
-Nothing staged. The project is in **feature freeze**.
+### Added
+
+- **Brand logo.** The shared `BrandLogo` SVG mark (heart-pulse + ECG on a
+  navy→teal tile) now renders in `TopBar`, the login panel and
+  `PublicDoctorProfile`; favicon, `logo192/512` and the PWA manifest are
+  generated from it — the manifest previously still carried the CRA
+  boilerplate ("React App").
+- **Patient rating summary.** The dashboard header shows a read-only average +
+  count chip from `/api/doctors/me` once the account has ratings.
+
+### Changed
+
+- Login left panel moves from flat `bg-slate-900` to the brand
+  navy→primary gradient, matching the patient portal.
 
 ## [0.1.0] - 2026-11-01
 

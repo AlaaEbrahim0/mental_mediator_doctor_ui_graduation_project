@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiCalendar, FiUserX } from "react-icons/fi";
 import { useAuth } from "../auth/authProvider";
+import BrandLogo from "../components/layout/BrandLogo";
 import { getPublicProfile } from "../api/profile.api";
 import { getApiErrorMessage } from "../api/client";
 import { ProfileView } from "../components/profile/ProfileView";
@@ -12,7 +13,6 @@ import {
     Skeleton,
 } from "../components/ui/primitives";
 
-const imagesDir = process.env.REACT_APP_IMAGE_BASE_URL || "/images";
 const patientAppUrl = (process.env.REACT_APP_PATIENT_APP_URL || "").replace(
     /\/+$/,
     ""
@@ -151,11 +151,7 @@ export function PublicDoctorProfile() {
                         className="flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700"
                         aria-label="Nexus home"
                     >
-                        <img
-                            src={`${imagesDir}/logo-no-background.png`}
-                            alt="Nexus"
-                            className="h-9 w-12 object-contain"
-                        />
+                        <BrandLogo size={34} />
                         <span className="text-base font-extrabold tracking-[0.12em] text-neutral-900">
                             NEXUS
                         </span>

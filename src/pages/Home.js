@@ -10,8 +10,9 @@ import { TbReportMoney } from "react-icons/tb";
 import { GiConfirmed } from "react-icons/gi";
 import { useGetNews } from "../api/community.api";
 import { FiArrowUpRight, FiBookOpen, FiClock, FiTrendingUp } from "react-icons/fi";
-import { FiActivity, FiCalendar, FiChevronRight } from "react-icons/fi";
+import { FiActivity, FiCalendar, FiChevronRight, FiStar } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { getDoctorProfile } from "../api/auth.api";
 import { useUserProfile } from "../context/profileContext";
 import { useJoinChatRoom } from "../api/chat.api";
 import { useDoctorActivity, useDoctorDashboard } from "../api/workspace.api";
@@ -37,6 +38,12 @@ export function Home() {
     } = useGetDoctorReport();
     const { userProfileData } = useUserProfile();
     const [dashboardDays, setDashboardDays] = useState(30);
+    const [doctorMe, setDoctorMe] = useState(null);
+
+    useEffect(() => {
+        // Read-only patient rating summary; the dashboard works without it.
+        getDoctorProfile().then(setDoctorMe).catch(() => undefined);
+    }, []);
 
     const {
         dashboard,
@@ -209,6 +216,12 @@ export function Home() {
                     <span className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-neutral-200 bg-base-100 px-3 text-sm font-medium text-neutral-700">
                         <FiCalendar aria-hidden="true" className="text-primary-800" />{dateLabel}
                     </span>
+                    {doctorMe?.ratingCount > 0 && (
+                        <span className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-neutral-200 bg-base-100 px-3 text-sm font-medium text-neutral-700">
+                            <FiStar aria-hidden="true" className="fill-amber-400 text-amber-500" />
+                            {Number(doctorMe.ratingAverage).toFixed(1)} · {doctorMe.ratingCount} {doctorMe.ratingCount === 1 ? "rating" : "ratings"}
+                        </span>
+                    )}
                     <Link to="/appointments" className="btn btn-primary btn-sm min-h-10 rounded-xl px-4">View appointments <FiChevronRight aria-hidden="true" /></Link>
                     <Link to="/schedule" className="btn btn-ghost btn-sm min-h-10 rounded-xl text-neutral-700">Edit availability</Link>
                 </div>
