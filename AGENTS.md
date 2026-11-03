@@ -49,7 +49,7 @@ warning at Jest teardown has been reported intermittently; it did not reproduce 
 ```
 package.json                 scripts + dependencies + engines (no lint script)
 vercel.json                  SPA rewrite: every non-asset path -> /index.html
-.shared-ui.json              the pin: upstream repo URL, commit `ref`, and the 51 vendored files
+.shared-ui.json              the pin: upstream repo URL, commit `ref`, and the 54 vendored files
 scripts/shared-ui-sync.mjs   the vendoring tool (Node built-ins + git only, no deps)
 .github/workflows/shared-ui-drift.yml  CI: runs `npm run shared-ui:check` on push/PR to `master`
 .env / .env.example          REACT_APP_API_URL, REACT_APP_IMAGE_BASE_URL, REACT_APP_PATIENT_APP_URL
@@ -89,7 +89,7 @@ src/pages/                   LOCAL — Home (dashboard), Appointment, Schedule, 
                              CommunityLayout, Forums, ForumsDetails, Rooms, ChatRoom
 ```
 
-The authoritative vendored list is the `files` array in `.shared-ui.json` (51 entries —
+The authoritative vendored list is the `files` array in `.shared-ui.json` (54 entries —
 6 more than `patient-ui`: the shared test files `RoomCard.test.js`, `roomsFilter.test.js`,
 `profileUtils.test.js`, `primitives.test.js`, plus the doctor-only `CertificateModal.js` and
 `QualificationModal.js`). When in doubt about whether a file is shared, check that array —
@@ -99,8 +99,8 @@ do not guess.
 
 `@nexus/shared-ui` is **not an npm package**. It is not in `node_modules` and is not
 resolved at build time. Each portal keeps a byte-for-byte copy of the upstream files at a
-commit pinned in `.shared-ui.json` (`ref: f082cb5d2f2d45de0b38f43fbea2cc9de9f7d1fd` right
-now, in sync: `In sync with @nexus/shared-ui@f082cb5 (51 files)`).
+commit pinned in `.shared-ui.json` (`ref: c7c4ebf5d58af2d3631e2870b8c96bbaeb7a5bf1` right
+now, in sync: `In sync with @nexus/shared-ui@c7c4ebf (54 files)`).
 
 **NEVER edit a file that appears in `.shared-ui.json`'s `files` list.** Not to fix a bug,
 not to tweak a class name, not to "just add one prop". Those copies are overwritten by the

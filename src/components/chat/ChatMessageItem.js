@@ -1,6 +1,7 @@
 import { FiClock, FiFlag, FiTrash2 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { Badge } from "../ui";
+import { ReactionBar } from "../ui/ReactionBar";
 import { formatChatTimestamp } from "../../utils/chat";
 import { canDeleteChatMessage, canReportChatMessage, isOwnChatMessage } from "../../utils/chat";
 import { getPublicProfilePath } from "../profile/profileUtils";
@@ -17,6 +18,8 @@ export const ChatMessageItem = ({
     room,
     onDelete,
     onReport,
+    onReact,
+    onRemoveReaction,
     isBusy = false,
 }) => {
     const isOwn = isOwnChatMessage(message, room);
@@ -24,6 +27,10 @@ export const ChatMessageItem = ({
     const canReport = canReportChatMessage(message, room);
 
     const isPending = Boolean(message.pending);
+    // A pending message has no server id yet, so there is nothing to react to;
+    // a removed message has no content left to react to either.
+    const showReactions =
+        Boolean(onReact) && !isPending && !message.isDeleted;
     const senderPath = message.senderUserId
         ? isOwn
             ? "/profile"
@@ -106,6 +113,14 @@ export const ChatMessageItem = ({
                                     aria-label="Video shared in this room"
                                     className="mt-2 max-h-80 w-full max-w-md rounded-xl border border-neutral-200 bg-black"
                                 />
+                            ) : message.mediaType === "audio" ? (
+                                <audio
+                                    src={message.mediaUrl}
+                                    controls
+                                    preload="metadata"
+                                    aria-label="Voice message shared in this room"
+                                    className="mt-2 w-full max-w-xs"
+                                />
                             ) : (
                                 <a
                                     href={message.mediaUrl}
@@ -130,8 +145,17 @@ export const ChatMessageItem = ({
                     </>
                 )}
 
-                {(canDelete || canReport) && (
+                {(showReactions || canDelete || canReport) && (
                     <div className="mt-1.5 flex items-center gap-1">
+                        {showReactions && (
+                            <ReactionBar
+                                reactions={message.reactions}
+                                myReaction={message.myReaction}
+                                onReact={(reaction) => onReact?.(message, reaction)}
+                                onRemove={() => onRemoveReaction?.(message)}
+                                disabled={isBusy}
+                            />
+                        )}
                         {canDelete && (
                             <button
                                 type="button"
